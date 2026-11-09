@@ -32,6 +32,24 @@ class SaleOrder(models.Model):
             return currency.compare_amounts(sum(invoices.mapped("amount_total")), self.amount_total) >= 0
         return False
 
+    def write(self, vals):
+        result = super().write(vals)
+        # A fully paid order earns as soon as it gets a customer with a phone (the queue keeps it to one sale).
+        if "partner_id" in vals:
+            self._nuqtapass_customer_changed()
+        return result
+
+    def _nuqtapass_customer_changed(self):
+        orders = self.filtered("website_id")
+        for order in orders.sudo():
+            try:
+                sale = order.nuqtapass_sync_ids.filtered(lambda s: s.kind == "sale")[:1]
+                if sale.state == "failed" and sale.phone_invalid:
+                    sale.action_resend()  # logged with a wrong phone: check the new customer's
+            except Exception:  # saving the order must never fail because of NuqtaPass
+                _logger.exception("NuqtaPass: could not re-check sale order %s", order.id)
+        orders._nuqtapass_queue_sale()  # skips orders that already have a sale and orders not fully paid
+
     def _nuqtapass_order_ref(self):
         """"S00023#57": the name is not unique by constraint (editable, per-company sequences), the id is."""
         self.ensure_one()

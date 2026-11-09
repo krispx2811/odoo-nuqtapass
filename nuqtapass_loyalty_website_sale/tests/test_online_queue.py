@@ -101,6 +101,40 @@ class TestOnlineByInvoice(AccountTestInvoicingCommon):
         self.env["sale.order"]._cron_nuqtapass_scan()
         self.assertFalse(order.nuqtapass_sync_ids)
 
+    # ── the customer changed after the order was paid ─────────────────
+    def test_paid_order_earns_as_soon_as_its_customer_changes(self):
+        nobody = self.env["res.partner"].create({"name": "Guest"})
+        order = self._order()
+        order.partner_id = nobody
+        self._invoice_and_pay(order)
+        self.env["sale.order"]._cron_nuqtapass_scan()
+        self.assertFalse(order.nuqtapass_sync_ids)
+        order.partner_id = self.partner  # no cron run: the change itself queues it
+        sale = order.nuqtapass_sync_ids
+        self.assertEqual((len(sale), sale.kind, sale.phone), (1, "sale", "+96891234567"))
+        self.assertEqual(sale.customer_name, "Sara")
+
+    def test_customer_change_on_an_unpaid_order_waits(self):
+        order = self._order()
+        order.partner_id = self.env["res.partner"].create({"name": "Ali", "phone": "9876 5432"})
+        self.assertFalse(order.nuqtapass_sync_ids)
+
+    def test_customer_change_after_earning_adds_no_row(self):
+        order = self._order()
+        self._invoice_and_pay(order)
+        self.env["sale.order"]._cron_nuqtapass_scan()
+        order.partner_id = self.env["res.partner"].create({"name": "Ali", "phone": "9876 5432"})
+        self.assertEqual((len(order.nuqtapass_sync_ids), order.nuqtapass_sync_ids.phone), (1, "+96891234567"))
+
+    def test_wrong_phone_row_checked_again_when_the_customer_changes(self):
+        self.partner.phone = "9417872"
+        order = self._order()
+        self._invoice_and_pay(order)
+        self.env["sale.order"]._cron_nuqtapass_scan()
+        self.assertEqual(order.nuqtapass_sync_ids.state, "failed")
+        order.partner_id = self.env["res.partner"].create({"name": "Ali", "phone": "9876 5432"})
+        self.assertEqual((order.nuqtapass_sync_ids.state, order.nuqtapass_sync_ids.phone), ("pending", "+96898765432"))
+
     def test_order_not_from_website_ignored(self):
         order = self._order(website=False)
         self._invoice_and_pay(order)
