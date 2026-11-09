@@ -47,6 +47,12 @@ class TestClient(TransactionCase):
         self.assertEqual(self.request.call_args.args, ("GET", DEFAULT_BASE_URL + "/customer"))
         self.assertEqual(self.request.call_args.kwargs["params"], {"phone": "+96891234567"})
 
+    def test_customer_by_card_uses_the_card_param(self):
+        self.request.return_value = fake_response(200, {"success": True, "data": {"cards": []}})
+        self.client.customer_by_card("cccccccc-1111-4111-8111-111111111111")
+        self.assertEqual(self.request.call_args.args, ("GET", DEFAULT_BASE_URL + "/customer"))
+        self.assertEqual(self.request.call_args.kwargs["params"], {"card": "cccccccc-1111-4111-8111-111111111111"})
+
     def test_network_error_is_retryable(self):
         self.request.side_effect = requests.exceptions.ConnectTimeout("boom")
         result = self.client.ping()

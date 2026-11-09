@@ -1,6 +1,6 @@
 from odoo.tests import TransactionCase, tagged
 
-from odoo.addons.nuqtapass_loyalty.lib.customer import clean_customer
+from odoo.addons.nuqtapass_loyalty.lib.customer import clean_customer, current_cards
 
 CARD_URL = "https://nuqtapass.com/join/qahwa"
 WHATSAPP = "https://api.whatsapp.com/send?phone=96891234567&text=Welcome"
@@ -35,7 +35,7 @@ class TestCustomer(TransactionCase):
         clean = clean_customer(part1_answer())
         self.assertEqual(clean["cards"][0], {
             "cardId": STAMP_CARD, "type": "STAMPS", "stamps": 6, "stampsRequired": 6, "rewardReady": True,
-            "points": 0, "pointsValue": 0, "balance": 0, "packUses": 0, "voucher": None,
+            "points": 0, "pointsValue": 0, "balance": 0, "packUses": 0, "voucher": None, "current": True,
         })
         self.assertEqual(clean["cards"][1]["voucher"], {"id": VOUCHER, "title": "Free coffee", "usesLeft": 1})
         self.assertTrue(clean["walletAdded"])
@@ -83,6 +83,26 @@ class TestCustomer(TransactionCase):
     def test_only_an_explicit_false_shows_the_qr(self):
         self.assertIsNone(clean_customer({"cardUrl": CARD_URL})["welcome"])
         self.assertIsNone(clean_customer({"walletAdded": "false", "cardUrl": CARD_URL})["welcome"])
+
+    def test_current_flag_kept_and_missing_means_current(self):
+        old_points = {"cardId": "aaaaaaaa-0000-4000-8000-000000000000", "type": "POINTS", "points": 40,
+                      "current": False}
+        cards = clean_customer(part1_answer(cards=[old_points, part1_answer()["cards"][0]]))["cards"]
+        self.assertEqual([c["current"] for c in cards], [False, True])  # an answer from before `current`
+        bad = clean_customer(part1_answer(cards=[dict(old_points, current="no")]))["cards"]
+        self.assertTrue(bad[0]["current"])  # only an explicit false hides a card
+
+    def test_current_cards_hide_earlier_programs_but_keep_usable_vouchers(self):
+        stamp, voucher = part1_answer()["cards"]
+        cards = clean_customer(part1_answer(cards=[
+            {"cardId": "aaaaaaaa-0000-4000-8000-000000000000", "type": "POINTS", "points": 40, "current": False},
+            dict(stamp, current=True),
+            # Vouchers are never "the card of a type", so their flag doesn't hide them; used-up ones go.
+            dict(voucher, current=False),
+            dict(voucher, cardId="dddddddd-2222-4222-8222-222222222222",
+                 voucher={"id": VOUCHER, "title": "Used", "usesLeft": 0}),
+        ]))["cards"]
+        self.assertEqual([c["cardId"] for c in current_cards(cards)], [STAMP_CARD, VOUCHER_CARD])
 
     def test_handles_missing_and_bad_shapes(self):
         self.assertEqual(clean_customer(None), {"cards": [], "walletAdded": True, "welcome": None})

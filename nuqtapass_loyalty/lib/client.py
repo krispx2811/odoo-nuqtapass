@@ -44,6 +44,10 @@ class NuqtaPassClient:
     def customer(self, phone):
         return self._call("GET", "/customer", params={"phone": phone})
 
+    def customer_by_card(self, card_id):
+        """The customer whose Wallet card this is (the card's QR holds its id). 404 for an unknown or another shop's card."""
+        return self._call("GET", "/customer", params={"card": card_id})
+
     def redeem(self, body):
         return self._call("POST", "/redeem", body=body)
 

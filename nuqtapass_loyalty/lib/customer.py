@@ -37,7 +37,20 @@ def _card(card):
         "title": str(voucher.get("title") or "")[:200],
         "usesLeft": _number(voucher.get("usesLeft")),
     } if voucher else None
+    # The card the till acts on for its type; cards from earlier programs are false. Answers from before the flag
+    # have none: every card is then current.
+    clean["current"] = card.get("current") is not False
     return clean
+
+
+def current_cards(cards):
+    """The cards the till shows: the current card of each type, and every voucher that still has a use left.
+
+    Vouchers are never "the card of a type" at NuqtaPass, so their flag doesn't hide them.
+    """
+    return [c for c in cards
+            if (c["type"] == "VOUCHER" and c["voucher"] and c["voucher"]["usesLeft"] > 0)
+            or (c["type"] != "VOUCHER" and c["current"])]
 
 
 def clean_customer(data):
