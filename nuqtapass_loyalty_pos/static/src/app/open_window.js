@@ -17,7 +17,6 @@ export function openNuqtaPassWindow(pos, { query = "", result = null } = {}) {
             startingQuery: query,
             ...(result ? { startingResult: result } : {}),
             forOrder: open,
-            formatCurrency: (amount) => pos.formatCurrency(amount),
             onCustomer: (phone) => {
                 if (open && phone) {
                     order.nuqtapass_phone = phone;

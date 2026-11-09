@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 20.0-20261102\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-09 15:53+0000\n"
-"PO-Revision-Date: 2026-11-09 15:53+0000\n"
+"POT-Creation-Date: 2026-11-09 18:02+0000\n"
+"PO-Revision-Date: 2026-11-09 18:02+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: ar\n"
@@ -29,6 +29,22 @@ msgid "%(earned)s · %(total)s now"
 msgstr "%(earned)s · صارت %(total)s"
 
 #. module: nuqtapass_loyalty_pos
+#. odoo-python
+#: code:addons/nuqtapass_loyalty_pos/models/pos_spend.py:0
+msgid "%(line)s: %(reason)s. Remove this line to take payment without it."
+msgstr "%(line)s: %(reason)s. شيل هالبند عشان تكمل الدفع بدونه."
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-python
+#: code:addons/nuqtapass_loyalty_pos/models/pos_spend.py:0
+msgid ""
+"%(line)s: this order already used %(done)s at NuqtaPass. Set the line back "
+"to that, or remove it."
+msgstr ""
+"%(line)s: هالطلب استخدم %(done)s في NuqtaPass من قبل. رجّع البند لنفس "
+"القيمة، أو شيله."
+
+#. module: nuqtapass_loyalty_pos
 #. odoo-javascript
 #: code:addons/nuqtapass_loyalty_pos/static/src/app/nuqtapass_api.js:0
 msgid "%(points)s points"
@@ -36,9 +52,21 @@ msgstr "النقاط: %(points)s"
 
 #. module: nuqtapass_loyalty_pos
 #. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/nuqtapass_lines.js:0
+msgid "%(points)s points used"
+msgstr "النقاط المستخدمة: %(points)s"
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
 #: code:addons/nuqtapass_loyalty_pos/static/src/app/nuqtapass_api.js:0
-msgid "%(points)s points (%(value)s)"
-msgstr "النقاط: %(points)s (%(value)s)"
+msgid "%(points)s points · worth %(value)s"
+msgstr "%(points)s نقطة · قيمتها %(value)s"
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/points_box.js:0
+msgid "%(points)s · %(value)s off"
+msgstr "%(points)s · خصم %(value)s"
 
 #. module: nuqtapass_loyalty_pos
 #. odoo-javascript
@@ -84,9 +112,15 @@ msgstr "نقطة وحدة"
 
 #. module: nuqtapass_loyalty_pos
 #. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/nuqtapass_lines.js:0
+msgid "1 point used"
+msgstr "نقطة وحدة مستخدمة"
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
 #: code:addons/nuqtapass_loyalty_pos/static/src/app/nuqtapass_api.js:0
-msgid "1 point (%(value)s)"
-msgstr "نقطة وحدة (%(value)s)"
+msgid "1 point · worth %(value)s"
+msgstr "نقطة وحدة · قيمتها %(value)s"
 
 #. module: nuqtapass_loyalty_pos
 #. odoo-javascript
@@ -96,15 +130,53 @@ msgstr "باقي استخدام واحد"
 
 #. module: nuqtapass_loyalty_pos
 #. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/points_box.js:0
+msgid "= %(points)s points"
+msgstr "= %(points)s نقطة"
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/points_box.js:0
+msgid "= 1 point"
+msgstr "= نقطة وحدة"
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
 #: code:addons/nuqtapass_loyalty_pos/static/src/app/receipt_box/receipt_box.xml:0
 msgid "Add"
 msgstr "أضف"
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_panel.xml:0
+msgid "Add the item it covers to the order first."
+msgstr "أضف المنتج اللي تغطيه للطلب أول."
 
 #. module: nuqtapass_loyalty_pos
 #. odoo-python
 #: code:addons/nuqtapass_loyalty_pos/models/pos_config.py:0
 msgid "Add your NuqtaPass key in Settings first."
 msgstr "حط مفتاح NuqtaPass في الإعدادات أول."
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/nuqtapass_dialog/nuqtapass_dialog.js:0
+msgid ""
+"Added to the order: %(value)s off for %(points)s points. They're used when "
+"you validate."
+msgstr ""
+"انضاف للطلب: خصم %(value)s مقابل %(points)s نقطة. تنصرف لما تأكد الدفع."
+
+#. module: nuqtapass_loyalty_pos
+#: model:ir.model.fields,field_description:nuqtapass_loyalty_pos.field_nuqtapass_pos_use__amount
+msgid "Amount"
+msgstr "المبلغ"
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/points_box.xml:0
+msgid "Amount to take off"
+msgstr "مبلغ الخصم"
 
 #. module: nuqtapass_loyalty_pos
 #. odoo-javascript
@@ -123,10 +195,27 @@ msgstr ""
 "«Odoo»."
 
 #. module: nuqtapass_loyalty_pos
+#: model:ir.model.fields,field_description:nuqtapass_loyalty_pos.field_nuqtapass_pos_use__card_id
+msgid "Card"
+msgstr "البطاقة"
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_panel.xml:0
+msgid "Change customer"
+msgstr "غيّر العميل"
+
+#. module: nuqtapass_loyalty_pos
 #. odoo-javascript
 #: code:addons/nuqtapass_loyalty_pos/static/src/app/nuqtapass_dialog/nuqtapass_dialog.xml:0
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_validation.js:0
 msgid "Close"
 msgstr "إغلاق"
+
+#. module: nuqtapass_loyalty_pos
+#: model:ir.model.fields,field_description:nuqtapass_loyalty_pos.field_nuqtapass_pos_use__company_id
+msgid "Company"
+msgstr "الشركة"
 
 #. module: nuqtapass_loyalty_pos
 #: model:ir.model,name:nuqtapass_loyalty_pos.model_res_config_settings
@@ -134,9 +223,35 @@ msgid "Config Settings"
 msgstr "تهيئة الإعدادات"
 
 #. module: nuqtapass_loyalty_pos
+#: model:ir.model.fields,field_description:nuqtapass_loyalty_pos.field_nuqtapass_pos_use__create_uid
+msgid "Created by"
+msgstr "أنشئ بواسطة"
+
+#. module: nuqtapass_loyalty_pos
+#: model:ir.model.fields,field_description:nuqtapass_loyalty_pos.field_nuqtapass_pos_use__create_date
+msgid "Created on"
+msgstr "أنشئ في"
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_panel.xml:0
+msgid "Credit to use"
+msgstr "الرصيد اللي بينصرف"
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-python
+#: code:addons/nuqtapass_loyalty_pos/models/pos_order.py:0
+msgid "Credit used: %(n)s"
+msgstr "الرصيد المستخدم: %(n)s"
+
+#. module: nuqtapass_loyalty_pos
+#: model:ir.model.fields,field_description:nuqtapass_loyalty_pos.field_nuqtapass_pos_use__display_name
 #: model:ir.model.fields,field_description:nuqtapass_loyalty_pos.field_nuqtapass_sync__display_name
 #: model:ir.model.fields,field_description:nuqtapass_loyalty_pos.field_pos_config__display_name
 #: model:ir.model.fields,field_description:nuqtapass_loyalty_pos.field_pos_order__display_name
+#: model:ir.model.fields,field_description:nuqtapass_loyalty_pos.field_pos_order_line__display_name
+#: model:ir.model.fields,field_description:nuqtapass_loyalty_pos.field_pos_payment__display_name
+#: model:ir.model.fields,field_description:nuqtapass_loyalty_pos.field_pos_payment_method__display_name
 #: model:ir.model.fields,field_description:nuqtapass_loyalty_pos.field_res_config_settings__display_name
 msgid "Display Name"
 msgstr "اسم العرض"
@@ -157,8 +272,15 @@ msgstr "أختام ونقاط NuqtaPass من كاشير Odoo، مع زر NuqtaPa
 #. module: nuqtapass_loyalty_pos
 #. odoo-javascript
 #: code:addons/nuqtapass_loyalty_pos/static/src/app/nuqtapass_dialog/nuqtapass_dialog.xml:0
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_panel.xml:0
 msgid "Find"
 msgstr "دوّر"
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_panel.js:0
+msgid "Give it free"
+msgstr "خله مجاني"
 
 #. module: nuqtapass_loyalty_pos
 #. odoo-javascript
@@ -167,19 +289,47 @@ msgid "Give reward"
 msgstr "عطه المكافأة"
 
 #. module: nuqtapass_loyalty_pos
+#: model:ir.model.fields,field_description:nuqtapass_loyalty_pos.field_nuqtapass_pos_use__id
 #: model:ir.model.fields,field_description:nuqtapass_loyalty_pos.field_nuqtapass_sync__id
 #: model:ir.model.fields,field_description:nuqtapass_loyalty_pos.field_pos_config__id
 #: model:ir.model.fields,field_description:nuqtapass_loyalty_pos.field_pos_order__id
+#: model:ir.model.fields,field_description:nuqtapass_loyalty_pos.field_pos_order_line__id
+#: model:ir.model.fields,field_description:nuqtapass_loyalty_pos.field_pos_payment__id
+#: model:ir.model.fields,field_description:nuqtapass_loyalty_pos.field_pos_payment_method__id
 #: model:ir.model.fields,field_description:nuqtapass_loyalty_pos.field_res_config_settings__id
 msgid "ID"
 msgstr "المُعرف"
 
 #. module: nuqtapass_loyalty_pos
 #. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_panel.xml:0
+msgid "Item it covers"
+msgstr "المنتج اللي تغطيه"
+
+#. module: nuqtapass_loyalty_pos
+#: model:ir.model.fields,field_description:nuqtapass_loyalty_pos.field_nuqtapass_pos_use__write_uid
+msgid "Last Updated by"
+msgstr "آخر تحديث بواسطة"
+
+#. module: nuqtapass_loyalty_pos
+#: model:ir.model.fields,field_description:nuqtapass_loyalty_pos.field_nuqtapass_pos_use__write_date
+msgid "Last Updated on"
+msgstr "آخر تحديث في"
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
 #: code:addons/nuqtapass_loyalty_pos/static/src/app/nuqtapass_dialog/nuqtapass_dialog.xml:0
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_panel.xml:0
 #: code:addons/nuqtapass_loyalty_pos/static/src/app/receipt_box/receipt_box.xml:0
 msgid "Loading…"
 msgstr "جاري التحميل…"
+
+#. module: nuqtapass_loyalty_pos
+#: model:ir.model.fields,help:nuqtapass_loyalty_pos.field_nuqtapass_pos_use__amount
+msgid ""
+"Money in the shop's NuqtaPass currency: the points' value or the credit "
+"used."
+msgstr "المبلغ بعملة المحل في NuqtaPass: قيمة النقاط أو الرصيد المستخدم."
 
 #. module: nuqtapass_loyalty_pos
 #. odoo-python
@@ -190,13 +340,28 @@ msgstr "ما فيه بطاقة NuqtaPass لهالرقم للحين."
 #. module: nuqtapass_loyalty_pos
 #. odoo-javascript
 #: code:addons/nuqtapass_loyalty_pos/static/src/app/nuqtapass_dialog/nuqtapass_dialog.xml:0
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_panel.xml:0
 msgid "No card yet. The customer gets one with their first purchase."
 msgstr "ما عنده بطاقة للحين. بتوصله وحدة مع أول شراء."
 
 #. module: nuqtapass_loyalty_pos
 #. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_panel.xml:0
+msgid "Nothing is used until you validate."
+msgstr "ما ينصرف شي إلا لما تأكد الدفع."
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/points_box.js:0
+msgid "Nothing to take off"
+msgstr "ما فيه خصم"
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
 #: code:addons/nuqtapass_loyalty_pos/static/src/app/control_buttons/control_buttons.xml:0
 #: code:addons/nuqtapass_loyalty_pos/static/src/app/nuqtapass_dialog/nuqtapass_dialog.js:0
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_panel.xml:0
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_validation.js:0
 #: model:ir.model.fields,field_description:nuqtapass_loyalty_pos.field_pos_order__nuqtapass_status
 #: model_terms:ir.ui.view,arch_db:nuqtapass_loyalty_pos.res_config_settings_view_form_nuqtapass_pos
 #: model_terms:ir.ui.view,arch_db:nuqtapass_loyalty_pos.view_pos_pos_form_nuqtapass
@@ -229,9 +394,42 @@ msgstr ""
 
 #. module: nuqtapass_loyalty_pos
 #. odoo-python
+#: code:addons/nuqtapass_loyalty_pos/models/pos_spend.py:0
+msgid ""
+"NuqtaPass can't be reached: remove the NuqtaPass lines to take payment "
+"without them."
+msgstr "ما قدرنا نوصل NuqtaPass. شيل بنود NuqtaPass عشان تكمل الدفع بدونها."
+
+#. module: nuqtapass_loyalty_pos
+#: model:ir.model.fields,field_description:nuqtapass_loyalty_pos.field_pos_order_line__nuqtapass_card_id
+#: model:ir.model.fields,field_description:nuqtapass_loyalty_pos.field_pos_payment__nuqtapass_card_id
+msgid "NuqtaPass card"
+msgstr "بطاقة NuqtaPass"
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-python
+#: code:addons/nuqtapass_loyalty_pos/models/pos_payment_method.py:0
+#: model:ir.model.fields,field_description:nuqtapass_loyalty_pos.field_pos_payment_method__nuqtapass_credit
+msgid "NuqtaPass credit"
+msgstr "رصيد NuqtaPass"
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-python
+#: code:addons/nuqtapass_loyalty_pos/models/pos_spend.py:0
+msgid ""
+"NuqtaPass is still recording this order. Press Validate again in a moment."
+msgstr "NuqtaPass للحين يسجل هالطلب. اضغط «تصديق» مرة ثانية بعد شوي."
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-python
 #: code:addons/nuqtapass_loyalty_pos/models/pos_config.py:0
 msgid "NuqtaPass is turned off for the till in Settings."
 msgstr "NuqtaPass موقّف للكاشير في الإعدادات."
+
+#. module: nuqtapass_loyalty_pos
+#: model:ir.model.fields,field_description:nuqtapass_loyalty_pos.field_pos_order_line__nuqtapass_label
+msgid "NuqtaPass line"
+msgstr "بند NuqtaPass"
 
 #. module: nuqtapass_loyalty_pos
 #: model:ir.model.fields,field_description:nuqtapass_loyalty_pos.field_pos_config__nuqtapass_till_on
@@ -244,10 +442,44 @@ msgid "NuqtaPass phone"
 msgstr "جوال NuqtaPass"
 
 #. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/nuqtapass_lines.js:0
+#: model:ir.model.fields.selection,name:nuqtapass_loyalty_pos.selection__pos_order_line__nuqtapass_use__points
+msgid "NuqtaPass points"
+msgstr "نقاط NuqtaPass"
+
+#. module: nuqtapass_loyalty_pos
+#: model:ir.model.fields,field_description:nuqtapass_loyalty_pos.field_pos_order_line__nuqtapass_qty
+msgid "NuqtaPass points / uses"
+msgstr "نقاط / استخدامات NuqtaPass"
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-python
+#: code:addons/nuqtapass_loyalty_pos/models/pos_payment_method.py:0
+msgid "NuqtaPass prepaid credit"
+msgstr "رصيد NuqtaPass المدفوع مقدماً"
+
+#. module: nuqtapass_loyalty_pos
 #. odoo-python
 #: code:addons/nuqtapass_loyalty_pos/models/pos_config.py:0
 msgid "NuqtaPass refused the key. Check it in Settings."
 msgstr "NuqtaPass رفض المفتاح. تأكد منه في الإعدادات."
+
+#. module: nuqtapass_loyalty_pos
+#: model:product.template,name:nuqtapass_loyalty_pos.product_nuqtapass_reward_product_template
+msgid "NuqtaPass reward"
+msgstr "مكافأة NuqtaPass"
+
+#. module: nuqtapass_loyalty_pos
+#: model:ir.model.fields,field_description:nuqtapass_loyalty_pos.field_pos_config__nuqtapass_reward_product_id
+msgid "NuqtaPass reward product"
+msgstr "منتج مكافأة NuqtaPass"
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-python
+#: code:addons/nuqtapass_loyalty_pos/models/pos_spend.py:0
+msgid "NuqtaPass said no"
+msgstr "NuqtaPass رفض"
 
 #. module: nuqtapass_loyalty_pos
 #. odoo-python
@@ -263,6 +495,26 @@ msgid "NuqtaPass sync"
 msgstr "مزامنة NuqtaPass"
 
 #. module: nuqtapass_loyalty_pos
+#: model:ir.model.fields,field_description:nuqtapass_loyalty_pos.field_nuqtapass_pos_use__transaction_id
+msgid "NuqtaPass transaction"
+msgstr "عملية NuqtaPass"
+
+#. module: nuqtapass_loyalty_pos
+#: model:ir.model.fields,field_description:nuqtapass_loyalty_pos.field_pos_order_line__nuqtapass_use
+msgid "NuqtaPass use"
+msgstr "استخدام NuqtaPass"
+
+#. module: nuqtapass_loyalty_pos
+#: model:ir.model,name:nuqtapass_loyalty_pos.model_nuqtapass_pos_use
+msgid "NuqtaPass use at payment"
+msgstr "استخدام NuqtaPass وقت الدفع"
+
+#. module: nuqtapass_loyalty_pos
+#: model:ir.model.fields,field_description:nuqtapass_loyalty_pos.field_pos_order_line__nuqtapass_voucher_id
+msgid "NuqtaPass voucher"
+msgstr "قسيمة NuqtaPass"
+
+#. module: nuqtapass_loyalty_pos
 #. odoo-python
 #: code:addons/nuqtapass_loyalty_pos/models/pos_config.py:0
 msgid ""
@@ -273,10 +525,44 @@ msgstr ""
 "nuqtapass.com."
 
 #. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_panel.js:0
+msgid "On this order: %(line)s · %(value)s off"
+msgstr "على هالطلب: %(line)s · خصم %(value)s"
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_panel.js:0
+msgid "On this order: %(value)s off · %(points)s points"
+msgstr "على هالطلب: خصم %(value)s · %(points)s نقطة"
+
+#. module: nuqtapass_loyalty_pos
 #. odoo-python
 #: code:addons/nuqtapass_loyalty_pos/controllers/main.py:0
 msgid "Only Point of Sale users can use NuqtaPass on the till."
 msgstr "بس مستخدمين نقاط البيع يقدرون يستخدمون NuqtaPass في الكاشير."
+
+#. module: nuqtapass_loyalty_pos
+#: model:ir.model.fields,field_description:nuqtapass_loyalty_pos.field_nuqtapass_pos_use__order_ref
+msgid "Order"
+msgstr "الطلب"
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-python
+#: code:addons/nuqtapass_loyalty_pos/models/pos_order.py:0
+msgid "Pack uses used: %(n)s"
+msgstr "استخدامات الباقة: %(n)s"
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_panel.js:0
+msgid "Paying %(amount)s with credit"
+msgstr "يدفع %(amount)s من الرصيد"
+
+#. module: nuqtapass_loyalty_pos
+#: model:ir.model.fields,field_description:nuqtapass_loyalty_pos.field_nuqtapass_pos_use__phone
+msgid "Phone"
+msgstr "الجوال"
 
 #. module: nuqtapass_loyalty_pos
 #. odoo-python
@@ -287,6 +573,7 @@ msgstr "رقم الجوال شكله غلط: %(phone)s"
 #. module: nuqtapass_loyalty_pos
 #. odoo-javascript
 #: code:addons/nuqtapass_loyalty_pos/static/src/app/nuqtapass_dialog/nuqtapass_dialog.xml:0
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_panel.xml:0
 #: code:addons/nuqtapass_loyalty_pos/static/src/app/receipt_box/receipt_box.xml:0
 msgid "Phone or scan card"
 msgstr "رقم الجوال أو امسح البطاقة"
@@ -301,6 +588,11 @@ msgstr ""
 "نفسه."
 
 #. module: nuqtapass_loyalty_pos
+#: model:ir.model.fields,field_description:nuqtapass_loyalty_pos.field_nuqtapass_pos_use__config_id
+msgid "Point of Sale"
+msgstr "نقطة البيع"
+
+#. module: nuqtapass_loyalty_pos
 #: model:ir.model,name:nuqtapass_loyalty_pos.model_pos_config
 msgid "Point of Sale Configuration"
 msgstr "تهيئة نقطة البيع"
@@ -311,16 +603,30 @@ msgid "Point of Sale Order"
 msgstr "طلب نقطة البيع"
 
 #. module: nuqtapass_loyalty_pos
+#: model:ir.model,name:nuqtapass_loyalty_pos.model_pos_order_line
+msgid "Point of Sale Order Line"
+msgstr "بند طلب نقطة البيع"
+
+#. module: nuqtapass_loyalty_pos
+#: model:ir.model,name:nuqtapass_loyalty_pos.model_pos_payment
+msgid "Point of Sale Payment"
+msgstr "دفعة نقطة البيع"
+
+#. module: nuqtapass_loyalty_pos
+#: model:ir.model,name:nuqtapass_loyalty_pos.model_pos_payment_method
+msgid "Point of Sale Payment Method"
+msgstr "طريقة الدفع في نقطة البيع"
+
+#. module: nuqtapass_loyalty_pos
+#: model:ir.model.fields.selection,name:nuqtapass_loyalty_pos.selection__nuqtapass_pos_use__use__points
+msgid "Points"
+msgstr "النقاط"
+
+#. module: nuqtapass_loyalty_pos
 #. odoo-javascript
 #: code:addons/nuqtapass_loyalty_pos/static/src/app/nuqtapass_api.js:0
 msgid "Points card"
 msgstr "بطاقة النقاط"
-
-#. module: nuqtapass_loyalty_pos
-#. odoo-javascript
-#: code:addons/nuqtapass_loyalty_pos/static/src/app/nuqtapass_dialog/nuqtapass_dialog.xml:0
-msgid "Points to use"
-msgstr "النقاط اللي بتنصرف"
 
 #. module: nuqtapass_loyalty_pos
 #. odoo-python
@@ -329,10 +635,26 @@ msgid "Points used."
 msgstr "انصرفت النقاط."
 
 #. module: nuqtapass_loyalty_pos
+#. odoo-python
+#: code:addons/nuqtapass_loyalty_pos/models/pos_order.py:0
+msgid "Points used: %(n)s"
+msgstr "النقاط المستخدمة: %(n)s"
+
+#. module: nuqtapass_loyalty_pos
+#: model:ir.model.fields,help:nuqtapass_loyalty_pos.field_nuqtapass_pos_use__quantity
+msgid "Points, or pack uses; 1 for a reward or a voucher."
+msgstr "النقاط أو استخدامات الباقة، و1 للمكافأة أو القسيمة."
+
+#. module: nuqtapass_loyalty_pos
 #. odoo-javascript
 #: code:addons/nuqtapass_loyalty_pos/static/src/app/nuqtapass_api.js:0
 msgid "Prepaid card"
 msgstr "بطاقة الرصيد"
+
+#. module: nuqtapass_loyalty_pos
+#: model:ir.model.fields.selection,name:nuqtapass_loyalty_pos.selection__nuqtapass_pos_use__use__credit
+msgid "Prepaid credit"
+msgstr "الرصيد المدفوع مقدماً"
 
 #. module: nuqtapass_loyalty_pos
 #. odoo-javascript
@@ -340,6 +662,29 @@ msgstr "بطاقة الرصيد"
 #: code:addons/nuqtapass_loyalty_pos/static/src/app/receipt_box/receipt_box.xml:0
 msgid "QR code of the card"
 msgstr "كود QR للبطاقة"
+
+#. module: nuqtapass_loyalty_pos
+#: model:ir.model.fields,field_description:nuqtapass_loyalty_pos.field_nuqtapass_pos_use__quantity
+msgid "Quantity"
+msgstr "الكمية"
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_panel.xml:0
+msgid "Remove"
+msgstr "شيله"
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_validation.js:0
+msgid "Remove NuqtaPass lines"
+msgstr "شيل بنود NuqtaPass"
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_validation.js:0
+msgid "Remove this line"
+msgstr "شيل هالبند"
 
 #. module: nuqtapass_loyalty_pos
 #: model_terms:ir.ui.view,arch_db:nuqtapass_loyalty_pos.view_pos_pos_form_nuqtapass
@@ -351,6 +696,12 @@ msgstr "أعد الإرسال"
 #: code:addons/nuqtapass_loyalty_pos/models/pos_config.py:0
 msgid "Reward given."
 msgstr "انعطت المكافأة."
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/nuqtapass_lines.js:0
+msgid "Reward: free %(item)s"
+msgstr "مكافأة: %(item)s مجاناً"
 
 #. module: nuqtapass_loyalty_pos
 #. odoo-python
@@ -386,12 +737,21 @@ msgstr "انرسل، وما فيه شي ينحسب لهالبطاقة على ه�
 #. module: nuqtapass_loyalty_pos
 #. odoo-javascript
 #: code:addons/nuqtapass_loyalty_pos/static/src/app/nuqtapass_api.js:0
+#: model:ir.model.fields.selection,name:nuqtapass_loyalty_pos.selection__nuqtapass_pos_use__use__pack
+#: model:ir.model.fields.selection,name:nuqtapass_loyalty_pos.selection__pos_order_line__nuqtapass_use__pack
 msgid "Service pack"
 msgstr "باقة الخدمات"
 
 #. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/nuqtapass_lines.js:0
+msgid "Service pack (1 use)"
+msgstr "باقة الخدمات (استخدام واحد)"
+
+#. module: nuqtapass_loyalty_pos
 #. odoo-python
 #: code:addons/nuqtapass_loyalty_pos/models/pos_config.py:0
+#: code:addons/nuqtapass_loyalty_pos/models/pos_spend.py:0
 msgid "Something is missing. Look the customer up again."
 msgstr "فيه شي ناقص. دوّر على العميل مرة ثانية."
 
@@ -400,6 +760,28 @@ msgstr "فيه شي ناقص. دوّر على العميل مرة ثانية."
 #: code:addons/nuqtapass_loyalty_pos/static/src/app/nuqtapass_api.js:0
 msgid "Stamp card"
 msgstr "بطاقة الأختام"
+
+#. module: nuqtapass_loyalty_pos
+#: model:ir.model.fields.selection,name:nuqtapass_loyalty_pos.selection__nuqtapass_pos_use__use__reward
+#: model:ir.model.fields.selection,name:nuqtapass_loyalty_pos.selection__pos_order_line__nuqtapass_use__reward
+msgid "Stamp reward"
+msgstr "مكافأة الأختام"
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-python
+#: code:addons/nuqtapass_loyalty_pos/models/pos_order.py:0
+msgid "Stamp reward used"
+msgstr "انستخدمت مكافأة الأختام"
+
+#. module: nuqtapass_loyalty_pos
+#: model:ir.model.fields,help:nuqtapass_loyalty_pos.field_pos_payment_method__nuqtapass_credit
+msgid ""
+"The customer pays with prepaid credit bought at NuqtaPass. The till adds it "
+"from its NuqtaPass panel only, and NuqtaPass takes the amount off the card "
+"when the order is validated."
+msgstr ""
+"العميل يدفع من رصيد شراه من NuqtaPass. الكاشير يضيفه من خانة NuqtaPass بس، "
+"وNuqtaPass يخصم المبلغ من البطاقة لما يتأكد الطلب."
 
 #. module: nuqtapass_loyalty_pos
 #. odoo-python
@@ -453,39 +835,88 @@ msgid "This point of sale no longer exists."
 msgstr "نقطة البيع هذي ما عادت موجودة."
 
 #. module: nuqtapass_loyalty_pos
+#: model:ir.model.constraint,message:nuqtapass_loyalty_pos.constraint_nuqtapass_pos_use_use_unique
+msgid "This use is already recorded for this order."
+msgstr "هالاستخدام مسجل من قبل لهالطلب."
+
+#. module: nuqtapass_loyalty_pos
 #: model:ir.model.fields,field_description:nuqtapass_loyalty_pos.field_nuqtapass_sync__pos_order_id
 msgid "Till order"
 msgstr "طلب الكاشير"
 
 #. module: nuqtapass_loyalty_pos
 #. odoo-javascript
-#: code:addons/nuqtapass_loyalty_pos/static/src/app/nuqtapass_dialog/nuqtapass_dialog.js:0
-msgid "Type how many points to use, as a whole number."
-msgstr "اكتب كم نقطة بتنصرف، رقم صحيح بدون كسور."
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/points_box.js:0
+msgid "Type an amount"
+msgstr "اكتب المبلغ"
+
+#. module: nuqtapass_loyalty_pos
+#: model:ir.model.fields,field_description:nuqtapass_loyalty_pos.field_nuqtapass_pos_use__use
+msgid "Use"
+msgstr "الاستخدام"
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_panel.xml:0
+msgid "Use credit"
+msgstr "ادفع من الرصيد"
 
 #. module: nuqtapass_loyalty_pos
 #. odoo-javascript
 #: code:addons/nuqtapass_loyalty_pos/static/src/app/nuqtapass_dialog/nuqtapass_dialog.xml:0
+msgid "Use credit, packs, rewards and vouchers on the payment screen."
+msgstr "الرصيد والباقات والمكافآت والقسائم تستخدمها في شاشة الدفع."
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_panel.js:0
+msgid "Use pack"
+msgstr "استخدم الباقة"
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/points_box.xml:0
 msgid "Use points"
 msgstr "اصرف النقاط"
 
 #. module: nuqtapass_loyalty_pos
 #. odoo-javascript
 #: code:addons/nuqtapass_loyalty_pos/static/src/app/nuqtapass_dialog/nuqtapass_dialog.xml:0
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_panel.js:0
 msgid "Use voucher"
 msgstr "استخدم القسيمة"
 
 #. module: nuqtapass_loyalty_pos
+#: model:ir.model.fields,field_description:nuqtapass_loyalty_pos.field_pos_order__nuqtapass_used
+msgid "Used at NuqtaPass"
+msgstr "المستخدم في NuqtaPass"
+
+#. module: nuqtapass_loyalty_pos
 #. odoo-javascript
 #: code:addons/nuqtapass_loyalty_pos/static/src/app/nuqtapass_api.js:0
+#: model:ir.model.fields,field_description:nuqtapass_loyalty_pos.field_nuqtapass_pos_use__voucher_id
+#: model:ir.model.fields.selection,name:nuqtapass_loyalty_pos.selection__nuqtapass_pos_use__use__voucher
+#: model:ir.model.fields.selection,name:nuqtapass_loyalty_pos.selection__pos_order_line__nuqtapass_use__voucher
 msgid "Voucher"
 msgstr "قسيمة"
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-python
+#: code:addons/nuqtapass_loyalty_pos/models/pos_order.py:0
+msgid "Voucher used"
+msgstr "انستخدمت القسيمة"
 
 #. module: nuqtapass_loyalty_pos
 #. odoo-python
 #: code:addons/nuqtapass_loyalty_pos/models/pos_config.py:0
 msgid "Voucher used."
 msgstr "انستخدمت القسيمة."
+
+#. module: nuqtapass_loyalty_pos
+#: model:ir.model.fields,help:nuqtapass_loyalty_pos.field_pos_order__nuqtapass_used
+msgid ""
+"What this order used of the customer's NuqtaPass cards when it was paid."
+msgstr "اللي استخدمه هالطلب من بطاقات العميل في NuqtaPass وقت الدفع."
 
 #. module: nuqtapass_loyalty_pos
 #: model_terms:ir.ui.view,arch_db:nuqtapass_loyalty_pos.res_config_settings_view_form_nuqtapass_pos

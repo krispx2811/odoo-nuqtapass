@@ -1,6 +1,8 @@
 import { rpc } from "@web/core/network/rpc";
 import { _t } from "@web/core/l10n/translation";
+import { user } from "@web/core/user";
 import { generateQRCodeDataUrl } from "@point_of_sale/utils";
+import { formatMoney, formatNumber } from "./pay/nuqtapass_math";
 
 export function offlineMessage() {
     return _t(
@@ -55,6 +57,17 @@ export function redeemOnCard(configId, phone, cardId, action, { voucherId = null
     });
 }
 
+/** Validate: spend the order's uses at NuqtaPass, once per order: { ok, used } or { ok: false, error, index, message }. */
+export function spendUses(configId, orderRef, phone, uses) {
+    return call("/nuqtapass_loyalty/pos/spend", { config_id: configId, order_ref: orderRef, phone, uses });
+}
+
+/** "42.120 OMR" in the shop's NuqtaPass currency (from /customer), in the till's language. LRI…PDI keeps the
+ * amount in its own order inside an Arabic line. */
+export function money(amount, currency) {
+    return `\u2066${formatMoney(amount, currency, user.lang)}\u2069`;
+}
+
 /** Right after payment: the server sends the order now and answers { show_qr, welcome } (Task 11). */
 export function afterPayment(configId, orderId) {
     return call("/nuqtapass_loyalty/pos/after_payment", { config_id: configId, order_id: orderId });
@@ -95,33 +108,28 @@ function usesLeft(n) {
 }
 
 /** A Part 1 PosCard's one line: where it stands. The dialog shows it inside <bdi> so numbers keep their order.
- * `formatCurrency` (the till's) adds what the points are worth. */
-export function cardLine(card, formatCurrency = null) {
+ * Money is in NuqtaPass's currency for the shop (`currency` from /customer), never the till's. */
+export function cardLine(card, currency = null) {
     switch (card.type) {
         case "STAMPS":
             return _t("%(stamps)s of %(required)s stamps", { stamps: card.stamps, required: card.stampsRequired });
-        case "POINTS":
-            if (formatCurrency && card.pointsValue > 0) {
-                // LRI…PDI: the amount ("$ 10.00", "10.000 ر.ع.") keeps its own order inside an Arabic line.
-                const value = `\u2066${formatCurrency(card.pointsValue)}\u2069`;
+        case "POINTS": {
+            const points = formatNumber(card.points);
+            if (card.pointsValue > 0) {
+                const value = money(card.pointsValue, currency);
                 return card.points === 1
-                    ? _t("1 point (%(value)s)", { value })
-                    : _t("%(points)s points (%(value)s)", { points: card.points, value });
+                    ? _t("1 point · worth %(value)s", { value })
+                    : _t("%(points)s points · worth %(value)s", { points, value });
             }
-            return card.points === 1 ? _t("1 point") : _t("%(points)s points", { points: card.points });
+            return card.points === 1 ? _t("1 point") : _t("%(points)s points", { points });
+        }
         case "PREPAID":
-            return _t("Balance: %(balance)s", { balance: card.balance });
+            return _t("Balance: %(balance)s", { balance: money(card.balance, currency) });
         case "PACK":
-            return usesLeft(card.packUses);
+            return usesLeft(card.usesLeft || card.packUses);
         default:
             return usesLeft(card.voucher?.usesLeft ?? 0);
     }
-}
-
-/** The points box starts with all of the first points card's points (Part 1 caps a visit itself). */
-export function startingPoints(cards) {
-    const card = (cards || []).find((c) => c.type === "POINTS" && c.points > 0);
-    return card ? String(card.points) : "";
 }
 
 /** "+96894176872" → "+968 9417 6872" (GCC and Jordan codes are 3 digits); anything else as it is. */

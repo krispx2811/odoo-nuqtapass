@@ -1,6 +1,6 @@
 import re
 
-from odoo import api, models
+from odoo import api, fields, models
 
 # One use per kind for an order (NuqtaPass: points, credit, pack and reward once each; a voucher once per voucher card).
 KINDS = ("points", "credit", "pack", "reward", "voucher")
@@ -22,6 +22,15 @@ def _money(value):
 
 class PosConfig(models.Model):
     _inherit = "pos.config"
+
+    # Read by the till page (pos.config loads all its fields): the product of its NuqtaPass lines.
+    nuqtapass_reward_product_id = fields.Many2one(
+        "product.product", "NuqtaPass reward product", compute="_compute_nuqtapass_reward_product_id")
+
+    def _compute_nuqtapass_reward_product_id(self):
+        product = self._nuqtapass_reward_product()
+        for config in self:
+            config.nuqtapass_reward_product_id = product
 
     # ── what the module adds to the till ──────────────────────────────
     @api.model

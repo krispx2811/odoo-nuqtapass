@@ -1,0 +1,87 @@
+import { patch } from "@web/core/utils/patch";
+import { _t } from "@web/core/l10n/translation";
+import { AlertDialog, ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
+import OrderPaymentValidation from "@point_of_sale/app/utils/order_payment_validation";
+import { spendUses } from "../nuqtapass_api";
+import { nuqtapassLines, orderUses, removeAllNuqtaPass } from "./nuqtapass_lines";
+
+/**
+ * Validate spends the order's NuqtaPass uses (points, credit, a pack use, a reward, vouchers) before Odoo takes the
+ * payment: the server calls NuqtaPass once per use with the order's receipt number, so a second press or a retry
+ * spends nothing more. Any refusal or no connection stops the payment with NuqtaPass's words.
+ */
+patch(OrderPaymentValidation.prototype, {
+    async askBeforeValidation(...args) {
+        if ((await super.askBeforeValidation(...args)) === false) {
+            return false;
+        }
+        return this.nuqtapassSpend();
+    },
+
+    async nuqtapassSpend() {
+        const order = this.order;
+        const uses = order && !order.isRefund ? orderUses(order) : [];
+        if (!uses.length) {
+            return true;
+        }
+        if (order.uiState.nuqtapassSpending) {
+            return false; // the first press is still at NuqtaPass
+        }
+        order.uiState.nuqtapassSpending = true;
+        this.pos.env.services.ui.block();
+        let res;
+        try {
+            const phone = order.nuqtapass_phone || order.partner_id?.phone || "";
+            res = await spendUses(this.pos.config.id, order.pos_reference, phone, uses);
+        } finally {
+            this.pos.env.services.ui.unblock();
+            order.uiState.nuqtapassSpending = false;
+        }
+        if (res?.ok) {
+            return true;
+        }
+        this.nuqtapassShowRefusal(order, uses, res || {});
+        return false;
+    },
+
+    nuqtapassShowRefusal(order, uses, res) {
+        const use = Number.isInteger(res.index) ? uses[res.index] : null;
+        if (res.error === "unreachable") {
+            this.pos.dialog.add(ConfirmationDialog, {
+                title: _t("NuqtaPass"),
+                body: res.message,
+                confirmLabel: _t("Remove NuqtaPass lines"),
+                confirm: () => removeAllNuqtaPass(order),
+                cancel: () => {},
+                cancelLabel: _t("Close"),
+            });
+            return;
+        }
+        if (res.error === "refused" && use) {
+            this.pos.dialog.add(ConfirmationDialog, {
+                title: _t("NuqtaPass"),
+                body: res.message,
+                confirmLabel: _t("Remove this line"),
+                confirm: () => this.nuqtapassRemove(order, use),
+                cancel: () => {},
+                cancelLabel: _t("Close"),
+            });
+            return;
+        }
+        this.pos.dialog.add(AlertDialog, { title: _t("NuqtaPass"), body: res.message || "" });
+    },
+
+    nuqtapassRemove(order, use) {
+        if (use.payment) {
+            const payment = order.payment_ids.find((p) => p.uuid === use.ref);
+            if (payment) {
+                order.removePaymentline(payment);
+            }
+            return;
+        }
+        const line = nuqtapassLines(order).find((l) => l.uuid === use.ref);
+        if (line) {
+            order.removeOrderline(line);
+        }
+    },
+});

@@ -2,13 +2,17 @@ import { Component, useProps, proxy, signal, t } from "@odoo/owl";
 import { Dialog } from "@web/core/dialog/dialog";
 import { useAutofocus } from "@web/core/utils/hooks";
 import { _t } from "@web/core/l10n/translation";
+import { usePos } from "@point_of_sale/app/hooks/pos_hook";
+import { NuqtaPassPointsBox } from "../pay/points_box";
+import { setPointsLine, totalWithoutPoints } from "../pay/nuqtapass_lines";
+import { formatNumber } from "../pay/nuqtapass_math";
 import {
     cardLine,
     cardTitle,
     displayPhone,
     findCustomer,
+    money,
     redeemOnCard,
-    startingPoints,
     welcomeWithQr,
     willEarnLine,
 } from "../nuqtapass_api";
@@ -19,7 +23,7 @@ import {
  */
 export class NuqtaPassDialog extends Component {
     static template = "nuqtapass_loyalty_pos.NuqtaPassDialog";
-    static components = { Dialog };
+    static components = { Dialog, NuqtaPassPointsBox };
     props = useProps({
         configId: t.number(),
         startingQuery: t.string().optional(""),
@@ -27,7 +31,6 @@ export class NuqtaPassDialog extends Component {
         startingResult: t.object().optional(),
         // True when an open order will earn for whoever is found here.
         forOrder: t.boolean().optional(false),
-        formatCurrency: t.function().optional(),
         // Set when the window opens after payment to show a new card's QR code.
         cardUrl: t.string().optional(""),
         whatsapp: t.string().optional(""),
@@ -39,6 +42,7 @@ export class NuqtaPassDialog extends Component {
     inputRef = signal.ref();
 
     setup() {
+        this.pos = usePos();
         // A 2D scanner types into the focused box and presses Enter (Odoo's barcode service leaves inputs alone).
         useAutofocus({ ref: this.inputRef });
         this.state = proxy({
@@ -47,7 +51,6 @@ export class NuqtaPassDialog extends Component {
             error: "",
             done: "",
             result: null,
-            points: "",
             welcome: welcomeWithQr({
                 cardUrl: this.props.cardUrl,
                 whatsapp: this.props.whatsapp,
@@ -82,13 +85,52 @@ export class NuqtaPassDialog extends Component {
     }
 
     cardLine(card) {
-        return cardLine(card, this.props.formatCurrency || null);
+        return cardLine(card, this.state.result?.currency || null);
+    }
+
+    /** The open order this window works on (points go on it as a discount line), or null. */
+    get order() {
+        const order = this.props.forOrder ? this.pos.getOrder() : null;
+        return order && !order.finalized ? order : null;
+    }
+
+    canUsePoints(card) {
+        return Boolean(this.order && card.type === "POINTS" && card.points > 0 && card.pointsPerUnit > 0);
+    }
+
+    get maxPointsValue() {
+        return this.order ? totalWithoutPoints(this.order) : 0;
+    }
+
+    /** Spent at payment, not now: the line can be removed at no cost. */
+    async usePoints(card, plan) {
+        const line = await setPointsLine(this.pos, this.order, card, plan);
+        if (line) {
+            this.state.error = "";
+            this.state.done = _t("Added to the order: %(value)s off for %(points)s points. They're used when you validate.", {
+                value: money(plan.value, this.state.result.currency),
+                points: formatNumber(plan.points),
+            });
+        }
+    }
+
+    /** Rewards, vouchers, credit and packs are used on the payment screen for an open order. */
+    get atPaymentHint() {
+        return Boolean(
+            this.order &&
+                this.state.result?.cards.some(
+                    (c) =>
+                        (c.type === "STAMPS" && c.rewardReady) ||
+                        (c.type === "VOUCHER" && c.voucher?.usesLeft > 0) ||
+                        (c.type === "PREPAID" && c.balance > 0) ||
+                        (c.type === "PACK" && (c.usesLeft || c.packUses) > 0)
+                )
+        );
     }
 
     show(res) {
         this.state.result = res;
         this.state.query = "";
-        this.state.points = startingPoints(res.cards);
         this.state.welcome = res.walletAdded ? null : welcomeWithQr(res.welcome);
         this.props.onCustomer?.(res.phone);
     }
@@ -115,20 +157,11 @@ export class NuqtaPassDialog extends Component {
         if (this.state.loading) {
             return;
         }
-        let points = null;
-        if (action === "reward" && card.type === "POINTS") {
-            points = Number(this.state.points);
-            if (!Number.isInteger(points) || points <= 0) {
-                this.state.error = _t("Type how many points to use, as a whole number.");
-                return;
-            }
-        }
         this.state.loading = true;
         this.state.error = "";
         this.state.done = "";
         const res = await redeemOnCard(this.props.configId, this.state.result.phone, card.cardId, action, {
             voucherId: action === "voucher" ? card.voucher?.id || null : null,
-            points,
         });
         this.state.loading = false;
         if (res.ok) {

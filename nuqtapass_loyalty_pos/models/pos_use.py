@@ -17,7 +17,7 @@ class NuqtapassPosUse(models.Model):
     _rec_name = "order_ref"
 
     company_id = fields.Many2one("res.company", required=True, index=True, readonly=True)
-    config_id = fields.Many2one("pos.config", readonly=True, index=True)
+    config_id = fields.Many2one("pos.config", "Point of Sale", readonly=True, index=True)
     order_ref = fields.Char("Order", required=True, index=True, readonly=True)
     phone = fields.Char(readonly=True)
     use = fields.Selection(USES, required=True, readonly=True)

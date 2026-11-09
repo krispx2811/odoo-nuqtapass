@@ -12,8 +12,11 @@ class PosOrderLine(models.Model):
     nuqtapass_card_id = fields.Char("NuqtaPass card", copy=False)
     nuqtapass_voucher_id = fields.Char("NuqtaPass voucher", copy=False)
     nuqtapass_qty = fields.Integer("NuqtaPass points / uses", copy=False)
+    # The line's name on the till and the receipt ("NuqtaPass points", "Reward: free Flat white"), in the till's
+    # language when it was added.
+    nuqtapass_label = fields.Char("NuqtaPass line", copy=False)
 
     @api.model
     def _load_pos_data_fields(self, config):
         return super()._load_pos_data_fields(config) + [
-            "nuqtapass_use", "nuqtapass_card_id", "nuqtapass_voucher_id", "nuqtapass_qty"]
+            "nuqtapass_use", "nuqtapass_card_id", "nuqtapass_voucher_id", "nuqtapass_qty", "nuqtapass_label"]
