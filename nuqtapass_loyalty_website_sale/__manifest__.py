@@ -7,7 +7,12 @@
     "website": "https://nuqtapass.com",
     "license": "LGPL-3",
     "depends": ["nuqtapass_loyalty", "website_sale"],
-    "data": ["data/ir_cron.xml"],
+    "data": [
+        "data/ir_cron.xml",
+        "views/sale_order_views.xml",
+        "views/res_config_settings_views.xml",
+        "views/nuqtapass_sync_views.xml",
+    ],
     "post_init_hook": "post_init_hook",
     "auto_install": True,
     "installable": True,

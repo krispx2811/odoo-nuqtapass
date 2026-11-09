@@ -7,7 +7,11 @@
     "website": "https://nuqtapass.com",
     "license": "LGPL-3",
     "depends": ["nuqtapass_loyalty", "point_of_sale"],
-    "data": [],
+    "data": [
+        "views/pos_order_views.xml",
+        "views/pos_config_views.xml",
+        "views/nuqtapass_sync_views.xml",
+    ],
     "assets": {
         "point_of_sale._assets_pos": [
             "nuqtapass_loyalty_pos/static/src/**/*",

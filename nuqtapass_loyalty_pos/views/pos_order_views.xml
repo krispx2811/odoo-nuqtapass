@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_pos_pos_form_nuqtapass" model="ir.ui.view">
+        <field name="name">pos.order.form.nuqtapass</field>
+        <field name="model">pos.order</field>
+        <field name="inherit_id" ref="point_of_sale.view_pos_pos_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='extra']" position="after">
+                <page name="nuqtapass" string="NuqtaPass" invisible="not nuqtapass_sync_ids">
+                    <field name="nuqtapass_sync_ids" readonly="1">
+                        <list>
+                            <field name="kind"/>
+                            <field name="refund_ref" optional="hide"/>
+                            <field name="phone"/>
+                            <field name="amount"/>
+                            <field name="currency_id" column_invisible="1"/>
+                            <field name="state" widget="badge" decoration-success="state == 'done'" decoration-danger="state == 'failed'"/>
+                            <field name="summary"/>
+                            <button name="action_resend" type="object" string="Resend" icon="fa-repeat" invisible="state == 'done'"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+            <!-- 20.0: partner_id is not inside the "Extra Info" page; pos_reference is (Other Information). -->
+            <xpath expr="//page[@name='extra']//field[@name='pos_reference']" position="after">
+                <field name="nuqtapass_phone" invisible="not nuqtapass_phone"/>
+            </xpath>
+        </field>
+    </record>
+
+    <menuitem id="menu_nuqtapass_sync_pos" name="NuqtaPass sync" parent="point_of_sale.menu_point_of_sale"
+              action="nuqtapass_loyalty.action_nuqtapass_sync" sequence="90"
+              groups="point_of_sale.group_pos_manager"/>
+</odoo>

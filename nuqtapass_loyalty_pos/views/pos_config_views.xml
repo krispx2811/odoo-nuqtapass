@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_nuqtapass_pos" model="ir.ui.view">
+        <field name="name">res.config.settings.form.nuqtapass.pos</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="point_of_sale.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <block id="pos_payment_section" position="after">
+                <block title="NuqtaPass" id="nuqtapass_pos_section">
+                    <setting id="nuqtapass_pos_branch" string="NuqtaPass branch"
+                             help="Which NuqtaPass branch this till's visits count for. Leave empty for 'Odoo'.">
+                        <field name="pos_nuqtapass_branch" placeholder="e.g. Qurum"/>
+                    </setting>
+                </block>
+            </block>
+        </field>
+    </record>
+</odoo>

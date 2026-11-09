@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_nuqtapass_website" model="ir.ui.view">
+        <field name="name">res.config.settings.form.nuqtapass.website</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="website_sale.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="(//block[@id='website_payment_block'])[last()]" position="after">
+                <block title="NuqtaPass" id="nuqtapass_website_section">
+                    <setting id="nuqtapass_website_branch" string="NuqtaPass branch"
+                             help="Which NuqtaPass branch this website's orders count for. Leave empty for 'Odoo online'.">
+                        <field name="website_nuqtapass_branch" placeholder="e.g. Online"/>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+</odoo>

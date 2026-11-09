@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="nuqtapass_sync_view_form_website" model="ir.ui.view">
+        <field name="name">nuqtapass.sync.form.website</field>
+        <field name="model">nuqtapass.sync</field>
+        <field name="inherit_id" ref="nuqtapass_loyalty.nuqtapass_sync_view_form"/>
+        <field name="arch" type="xml">
+            <field name="branch" position="after">
+                <field name="sale_order_id" invisible="not sale_order_id"/>
+                <field name="move_id" invisible="not move_id"/>
+            </field>
+        </field>
+    </record>
+</odoo>
