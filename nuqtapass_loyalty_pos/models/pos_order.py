@@ -3,6 +3,8 @@ import logging
 from odoo import api, fields, models
 
 _logger = logging.getLogger(__name__)
+PAID_STATES = ("paid", "done", "invoiced")
+CUSTOMER_FIELDS = {"partner_id", "nuqtapass_phone"}
 
 
 class PosOrder(models.Model):
@@ -24,6 +26,25 @@ class PosOrder(models.Model):
         result = super().action_pos_order_paid()
         self._nuqtapass_queue()
         return result
+
+    def write(self, vals):
+        result = super().write(vals)
+        # A paid order earns as soon as it gets a customer: on the receipt screen, from the back office, or when the
+        # till sends the order again with a customer. The queue's de-dup key keeps it to one sale per order.
+        if CUSTOMER_FIELDS & vals.keys():
+            self.filtered(lambda o: o.state in PAID_STATES)._nuqtapass_customer_changed()
+        return result
+
+    def _nuqtapass_customer_changed(self):
+        for order in self:
+            try:
+                sale = order.nuqtapass_sync_ids.filtered(lambda s: s.kind == "sale")[:1]
+                if not sale:
+                    order._nuqtapass_queue_one()
+                elif sale.state == "failed" and sale.phone_invalid:
+                    sale.action_resend()  # logged with a wrong phone: check the new one (a good one is sent)
+            except Exception:  # saving the order must never fail because of NuqtaPass
+                _logger.exception("NuqtaPass: could not queue POS order %s after its customer changed", order.id)
 
     def _nuqtapass_raw_phone(self):
         return self.nuqtapass_phone or self.partner_id.phone
