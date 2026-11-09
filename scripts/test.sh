@@ -33,4 +33,13 @@ fi
 if ! grep -qE "of [1-9][0-9]* tests" "$LOG"; then
   echo "TESTS FAILED (no test ran)"; exit 1
 fi
+# The till's money math is plain JS (no Odoo imports): run it with Node, on the host.
+if [[ ",$MODULES," == *",nuqtapass_loyalty_pos,"* ]]; then
+  if ! command -v node >/dev/null 2>&1; then
+    echo "TESTS FAILED (node not found: the till's JS tests need Node 22+)"; exit 1
+  fi
+  if ! node --test ../nuqtapass_loyalty_pos/tests/js/*.test.mjs; then
+    echo "TESTS FAILED (till JS)"; exit 1
+  fi
+fi
 echo "TESTS PASSED"
