@@ -4,9 +4,11 @@ import { useAutofocus } from "@web/core/utils/hooks";
 import { _t } from "@web/core/l10n/translation";
 import { usePos } from "@point_of_sale/app/hooks/pos_hook";
 import { NuqtaPassPointsBox } from "../pay/points_box";
+import { NuqtaPassCorrectBox } from "../correct/correct_box";
 import { setPointsLine, totalWithoutPoints } from "../pay/nuqtapass_lines";
 import { formatNumber } from "../pay/nuqtapass_math";
 import {
+    adjustCard,
     bandStyle,
     cardLine,
     cardTitle,
@@ -25,7 +27,7 @@ import {
  */
 export class NuqtaPassDialog extends Component {
     static template = "nuqtapass_loyalty_pos.NuqtaPassDialog";
-    static components = { Dialog, NuqtaPassPointsBox };
+    static components = { Dialog, NuqtaPassPointsBox, NuqtaPassCorrectBox };
     props = useProps({
         configId: t.number(),
         startingQuery: t.string().optional(""),
@@ -55,6 +57,8 @@ export class NuqtaPassDialog extends Component {
             error: "",
             done: "",
             result: null,
+            // The card being corrected (POS managers only), or "".
+            correcting: "",
             welcome: welcomeWithQr({
                 cardUrl: this.props.cardUrl,
                 whatsapp: this.props.whatsapp,
@@ -162,6 +166,36 @@ export class NuqtaPassDialog extends Component {
         } else {
             this.state.result = null;
             this.state.welcome = null;
+            this.state.error = res.message;
+        }
+    }
+
+    /** POS managers ("Point of Sale / Administrator", answered by the server with each look-up; the server checks
+     * it again on save): stamps and points cards can be corrected. */
+    canCorrect(card) {
+        return Boolean(this.state.result?.canCorrect && ["STAMPS", "POINTS"].includes(card.type));
+    }
+
+    startCorrect(card) {
+        this.state.correcting = card.cardId;
+        this.state.error = "";
+        this.state.done = "";
+    }
+
+    async saveCorrection(body) {
+        if (this.state.loading) {
+            return;
+        }
+        this.state.loading = true;
+        this.state.error = "";
+        this.state.done = "";
+        const res = await adjustCard(this.props.configId, body);
+        this.state.loading = false;
+        if (res.ok) {
+            this.state.correcting = "";
+            await this.lookUp(this.state.result.phone);
+            this.state.done = res.message;
+        } else {
             this.state.error = res.message;
         }
     }
