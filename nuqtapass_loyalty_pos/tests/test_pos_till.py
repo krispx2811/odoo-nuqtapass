@@ -354,3 +354,15 @@ class TestPosTill(TestPoSCommon):
         self.assertEqual((res["ok"], res["pending"], res["phone"]), (True, True, "+96891234567"))
         self.assertIn("will earn", res["message"])
         self.assertEqual(order.nuqtapass_sync_ids.state, "pending")
+
+    # ── what the till page knows: is NuqtaPass on (the receipt box and scans only then) ─
+    def test_till_page_knows_whether_nuqtapass_is_on(self):
+        icp = self.env["ir.config_parameter"].sudo()
+        self.assertTrue(self.config._load_pos_data_read(self.config, self.config)[0]["nuqtapass_till_on"])
+        icp.set_str("nuqtapass_loyalty.api_key", False)
+        self.config.invalidate_recordset()
+        self.assertFalse(self.config._load_pos_data_read(self.config, self.config)[0]["nuqtapass_till_on"])
+        icp.set_str("nuqtapass_loyalty.api_key", "sip_test")
+        icp.set_bool("nuqtapass_loyalty.till_enabled", False)
+        self.config.invalidate_recordset()
+        self.assertFalse(self.config._load_pos_data_read(self.config, self.config)[0]["nuqtapass_till_on"])
