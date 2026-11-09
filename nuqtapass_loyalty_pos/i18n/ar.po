@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 20.0-20261102\n"
+"Project-Id-Version: Odoo Server 19.0-20261102\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-09 14:10+0000\n"
-"PO-Revision-Date: 2026-11-09 14:10+0000\n"
+"POT-Creation-Date: 2026-11-09 16:36+0000\n"
+"PO-Revision-Date: 2026-11-09 16:36+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: ar\n"
@@ -19,8 +19,26 @@ msgstr ""
 #. module: nuqtapass_loyalty_pos
 #. odoo-javascript
 #: code:addons/nuqtapass_loyalty_pos/static/src/app/nuqtapass_api.js:0
+msgid "%(earned)s · %(stamps)s of %(required)s now"
+msgstr "%(earned)s · صارت %(stamps)s من %(required)s"
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/nuqtapass_api.js:0
+msgid "%(earned)s · %(total)s now"
+msgstr "%(earned)s · صارت %(total)s"
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/nuqtapass_api.js:0
 msgid "%(points)s points"
 msgstr "النقاط: %(points)s"
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/nuqtapass_api.js:0
+msgid "%(points)s points (%(value)s)"
+msgstr "النقاط: %(points)s (%(value)s)"
 
 #. module: nuqtapass_loyalty_pos
 #. odoo-javascript
@@ -37,14 +55,50 @@ msgstr "الاستخدامات الباقية: %(uses)s"
 #. module: nuqtapass_loyalty_pos
 #. odoo-javascript
 #: code:addons/nuqtapass_loyalty_pos/static/src/app/nuqtapass_api.js:0
+msgid "+%(points)s points"
+msgstr "النقاط: +%(points)s"
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/nuqtapass_api.js:0
+msgid "+%(stamps)s stamps"
+msgstr "الأختام: +%(stamps)s"
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/nuqtapass_api.js:0
+msgid "+1 point"
+msgstr "النقاط: +1"
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/nuqtapass_api.js:0
+msgid "+1 stamp"
+msgstr "الأختام: +1"
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/nuqtapass_api.js:0
 msgid "1 point"
 msgstr "نقطة وحدة"
 
 #. module: nuqtapass_loyalty_pos
 #. odoo-javascript
 #: code:addons/nuqtapass_loyalty_pos/static/src/app/nuqtapass_api.js:0
+msgid "1 point (%(value)s)"
+msgstr "نقطة وحدة (%(value)s)"
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/nuqtapass_api.js:0
 msgid "1 use left"
 msgstr "باقي استخدام واحد"
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/receipt_box/receipt_box.xml:0
+msgid "Add"
+msgstr "أضف"
 
 #. module: nuqtapass_loyalty_pos
 #. odoo-python
@@ -80,12 +134,6 @@ msgid "Config Settings"
 msgstr "تهيئة الإعدادات"
 
 #. module: nuqtapass_loyalty_pos
-#. odoo-javascript
-#: code:addons/nuqtapass_loyalty_pos/static/src/app/nuqtapass_dialog/nuqtapass_dialog.xml:0
-msgid "Customer phone"
-msgstr "جوال العميل"
-
-#. module: nuqtapass_loyalty_pos
 #: model:ir.model.fields,field_description:nuqtapass_loyalty_pos.field_nuqtapass_sync__display_name
 #: model:ir.model.fields,field_description:nuqtapass_loyalty_pos.field_pos_config__display_name
 #: model:ir.model.fields,field_description:nuqtapass_loyalty_pos.field_pos_order__display_name
@@ -94,17 +142,16 @@ msgid "Display Name"
 msgstr "اسم العرض"
 
 #. module: nuqtapass_loyalty_pos
-#: model:ir.module.module,summary:base.module_nuqtapass_loyalty_pos
-msgid ""
-"Earn NuqtaPass stamps and points at the Odoo till, with a NuqtaPass button "
-"for rewards"
-msgstr "أختام ونقاط NuqtaPass من كاشير Odoo، مع زر NuqtaPass للمكافآت"
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/receipt_box/receipt_box.js:0
+msgid "Earn NuqtaPass points"
+msgstr "اجمع نقاط NuqtaPass"
 
 #. module: nuqtapass_loyalty_pos
 #. odoo-javascript
 #: code:addons/nuqtapass_loyalty_pos/static/src/app/nuqtapass_dialog/nuqtapass_dialog.xml:0
-msgid "Earn on this order"
-msgstr "احسبها على هالطلب"
+msgid "Find"
+msgstr "دوّر"
 
 #. module: nuqtapass_loyalty_pos
 #. odoo-javascript
@@ -123,14 +170,9 @@ msgstr "المُعرف"
 #. module: nuqtapass_loyalty_pos
 #. odoo-javascript
 #: code:addons/nuqtapass_loyalty_pos/static/src/app/nuqtapass_dialog/nuqtapass_dialog.xml:0
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/receipt_box/receipt_box.xml:0
 msgid "Loading…"
 msgstr "جاري التحميل…"
-
-#. module: nuqtapass_loyalty_pos
-#. odoo-javascript
-#: code:addons/nuqtapass_loyalty_pos/static/src/app/nuqtapass_dialog/nuqtapass_dialog.xml:0
-msgid "Look up"
-msgstr "دوّر"
 
 #. module: nuqtapass_loyalty_pos
 #. odoo-python
@@ -153,11 +195,6 @@ msgstr "ما عنده بطاقة للحين. بتوصله وحدة مع أول �
 #: model_terms:ir.ui.view,arch_db:nuqtapass_loyalty_pos.view_pos_pos_form_nuqtapass
 msgid "NuqtaPass"
 msgstr "NuqtaPass"
-
-#. module: nuqtapass_loyalty_pos
-#: model:ir.module.module,shortdesc:base.module_nuqtapass_loyalty_pos
-msgid "NuqtaPass Loyalty – Point of Sale"
-msgstr "ولاء NuqtaPass – نقاط البيع"
 
 #. module: nuqtapass_loyalty_pos
 #: model:ir.model.fields,field_description:nuqtapass_loyalty_pos.field_pos_config__nuqtapass_branch
@@ -183,6 +220,11 @@ msgstr ""
 #: code:addons/nuqtapass_loyalty_pos/models/pos_config.py:0
 msgid "NuqtaPass is turned off for the till in Settings."
 msgstr "NuqtaPass موقّف للكاشير في الإعدادات."
+
+#. module: nuqtapass_loyalty_pos
+#: model:ir.model.fields,field_description:nuqtapass_loyalty_pos.field_pos_config__nuqtapass_till_on
+msgid "NuqtaPass on the till"
+msgstr "NuqtaPass في الكاشير"
 
 #. module: nuqtapass_loyalty_pos
 #: model:ir.model.fields,field_description:nuqtapass_loyalty_pos.field_pos_order__nuqtapass_phone
@@ -231,6 +273,13 @@ msgid "Phone number looks wrong: %(phone)s"
 msgstr "رقم الجوال شكله غلط: %(phone)s"
 
 #. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/nuqtapass_dialog/nuqtapass_dialog.xml:0
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/receipt_box/receipt_box.xml:0
+msgid "Phone or scan card"
+msgstr "رقم الجوال أو امسح البطاقة"
+
+#. module: nuqtapass_loyalty_pos
 #: model:ir.model.fields,help:nuqtapass_loyalty_pos.field_pos_order__nuqtapass_phone
 msgid ""
 "Phone typed in the NuqtaPass window on the till; used before the customer's "
@@ -246,8 +295,8 @@ msgstr "تهيئة نقطة البيع"
 
 #. module: nuqtapass_loyalty_pos
 #: model:ir.model,name:nuqtapass_loyalty_pos.model_pos_order
-msgid "Point of Sale Order"
-msgstr "طلب نقطة البيع"
+msgid "Point of Sale Orders"
+msgstr "طلبات نقطة البيع"
 
 #. module: nuqtapass_loyalty_pos
 #. odoo-javascript
@@ -276,6 +325,7 @@ msgstr "بطاقة الرصيد"
 #. module: nuqtapass_loyalty_pos
 #. odoo-javascript
 #: code:addons/nuqtapass_loyalty_pos/static/src/app/nuqtapass_dialog/nuqtapass_dialog.xml:0
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/receipt_box/receipt_box.xml:0
 msgid "QR code of the card"
 msgstr "كود QR للبطاقة"
 
@@ -291,8 +341,15 @@ msgid "Reward given."
 msgstr "انعطت المكافأة."
 
 #. module: nuqtapass_loyalty_pos
+#. odoo-python
+#: code:addons/nuqtapass_loyalty_pos/models/pos_config.py:0
+msgid "Saved. The order will earn when NuqtaPass can be reached."
+msgstr "انحفظ. الطلب بينحسب أول ما يرجع الاتصال مع NuqtaPass."
+
+#. module: nuqtapass_loyalty_pos
 #. odoo-javascript
 #: code:addons/nuqtapass_loyalty_pos/static/src/app/nuqtapass_dialog/nuqtapass_dialog.xml:0
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/receipt_box/receipt_box.xml:0
 msgid "Scan to add your card"
 msgstr "امسح الكود عشان تضيف بطاقتك"
 
@@ -307,6 +364,12 @@ msgstr "أرسلها برسالة SMS"
 #: code:addons/nuqtapass_loyalty_pos/static/src/app/nuqtapass_dialog/nuqtapass_dialog.xml:0
 msgid "Send by WhatsApp"
 msgstr "أرسلها على واتساب"
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/nuqtapass_api.js:0
+msgid "Sent. Nothing to earn on this card for this order."
+msgstr "انرسل، وما فيه شي ينحسب لهالبطاقة على هالطلب."
 
 #. module: nuqtapass_loyalty_pos
 #. odoo-javascript
@@ -334,6 +397,42 @@ msgid ""
 "nuqtapass.com."
 msgstr ""
 "انتهى اشتراك المحل في NuqtaPass. صاحب المحل يقدر يجدده من nuqtapass.com."
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-python
+#: code:addons/nuqtapass_loyalty_pos/models/pos_config.py:0
+msgid "This card isn't from this shop."
+msgstr "هالبطاقة مو من هالمحل."
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-python
+#: code:addons/nuqtapass_loyalty_pos/models/pos_config.py:0
+msgid "This order already earns for %(phone)s."
+msgstr "هالطلب محسوب من قبل على الرقم: %(phone)s"
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-python
+#: code:addons/nuqtapass_loyalty_pos/models/pos_config.py:0
+msgid "This order can't earn NuqtaPass points."
+msgstr "هالطلب ما ينحسب له نقاط NuqtaPass."
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/nuqtapass_api.js:0
+msgid "This order will earn for this customer"
+msgstr "هالطلب بينحسب لهالعميل"
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/nuqtapass_api.js:0
+msgid "This order will earn points"
+msgstr "هالطلب بيعطي نقاط"
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/nuqtapass_api.js:0
+msgid "This order will earn stamps"
+msgstr "هالطلب بيعطي أختام"
 
 #. module: nuqtapass_loyalty_pos
 #. odoo-python

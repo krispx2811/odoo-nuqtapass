@@ -102,7 +102,8 @@ export function cardLine(card, formatCurrency = null) {
             return _t("%(stamps)s of %(required)s stamps", { stamps: card.stamps, required: card.stampsRequired });
         case "POINTS":
             if (formatCurrency && card.pointsValue > 0) {
-                const value = formatCurrency(card.pointsValue);
+                // LRI…PDI: the amount ("$ 10.00", "10.000 ر.ع.") keeps its own order inside an Arabic line.
+                const value = `\u2066${formatCurrency(card.pointsValue)}\u2069`;
                 return card.points === 1
                     ? _t("1 point (%(value)s)", { value })
                     : _t("%(points)s points (%(value)s)", { points: card.points, value });
