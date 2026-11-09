@@ -9,7 +9,7 @@ class TestPosArabic(TransactionCase):
         cls.env["res.lang"]._activate_lang("ar_001")
         cls.env["ir.module.module"]._load_module_terms(
             ["nuqtapass_loyalty", "nuqtapass_loyalty_pos"], ["ar_001"], overwrite=True)
-        cls.env["ir.config_parameter"].sudo().set_bool("nuqtapass_loyalty.till_enabled", True)
+        cls.env["ir.config_parameter"].sudo().set_param("nuqtapass_loyalty.till_enabled", "True")
         cls.config = cls.env["pos.config"].create({"name": "Till AR"})
 
     def test_till_message_in_arabic(self):

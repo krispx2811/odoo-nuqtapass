@@ -1,6 +1,6 @@
 {
     "name": "NuqtaPass Loyalty – Point of Sale",
-    "version": "20.0.1.0.0",
+    "version": "19.0.1.0.0",
     "summary": "Earn NuqtaPass stamps and points at the Odoo till, with a NuqtaPass button for rewards",
     "category": "Sales/Point of Sale",
     "author": "NuqtaPass",

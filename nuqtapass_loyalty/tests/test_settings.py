@@ -12,13 +12,24 @@ class TestSettings(TransactionCase):
 
     def test_key_saved_in_system_parameter(self):
         self._settings(nuqtapass_api_key="sip_abc").execute()
-        self.assertEqual(self.env["ir.config_parameter"].sudo().get_str("nuqtapass_loyalty.api_key"), "sip_abc")
+        self.assertEqual(self.env["ir.config_parameter"].sudo().get_param("nuqtapass_loyalty.api_key"), "sip_abc")
 
     def test_switches_round_trip(self):
         self._settings(nuqtapass_till_enabled=False, nuqtapass_online_enabled=True).execute()
         Sync = self.env["nuqtapass.sync"]
         self.assertFalse(Sync._channel_enabled("till"))
         self.assertTrue(Sync._channel_enabled("online"))
+
+    def test_switch_storage_on_odoo_19(self):
+        # Odoo 19: a Boolean setting is stored as "True"; switched off, the parameter is deleted. A "False"
+        # string (e.g. data moved over from Odoo 20, which stores it) must still read as off.
+        icp = self.env["ir.config_parameter"].sudo()
+        self._settings(nuqtapass_till_enabled=False).execute()
+        self.assertFalse(icp.get_param("nuqtapass_loyalty.till_enabled"))
+        self._settings(nuqtapass_till_enabled=True).execute()
+        self.assertEqual(icp.get_param("nuqtapass_loyalty.till_enabled"), "True")
+        icp.set_param("nuqtapass_loyalty.till_enabled", "False")
+        self.assertFalse(self.env["nuqtapass.sync"]._channel_enabled("till"))
 
     def test_switches_on_after_install(self):
         settings = self._settings()
@@ -33,7 +44,7 @@ class TestSettings(TransactionCase):
         self.assertEqual(action["params"]["type"], "success")
         self.assertIn("Demo Café", action["params"]["message"])
         # Testing never saves the key.
-        self.assertFalse(self.env["ir.config_parameter"].sudo().get_str("nuqtapass_loyalty.api_key"))
+        self.assertFalse(self.env["ir.config_parameter"].sudo().get_param("nuqtapass_loyalty.api_key"))
 
     def test_test_connection_error(self):
         result = ApiResult(False, 401, None, "Invalid key", "UNAUTHORIZED", True)
@@ -49,7 +60,7 @@ class TestSettings(TransactionCase):
         self.assertEqual(action["params"]["type"], "warning")
 
     def test_test_connection_bad_base_url_setting(self):
-        self.env["ir.config_parameter"].sudo().set_str("nuqtapass_loyalty.base_url", "http://insecure.example")
+        self.env["ir.config_parameter"].sudo().set_param("nuqtapass_loyalty.base_url", "http://insecure.example")
         with patch.object(NuqtaPassClient, "ping") as ping:
             action = self._settings(nuqtapass_api_key="sip_typed").action_nuqtapass_test_connection()
         ping.assert_not_called()

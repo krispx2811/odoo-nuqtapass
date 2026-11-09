@@ -10,8 +10,8 @@ class TestPosQueue(TestPoSCommon):
         super().setUp()
         self.config = self.basic_config
         self.env.company.country_id = self.env.ref("base.om")
-        # Odoo 20: typed config parameters (get_param / set_param are gone).
-        self.env["ir.config_parameter"].sudo().set_bool("nuqtapass_loyalty.till_enabled", True)
+        # Odoo 19: get_param / set_param (Odoo 20 replaced them with typed calls).
+        self.env["ir.config_parameter"].sudo().set_param("nuqtapass_loyalty.till_enabled", "True")
         self.config.nuqtapass_branch = "Qurum"
         self.product = self.create_product("Coffee", self.categ_basic, 2.5, 1.0)
         self.customer.phone = "9123 4567"
@@ -66,7 +66,7 @@ class TestPosQueue(TestPoSCommon):
         self.assertFalse(order.nuqtapass_sync_ids)
 
     def test_till_switched_off_nothing_queued(self):
-        self.env["ir.config_parameter"].sudo().set_bool("nuqtapass_loyalty.till_enabled", False)
+        self.env["ir.config_parameter"].sudo().set_param("nuqtapass_loyalty.till_enabled", False)
         self.assertFalse(self._pay(customer=self.customer).nuqtapass_sync_ids)
 
     def test_refund_is_queued_against_original(self):
@@ -86,7 +86,7 @@ class TestPosQueue(TestPoSCommon):
         self.assertEqual(order.nuqtapass_sync_ids.kind, "sale")
 
     def test_two_devices_same_order_name_both_queue(self):
-        # Every till device (or a reset browser) numbers its orders from 000001, so on Odoo 20 two orders can
+        # Every till device (or a reset browser) numbers its orders from 000001, so on Odoo 19 and 20 two orders can
         # share a name like "Shop - 000001". Their receipt numbers (pos_reference) differ by device.
         first = self._pay(customer=self.customer, pos_reference=f"261-{self.config.id}-000001")
         second = self._pay(customer=self.customer, pos_reference=f"262-{self.config.id}-000001")

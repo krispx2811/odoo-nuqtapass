@@ -1,4 +1,4 @@
-import { Component, useProps, proxy, t } from "@odoo/owl";
+import { Component, useState } from "@odoo/owl";
 import { Dialog } from "@web/core/dialog/dialog";
 import { _t } from "@web/core/l10n/translation";
 import { cardLine, cardTitle, lookUpCustomer, redeemOnCard, startingPoints, welcomeWithQr } from "../nuqtapass_api";
@@ -6,19 +6,21 @@ import { cardLine, cardTitle, lookUpCustomer, redeemOnCard, startingPoints, welc
 export class NuqtaPassDialog extends Component {
     static template = "nuqtapass_loyalty_pos.NuqtaPassDialog";
     static components = { Dialog };
-    props = useProps({
-        configId: t.number(),
-        startingPhone: t.string().optional(""),
+    // Odoo 19 (OWL 2): static props + defaultProps, useState (20.0 uses useProps / proxy).
+    static props = {
+        configId: Number,
+        startingPhone: { type: String, optional: true },
         // Set when the window opens after payment to show a new card's QR code.
-        cardUrl: t.string().optional(""),
-        whatsapp: t.string().optional(""),
-        sms: t.string().optional(""),
-        onUsePhone: t.function(),
-        close: t.function(),
-    });
+        cardUrl: { type: String, optional: true },
+        whatsapp: { type: String, optional: true },
+        sms: { type: String, optional: true },
+        onUsePhone: Function,
+        close: Function,
+    };
+    static defaultProps = { startingPhone: "", cardUrl: "", whatsapp: "", sms: "" };
 
     setup() {
-        this.state = proxy({
+        this.state = useState({
             phone: this.props.startingPhone,
             loading: false,
             error: "",

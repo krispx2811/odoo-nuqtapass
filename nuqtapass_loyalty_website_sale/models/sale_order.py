@@ -71,8 +71,7 @@ class SaleOrder(models.Model):
         """Catch orders paid by invoice (bank transfer, manual payment) – every 5 minutes."""
         if not self.env["nuqtapass.sync"]._channel_enabled("online"):
             return
-        # Odoo 20: typed get_str (get_param is gone).
-        since = self.env["ir.config_parameter"].sudo().get_str(SINCE_PARAM)
+        since = self.env["ir.config_parameter"].sudo().get_param(SINCE_PARAM)
         floor = fields.Datetime.now() - timedelta(days=7)
         start = max(fields.Datetime.to_datetime(since), floor) if since else floor
         orders = self.sudo().search([

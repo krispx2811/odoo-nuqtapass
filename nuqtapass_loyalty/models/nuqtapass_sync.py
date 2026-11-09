@@ -55,8 +55,8 @@ class NuqtapassSync(models.Model):
     # ── settings helpers ──────────────────────────────────────────────
     @api.model
     def _channel_enabled(self, channel):
-        # Odoo 20: typed parameters (get_bool); a missing parameter means "off".
-        return self.env["ir.config_parameter"].sudo().get_bool(f"nuqtapass_loyalty.{channel}_enabled")
+        # Odoo 19: a Boolean setting is stored as "True"; switched off, the parameter is deleted ("off").
+        return self.env["ir.config_parameter"].sudo().get_param(f"nuqtapass_loyalty.{channel}_enabled") == "True"
 
     @api.model
     def _normalise_phone(self, raw, company):
@@ -64,12 +64,12 @@ class NuqtapassSync(models.Model):
 
     @api.model
     def _make_client(self, key):
-        base = self.env["ir.config_parameter"].sudo().get_str(PARAM_BASE_URL) or DEFAULT_BASE_URL
+        base = self.env["ir.config_parameter"].sudo().get_param(PARAM_BASE_URL) or DEFAULT_BASE_URL
         return NuqtaPassClient(key.strip(), base)
 
     @api.model
     def _get_client(self):
-        key = (self.env["ir.config_parameter"].sudo().get_str(PARAM_KEY) or "").strip()
+        key = (self.env["ir.config_parameter"].sudo().get_param(PARAM_KEY) or "").strip()
         if not key:
             return None
         try:

@@ -68,9 +68,9 @@ class TestSyncQueue(TransactionCase):
 
     def test_channel_switches(self):
         icp = self.env["ir.config_parameter"].sudo()
-        icp.set_bool("nuqtapass_loyalty.till_enabled", True)
+        icp.set_param("nuqtapass_loyalty.till_enabled", "True")
         self.assertTrue(self.Sync._channel_enabled("till"))
-        icp.set_bool("nuqtapass_loyalty.till_enabled", False)
+        icp.set_param("nuqtapass_loyalty.till_enabled", False)
         self.assertFalse(self.Sync._channel_enabled("till"))
 
     def test_normalise_phone_uses_company_country(self):

@@ -10,10 +10,10 @@ from odoo.addons.account_payment.tests.common import AccountPaymentCommon
 
 def _setup_shop(env):
     env.company.country_id = env.ref("base.om")
-    # Odoo 20: typed config parameters (get_param / set_param are gone).
+    # Odoo 19: get_param / set_param (Odoo 20 replaced them with typed calls).
     icp = env["ir.config_parameter"].sudo()
-    icp.set_bool("nuqtapass_loyalty.online_enabled", True)
-    icp.set_str("nuqtapass_loyalty_website_sale.since",
+    icp.set_param("nuqtapass_loyalty.online_enabled", "True")
+    icp.set_param("nuqtapass_loyalty_website_sale.since",
                 fields.Datetime.to_string(fields.Datetime.now() - timedelta(days=1)))
     website = env["website"].create({"name": "Shop site", "nuqtapass_branch": "Online"})
     env.user.group_ids |= env.ref("sales_team.group_sale_manager")
@@ -53,7 +53,7 @@ class TestOnlineByInvoice(AccountTestInvoicingCommon):
         return credit
 
     def test_install_hook_sets_since(self):
-        self.assertTrue(self.env["ir.config_parameter"].sudo().get_str("nuqtapass_loyalty_website_sale.since"))
+        self.assertTrue(self.env["ir.config_parameter"].sudo().get_param("nuqtapass_loyalty_website_sale.since"))
 
     def test_unpaid_order_not_queued(self):
         order = self._order()
@@ -108,7 +108,7 @@ class TestOnlineByInvoice(AccountTestInvoicingCommon):
         self.assertFalse(order.nuqtapass_sync_ids)
 
     def test_orders_before_install_ignored(self):
-        self.env["ir.config_parameter"].sudo().set_str(
+        self.env["ir.config_parameter"].sudo().set_param(
             "nuqtapass_loyalty_website_sale.since",
             fields.Datetime.to_string(fields.Datetime.now() + timedelta(hours=1)))
         order = self._order()
@@ -117,7 +117,7 @@ class TestOnlineByInvoice(AccountTestInvoicingCommon):
         self.assertFalse(order.nuqtapass_sync_ids)
 
     def test_online_switch_off(self):
-        self.env["ir.config_parameter"].sudo().set_bool("nuqtapass_loyalty.online_enabled", False)
+        self.env["ir.config_parameter"].sudo().set_param("nuqtapass_loyalty.online_enabled", False)
         order = self._order()
         self._invoice_and_pay(order)
         self.env["sale.order"]._cron_nuqtapass_scan()
@@ -175,8 +175,9 @@ class TestOnlineByInvoice(AccountTestInvoicingCommon):
 
 @tagged("post_install", "-at_install", "nuqtapass")
 class TestOnlineByTransaction(AccountPaymentCommon):
-    # AccountPaymentCommon = PaymentCommon + accounting, with Odoo 20's `_post_process` mock switched off, so the
-    # real post-processing (confirm the quotation, create the payment) runs.
+    # AccountPaymentCommon = PaymentCommon + accounting, with the `_post_process` mock switched off
+    # (`enable_post_process_patcher = False`, Odoo 19), so the real post-processing (confirm the quotation,
+    # create the payment) runs.
 
     def test_done_transaction_queues_sale_when_post_processed(self):
         website, partner, product = _setup_shop(self.env)
@@ -185,12 +186,12 @@ class TestOnlineByTransaction(AccountPaymentCommon):
             "website_id": website.id,
             "order_line": [Command.create({"product_id": product.id, "product_uom_qty": 1, "price_unit": 10.0})],
         })
-        self._create_transaction(
+        tx = self._create_transaction(
             "redirect", sale_order_ids=[order.id], state="done", amount=order.amount_total,
             currency_id=order.currency_id.id, partner_id=partner.id)
-        # Odoo's own post-processing cron (bypasses the payment write guard): `sale` confirms the quotation,
-        # then our hook queues the sale.
-        self._run_post_processing()
+        # Odoo 19 has no `_run_post_processing` test helper (and its cron commits), so post-process the
+        # transaction directly: `sale` confirms the quotation, then our hook queues the sale.
+        tx._post_process()
         self.assertEqual(order.state, "sale")
         self.assertTrue(order._nuqtapass_is_fully_paid())
         sync = order.nuqtapass_sync_ids

@@ -27,10 +27,10 @@ class TestPosTill(TestPoSCommon):
         super().setUp()
         self.config = self.basic_config
         self.env.company.country_id = self.env.ref("base.om")
-        # Odoo 20: typed config parameters (get_param / set_param are gone).
+        # Odoo 19: get_param / set_param (Odoo 20 replaced them with typed calls).
         icp = self.env["ir.config_parameter"].sudo()
-        icp.set_bool("nuqtapass_loyalty.till_enabled", True)
-        icp.set_str("nuqtapass_loyalty.api_key", "sip_test")
+        icp.set_param("nuqtapass_loyalty.till_enabled", "True")
+        icp.set_param("nuqtapass_loyalty.api_key", "sip_test")
         self.product = self.create_product("Coffee", self.categ_basic, 2.5, 1.0)
         self.customer.phone = "9123 4567"
         self.open_new_session()
@@ -71,11 +71,11 @@ class TestPosTill(TestPoSCommon):
             self.assertEqual(self.config._nuqtapass_lookup("91234567")["error"], "unreachable")
 
     def test_lookup_without_key(self):
-        self.env["ir.config_parameter"].sudo().set_str("nuqtapass_loyalty.api_key", False)
+        self.env["ir.config_parameter"].sudo().set_param("nuqtapass_loyalty.api_key", False)
         self.assertEqual(self.config._nuqtapass_lookup("91234567")["error"], "not_configured")
 
     def test_lookup_when_till_off(self):
-        self.env["ir.config_parameter"].sudo().set_bool("nuqtapass_loyalty.till_enabled", False)
+        self.env["ir.config_parameter"].sudo().set_param("nuqtapass_loyalty.till_enabled", False)
         self.assertEqual(self.config._nuqtapass_lookup("91234567")["error"], "disabled")
 
     def test_lookup_no_card_here(self):

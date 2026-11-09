@@ -21,7 +21,7 @@ class TestSyncSend(TransactionCase):
     def setUp(self):
         super().setUp()
         self.Sync = self.env["nuqtapass.sync"].sudo()
-        self.env["ir.config_parameter"].sudo().set_str("nuqtapass_loyalty.api_key", "sip_test")
+        self.env["ir.config_parameter"].sudo().set_param("nuqtapass_loyalty.api_key", "sip_test")
         self.rec = self.Sync._queue({
             "kind": "sale", "channel": "till", "order_ref": "Shop/0001", "phone": "+96891234567",
             "amount": 2.5, "occurred_at": datetime(2026, 11, 9, 10, 0),
@@ -86,7 +86,7 @@ class TestSyncSend(TransactionCase):
         self.assertEqual(self.rec.attempts, 17)
 
     def test_no_key_is_temporary(self):
-        self.env["ir.config_parameter"].sudo().set_str("nuqtapass_loyalty.api_key", False)
+        self.env["ir.config_parameter"].sudo().set_param("nuqtapass_loyalty.api_key", False)
         self.Sync._send_due(now=self.now)
         self.assertEqual(self.rec.state, "pending")
         self.assertTrue(self.rec.last_error)

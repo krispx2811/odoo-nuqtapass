@@ -1,6 +1,6 @@
 {
     "name": "NuqtaPass Loyalty – eCommerce",
-    "version": "20.0.1.0.0",
+    "version": "19.0.1.0.0",
     "summary": "Earn NuqtaPass stamps and points on paid Odoo online-store orders; credit notes take them back",
     "category": "Website/eCommerce",
     "author": "NuqtaPass",

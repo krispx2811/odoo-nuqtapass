@@ -66,7 +66,7 @@ class PosOrder(models.Model):
         Sync._queue({
             "kind": "sale",
             "channel": "till",
-            # Odoo's receipt number ("266-1-000001": year + device, till, number), not `name`: on Odoo 20 every
+            # Odoo's receipt number ("266-1-000001": year + device, till, number), not `name`: on Odoo 19 and 20 every
             # till device starts its names at "<till> - 000001", so names repeat across devices.
             "order_ref": self.pos_reference,
             "phone": phone,

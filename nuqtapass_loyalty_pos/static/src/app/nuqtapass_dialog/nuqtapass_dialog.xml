@@ -5,7 +5,7 @@
             <div class="o_nuqtapass_dialog">
                 <form t-if="!this.qrOnly" class="d-flex gap-2 mb-3" t-on-submit.prevent="() => this.lookUp()">
                     <input type="tel" dir="ltr" class="form-control form-control-lg o_nuqtapass_phone"
-                           t-model.proxy="this.state.phone" placeholder="Customer phone" autocomplete="off"/>
+                           t-model="state.phone" placeholder="Customer phone" autocomplete="off"/>
                     <button type="submit" class="btn btn-primary btn-lg text-nowrap"
                             t-att-disabled="this.state.loading or !this.state.phone.trim()">Look up</button>
                 </form>
@@ -41,7 +41,7 @@
                                 <label class="visually-hidden" t-att-for="'o_nuqtapass_points_' + card.cardId">Points to use</label>
                                 <input t-att-id="'o_nuqtapass_points_' + card.cardId" type="number" min="1" step="1"
                                        inputmode="numeric" dir="ltr" class="form-control o_nuqtapass_points"
-                                       t-model.proxy="this.state.points"/>
+                                       t-model="state.points"/>
                                 <button class="btn btn-primary" t-att-disabled="this.state.loading"
                                         t-on-click="() => this.redeem(card, 'reward')">Use points</button>
                             </t>

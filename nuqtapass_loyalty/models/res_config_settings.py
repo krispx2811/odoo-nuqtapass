@@ -4,8 +4,7 @@ from odoo import fields, models
 class ResConfigSettings(models.TransientModel):
     _inherit = "res.config.settings"
 
-    # Odoo 20 stores these with the typed ir.config_parameter calls (set_str / set_bool); a switched-off
-    # Boolean is stored as "False", which get_bool reads back as off.
+    # Odoo 19 stores these with set_param: a Boolean switched on is "True", switched off deletes the parameter.
     nuqtapass_api_key = fields.Char("NuqtaPass key", config_parameter="nuqtapass_loyalty.api_key")
     nuqtapass_till_enabled = fields.Boolean("Earn at the till", config_parameter="nuqtapass_loyalty.till_enabled")
     nuqtapass_online_enabled = fields.Boolean(

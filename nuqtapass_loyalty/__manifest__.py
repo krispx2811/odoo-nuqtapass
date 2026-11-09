@@ -1,6 +1,6 @@
 {
     "name": "NuqtaPass Loyalty",
-    "version": "20.0.1.0.0",
+    "version": "19.0.1.0.0",
     "summary": "Stamps and points on Apple Wallet and Google Wallet cards for every paid order",
     "category": "Sales/Point of Sale",
     "author": "NuqtaPass",
@@ -9,7 +9,7 @@
     "depends": ["base_setup"],
     "external_dependencies": {"python": ["requests"]},
     "data": [
-        "security/ir.access.csv",
+        "security/ir.model.access.csv",
         "data/ir_config_parameter.xml",
         "data/ir_cron.xml",
         "views/nuqtapass_sync_views.xml",
