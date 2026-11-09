@@ -6,3 +6,4 @@ from . import test_pos_i18n
 from . import test_pos_assets
 from . import test_pos_spend
 from . import test_pos_refund_uses
+from . import test_pos_adjust

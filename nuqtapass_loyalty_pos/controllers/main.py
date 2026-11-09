@@ -36,3 +36,8 @@ class NuqtaPassPosController(http.Controller):
     @http.route("/nuqtapass_loyalty/pos/attach", type="jsonrpc", auth="user", methods=["POST"])
     def attach(self, config_id, order_id, query):
         return self._config(config_id)._nuqtapass_attach(order_id, query)
+
+    @http.route("/nuqtapass_loyalty/pos/adjust", type="jsonrpc", auth="user", methods=["POST"])
+    def adjust(self, config_id, card_id, action, reason, delta=None):
+        """A correction (a stamp on or off, ± points) with a reason. pos.config re-checks the POS administrator group."""
+        return self._config(config_id)._nuqtapass_adjust(card_id, action, delta, reason)

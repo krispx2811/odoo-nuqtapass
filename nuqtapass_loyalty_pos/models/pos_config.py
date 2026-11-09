@@ -109,7 +109,8 @@ class PosConfig(models.Model):
                 return self._nuqtapass_failure(result)
         # clean_customer: Part 1's cards, walletAdded and, while the card isn't on a phone, the QR / WhatsApp / SMS links.
         clean = clean_customer(result.data)
-        return {"ok": True, "phone": e164, **clean, "cards": current_cards(clean["cards"])}
+        return {"ok": True, "phone": e164, **clean, "cards": current_cards(clean["cards"]),
+                "canCorrect": self._nuqtapass_can_correct()}
 
     def _nuqtapass_redeem(self, phone, card_id, action, voucher_id=None, points=None):
         """POST /redeem with Part 1's body: cardId from /customer, the card's voucher id when it has one, and for a
@@ -223,5 +224,5 @@ class PosConfig(models.Model):
         result = client.customer(phone)
         clean = clean_customer(result.data) if result.ok else clean_customer({})
         card = next((c for c in current_cards(clean["cards"]) if c["type"] == earned["cardType"]), None)
-        return {"ok": True, "phone": phone, "earned": earned, "card": card,
+        return {"ok": True, "phone": phone, "earned": earned, "card": card, "cards": current_cards(clean["cards"]),
                 "show_qr": not clean["walletAdded"], "welcome": clean["welcome"]}

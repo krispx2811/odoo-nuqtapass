@@ -55,6 +55,13 @@ class TestPosTill(TestPoSCommon):
         self.assertTrue(res["walletAdded"])
         self.assertIsNone(res["welcome"])
 
+    def test_lookup_keeps_the_tier(self):
+        tier = {"name": "GOLD", "cashbackPct": 10, "next": None, "color": "rgb(212, 175, 55)"}
+        points = {"cardId": POINTS_CARD, "type": "POINTS", "points": 1404, "current": True, "tier": tier}
+        with patch.object(NuqtaPassClient, "customer", return_value=ok({"walletAdded": True, "cards": [points]})):
+            res = self.config._nuqtapass_lookup("91234567")
+        self.assertEqual(res["cards"][0]["tier"], tier)
+
     def test_lookup_answers_nuqtapass_currency_not_the_till_currency(self):
         # Kareem, 2026-11-09: a till set up in US dollars still shows an Omani shop's NuqtaPass amounts in OMR.
         self.assertNotEqual(self.config.currency_id.name, "OMR")
@@ -290,6 +297,8 @@ class TestPosTill(TestPoSCommon):
         self.assertEqual(res["earned"], {"cardType": "POINTS", "stamps": 0, "points": 3})
         self.assertEqual((res["ok"], res["phone"], res["card"]["points"], res["show_qr"]),
                          (True, "+96891234567", 163, False))
+        # The customer's current cards too: the till's reward-ready notice reads them (spec 2026-11-09 §2).
+        self.assertEqual([c["cardId"] for c in res["cards"]], [STAMP_CARD, POINTS_CARD])
 
     def test_attach_new_customer_earns_and_shows_the_qr(self):
         order = self._paid_order(customer=False)
