@@ -1,0 +1,20 @@
+.o_nuqtapass_dialog {
+    .o_nuqtapass_phone {
+        text-align: start;
+        unicode-bidi: plaintext;
+    }
+    .o_nuqtapass_card {
+        text-align: start;
+        border-inline-start-width: 4px !important;
+    }
+    .o_nuqtapass_points {
+        inline-size: 8rem;
+    }
+    .o_nuqtapass_qr img {
+        // A QR code must stay black on white to scan, whatever the till's theme.
+        background: #fff;
+        padding: 8px;
+        max-inline-size: 100%;
+        block-size: auto;
+    }
+}

@@ -8,6 +8,11 @@
     "license": "LGPL-3",
     "depends": ["nuqtapass_loyalty", "point_of_sale"],
     "data": [],
+    "assets": {
+        "point_of_sale._assets_pos": [
+            "nuqtapass_loyalty_pos/static/src/**/*",
+        ],
+    },
     "auto_install": True,
     "installable": True,
 }
