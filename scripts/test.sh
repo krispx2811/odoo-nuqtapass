@@ -11,10 +11,16 @@ LOG="$(mktemp)"
 set +e
 docker compose run --rm odoo odoo -c /etc/odoo/odoo.conf -d "$DB" -i "$MODULES" \
   --test-tags "$TAGS" --stop-after-init --log-level=test --http-port=8169 2>&1 | tee "$LOG"
+STATUS=${PIPESTATUS[0]}
 set -e
 docker compose exec -T db dropdb -U odoo --if-exists "$DB" >/dev/null 2>&1 || true
 if grep -qE "(FAIL|ERROR):|[1-9][0-9]* failed|[1-9][0-9]* error\(s\)" "$LOG"; then
   echo "TESTS FAILED"; exit 1
+fi
+# An import error or a broken registry stops Odoo before any test runs: it is logged at
+# ERROR/CRITICAL level (not "ERROR:") and prints no result line, so catch it here.
+if [ "$STATUS" -ne 0 ] || grep -qE "^[0-9-]+ [0-9:,]+ [0-9]+ (ERROR|CRITICAL) " "$LOG"; then
+  echo "TESTS FAILED (Odoo exited $STATUS or logged an error)"; exit 1
 fi
 # A module Odoo can't find is only a warning, and then none of its tests run: that is not a pass.
 if grep -q "invalid module names" "$LOG"; then
