@@ -56,6 +56,17 @@ class TestPosSpend(NuqtaPassUsesCommon):
         self.assertEqual((product.type, product.taxes_id.ids, product.available_in_pos), ("service", [], True))
         self.assertEqual(self.env["pos.config"]._nuqtapass_reward_product(), product)
 
+    def test_till_data_makes_the_missing_reward_product(self):
+        # A till already open (not opened again from the back office) still gets the product when it loads: without
+        # it the payment panel shows no actions and "Use points" adds nothing.
+        self.env["ir.model.data"].search([("module", "=", "nuqtapass_loyalty_pos"),
+                                          ("name", "=", "product_nuqtapass_reward")]).unlink()
+        self.config.invalidate_recordset()
+        product = self.config.nuqtapass_reward_product_id
+        self.assertTrue(product)
+        self.assertEqual(self.env.ref("nuqtapass_loyalty_pos.product_nuqtapass_reward"), product)
+        self.assertIn(product, self.config._get_special_products())
+
     def test_opening_a_till_adds_the_credit_method(self):
         config = self.env["pos.config"].create({"name": "Third till"})
         config.payment_method_ids -= self.credit_pm

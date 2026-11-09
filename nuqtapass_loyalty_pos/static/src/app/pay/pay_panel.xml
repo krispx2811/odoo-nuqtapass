@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates id="template" xml:space="preserve">
     <t t-name="nuqtapass_loyalty_pos.PayPanel">
-        <section class="o_nuqtapass_pay mt-3" aria-labelledby="o_nuqtapass_pay_title">
+        <section class="o_nuqtapass_pay" aria-labelledby="o_nuqtapass_pay_title">
             <header class="d-flex align-items-baseline gap-2 mb-2">
                 <h2 id="o_nuqtapass_pay_title" class="fs-5 fw-bold mb-0">NuqtaPass</h2>
                 <bdi t-if="this.state.result" dir="ltr" class="o_nuqtapass_who fs-6 text-muted" t-out="this.phoneText"/>
@@ -28,51 +28,50 @@
                 </div>
                 <p t-if="!this.cards.length" class="text-muted mb-0">No card yet. The customer gets one with their first purchase.</p>
                 <div t-foreach="this.cards" t-as="card" t-key="card.cardId" class="o_nuqtapass_card rounded mb-2"
-                     t-att-class="{'o_nuqtapass_focus': card.cardId === this.state.focus}"
-                     t-att-style="this.bandStyle(card)">
+                     t-att-class="{'o_nuqtapass_focus': card.cardId === this.state.focus}">
                     <div class="o_nuqtapass_card_title small text-muted"><bdi t-out="this.cardTitle(card)"/></div>
                     <div class="o_nuqtapass_card_line fs-5 fw-semibold"><bdi t-out="this.cardLine(card)"/></div>
                     <t t-set="done" t-value="this.applied(card)"/>
+                    <t t-set="why" t-value="!done and this.notNow(card)"/>
                     <div t-if="done" class="o_nuqtapass_applied d-flex align-items-center gap-2 mt-2">
                         <span class="flex-grow-1 text-success fw-medium"><bdi t-out="done.label"/></span>
                         <button type="button" class="btn btn-outline-secondary" t-on-click="() => done.remove()">Remove</button>
                     </div>
-                    <t t-elif="this.canUse(card)">
-                        <div t-if="card.type === 'POINTS'" class="mt-2">
+                    <p t-elif="why" class="o_nuqtapass_why text-muted mt-1 mb-0"><bdi t-out="why"/></p>
+                    <t t-elif="card.type === 'POINTS'">
+                        <div class="mt-2">
                             <NuqtaPassPointsBox card="card" currency="this.currency" cap="this.state.result.limits.pointsPerVisit"
                                                 maxValue="this.maxPointsValue" onUse="(plan) => this.usePoints(card, plan)"/>
                         </div>
-                        <form t-elif="card.type === 'PREPAID'" class="d-flex align-items-center gap-2 mt-2"
-                              t-on-submit.prevent="() => this.useCredit(card)">
-                            <label class="visually-hidden" t-att-for="'o_nuqtapass_credit_' + card.cardId">Credit to use</label>
-                            <div class="input-group input-group-lg o_nuqtapass_amount">
-                                <input t-att-id="'o_nuqtapass_credit_' + card.cardId" type="text" inputmode="decimal" dir="ltr"
-                                       autocomplete="off" class="form-control" t-model="state.credit"/>
-                                <span class="input-group-text" dir="auto" t-out="this.currencyLabel"/>
-                            </div>
-                            <button type="submit" class="btn btn-primary btn-lg text-nowrap"
-                                    t-att-disabled="!this.creditToUse(card)">Use credit</button>
-                        </form>
-                        <form t-else="" class="d-flex align-items-center gap-2 mt-2" t-on-submit.prevent="() => this.useOnItem(card)">
-                            <t t-if="this.coverable.length">
-                                <label class="visually-hidden" t-att-for="'o_nuqtapass_item_' + card.cardId">Item it covers</label>
-                                <select t-att-id="'o_nuqtapass_item_' + card.cardId" class="form-select form-select-lg"
-                                        t-on-change="(ev) => this.pick(card, ev.target.value)">
-                                    <option t-foreach="this.coverable" t-as="line" t-key="line.uuid" t-att-value="line.uuid"
-                                            t-att-selected="this.picked(card) === line" t-out="this.itemLabel(line)"/>
-                                </select>
-                                <button type="submit" class="btn btn-primary btn-lg text-nowrap" t-out="this.useLabel(card)"/>
-                            </t>
-                            <span t-else="" class="text-muted">Add the item it covers to the order first.</span>
-                        </form>
                     </t>
+                    <form t-elif="card.type === 'PREPAID'" class="d-flex align-items-center gap-2 mt-2"
+                          t-on-submit.prevent="() => this.useCredit(card)">
+                        <label class="visually-hidden" t-att-for="'o_nuqtapass_credit_' + card.cardId">Credit to use</label>
+                        <div class="input-group input-group-lg o_nuqtapass_amount">
+                            <input t-att-id="'o_nuqtapass_credit_' + card.cardId" type="text" inputmode="decimal" dir="ltr"
+                                   autocomplete="off" class="form-control" t-model="state.credit"/>
+                            <span class="input-group-text" dir="auto" t-out="this.currencyLabel"/>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-lg text-nowrap"
+                                t-att-disabled="!this.creditToUse(card)">Use credit</button>
+                    </form>
+                    <form t-else="" class="d-flex align-items-center gap-2 mt-2" t-on-submit.prevent="() => this.useOnItem(card)">
+                        <label class="visually-hidden" t-att-for="'o_nuqtapass_item_' + card.cardId">Item it covers</label>
+                        <select t-att-id="'o_nuqtapass_item_' + card.cardId" class="form-select form-select-lg"
+                                t-on-change="(ev) => this.pick(card, ev.target.value)">
+                            <option t-foreach="this.coverable" t-as="line" t-key="line.uuid" t-att-value="line.uuid"
+                                    t-att-selected="this.picked(card) === line" t-out="this.itemLabel(line)"/>
+                        </select>
+                        <button type="submit" class="btn btn-primary btn-lg text-nowrap" t-out="this.useLabel(card)"/>
+                    </form>
                 </div>
                 <p t-if="this.cards.length" class="o_nuqtapass_hint small text-muted mb-0">Nothing is used until you validate.</p>
             </t>
         </section>
     </t>
 
-    <!-- Phone layout: under the payment methods. Wide layout: in the open space beside them, under the amount due. -->
+    <!-- Phone layout: under the payment methods. Wide layout: in the right column under the amount due and the payment
+         lines, in the column's own flow (it scrolls with them; see .o_nuqtapass_pay_wide in the SCSS). -->
     <t t-name="nuqtapass_loyalty_pos.PaymentScreenMethods" t-inherit="point_of_sale.PaymentScreenMethods" t-inherit-mode="extension">
         <xpath expr="//div[hasclass('paymentmethods')]" position="after">
             <NuqtaPassPayPanel t-if="this.nuqtapassPanel and this.ui.isSmall" order="this.currentOrder"/>

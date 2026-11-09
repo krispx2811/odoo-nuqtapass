@@ -1218,3 +1218,51 @@ msgstr "اكتب السبب، من 3 إلى 200 حرف."
 #: model_terms:ir.ui.view,arch_db:nuqtapass_loyalty_pos.res_config_settings_view_form_nuqtapass_pos
 msgid "e.g. Qurum"
 msgstr "مثلاً: القرم"
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_panel.js:0
+msgid "No points to use yet."
+msgstr "ما فيه نقاط تنصرف للحين."
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_panel.js:0
+msgid "Nothing on the order to take off."
+msgstr "ما فيه شي بالطلب ينخصم منه."
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_panel.js:0
+msgid "No credit left on this card."
+msgstr "ما بقى رصيد بهالبطاقة."
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_panel.js:0
+msgid "Nothing left to pay."
+msgstr "ما بقى شي للدفع."
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_panel.js:0
+msgid "No uses left on this pack."
+msgstr "ما بقى استخدامات بهالباقة."
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_panel.js:0
+msgid "Reward not ready yet."
+msgstr "المكافأة مو جاهزة للحين."
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_panel.js:0
+msgid "This voucher is used up."
+msgstr "هالقسيمة انصرفت."
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_panel.js:0
+msgid "This till isn't ready for NuqtaPass yet. Reload the till page, then try again."
+msgstr "هالكاشير مو جاهز للحين لاستخدام NuqtaPass. حدّث صفحة الكاشير وجرب مرة ثانية."

@@ -209,7 +209,4 @@ export function tierInfo(cards) {
     return { member: memberLine(parts.name, parts.pct), next, color: parts.color, cardId: card.cardId };
 }
 
-/** The card strip's start band in the tier's colour (NuqtaPass sends only "rgb(r, g, b)"; the server checks it). */
-export function bandStyle(card, tier) {
-    return tier?.color && card.cardId === tier.cardId ? `border-inline-start-color: ${tier.color}` : "";
-}
+
