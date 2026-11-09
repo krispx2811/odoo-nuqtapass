@@ -156,10 +156,10 @@ class PosConfig(models.Model):
         return clean
 
     def _nuqtapass_spend(self, order_ref, phone, uses):
-        """POST /redeem for each use with the order's receipt number: NuqtaPass spends each once per order.
+        """POST /redeem for all uses at once, with the receipt number: NuqtaPass spends each once per order.
 
         {"ok": True, "used": [...]} when all went through; else {"ok": False, "error", "index", "message"} and the
-        till stops the payment. Uses spent before a refusal stay recorded; the next Validate sends them again and
+        till stops the payment. The other uses NuqtaPass spent stay recorded; the next Validate sends them again and
         NuqtaPass answers them as duplicates, spending nothing more.
         """
         self.ensure_one()
@@ -175,18 +175,25 @@ class PosConfig(models.Model):
         if client is None:
             return e164
         Use = self.env["nuqtapass.pos.use"].sudo()
-        used = []
-        for index, use in enumerate(clean):
+        bodies = []
+        for use in clean:
             body = {"phone": e164, **use["body"], "orderRef": order_ref}
             if self.nuqtapass_branch:
                 body["branch"] = self.nuqtapass_branch
-            result = client.redeem(body)
+            bodies.append(body)
+        # All uses go out at once; every one NuqtaPass spent is recorded, then the first failure (if any) stops
+        # the payment.
+        results = client.redeem_all(bodies)
+        used, failure = [], None
+        for index, (use, result) in enumerate(zip(clean, results)):
             if not result.ok:
-                return dict(self._nuqtapass_spend_failure(result, use, order_ref), index=index)
+                if failure is None:
+                    failure = dict(self._nuqtapass_spend_failure(result, use, order_ref), index=index)
+                continue
             data = result.data or {}
             self._nuqtapass_record_use(Use, order_ref, e164, use, data)
             used.append({"index": index, "use": use["use"], "duplicate": bool(data.get("duplicate"))})
-        return {"ok": True, "used": used}
+        return failure or {"ok": True, "used": used}
 
     def _nuqtapass_record_use(self, Use, order_ref, phone, use, data):
         body = use["body"]

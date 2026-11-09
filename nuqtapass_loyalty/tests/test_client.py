@@ -23,7 +23,7 @@ class TestClient(TransactionCase):
     def setUp(self):
         super().setUp()
         self.client = NuqtaPassClient("sip_test_key")
-        patcher = patch.object(client_mod.requests, "request")
+        patcher = patch.object(client_mod.requests.Session, "request")
         self.request = patcher.start()
         self.addCleanup(patcher.stop)
 
@@ -40,6 +40,18 @@ class TestClient(TransactionCase):
         self.assertEqual(kwargs["json"], body)
         self.assertEqual(kwargs["headers"]["Authorization"], "Bearer sip_test_key")
         self.assertIn("timeout", kwargs)
+
+    def test_redeem_all_keeps_the_order_on_one_session(self):
+        def reply(method, url, **kwargs):
+            return fake_response(200, {"success": True, "data": {"n": kwargs["json"]["n"]}})
+        self.request.side_effect = reply
+        results = self.client.redeem_all([{"n": i} for i in range(5)])
+        self.assertEqual([r.data["n"] for r in results], [0, 1, 2, 3, 4])
+        self.assertEqual(self.request.call_count, 5)
+        self.assertEqual({c.args[1] for c in self.request.call_args_list}, {DEFAULT_BASE_URL + "/redeem"})
+        self.assertTrue(all("timeout" in c.kwargs for c in self.request.call_args_list))
+        self.assertIsInstance(self.client._session, requests.Session)
+        self.assertEqual(self.client.redeem_all([]), [])
 
     def test_customer_uses_query_param(self):
         self.request.return_value = fake_response(200, {"success": True, "data": {"cards": []}})

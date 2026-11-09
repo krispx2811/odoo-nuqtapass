@@ -1,3 +1,4 @@
+import time
 from types import SimpleNamespace
 from unittest.mock import patch
 
@@ -130,7 +131,9 @@ class TestPosSpend(NuqtaPassUsesCommon):
 
     # ── Validate: one /redeem per use, with the order's reference ────
     def _spend(self, uses, results):
-        with patch.object(NuqtaPassClient, "redeem", side_effect=results) as mocked:
+        # The uses go out at the same time, in any order: each answer goes with its use's card.
+        by_card = {str(use.get("card_id") or "").lower(): result for use, result in zip(uses, results)}
+        with patch.object(NuqtaPassClient, "redeem", side_effect=lambda body: by_card[body["cardId"]]) as mocked:
             res = self.config._nuqtapass_spend(REF, PHONE, uses)
         return res, mocked
 
@@ -141,7 +144,7 @@ class TestPosSpend(NuqtaPassUsesCommon):
             [answer("points", pointsUsed=167), answer("credit"), answer("pack"), answer("reward"), answer("voucher")])
         self.assertTrue(res["ok"], res)
         base = {"phone": PHONE, "orderRef": REF, "branch": "Qurum"}
-        self.assertEqual([c.args[0] for c in mocked.call_args_list], [
+        self.assertCountEqual([c.args[0] for c in mocked.call_args_list], [
             dict(base, cardId=POINTS_CARD, action="reward", points=167),
             dict(base, cardId=PREPAID_CARD, action="credit", amount=2.5),
             dict(base, cardId=PACK_CARD, action="pack", uses=1),
@@ -170,6 +173,30 @@ class TestPosSpend(NuqtaPassUsesCommon):
                                          "Remove this line to take payment without it.")
         # What was already used stays recorded; a new Validate resends it (NuqtaPass answers it as a duplicate).
         self.assertEqual(self.Use.search([("order_ref", "=", REF)]).mapped("use"), ["credit"])
+
+    def test_uses_go_out_at_the_same_time(self):
+        # Kareem's till: five uses one after another took ~21 s (one internet round trip each).
+        def slow(body):
+            time.sleep(0.4)
+            return answer(body["action"])
+        started = time.monotonic()
+        with patch.object(NuqtaPassClient, "redeem", side_effect=slow) as mocked:
+            res = self.config._nuqtapass_spend(REF, PHONE, [POINTS_USE, CREDIT_USE, PACK_USE, REWARD_USE, VOUCHER_USE])
+        self.assertTrue(res["ok"], res)
+        self.assertEqual(mocked.call_count, 5)
+        self.assertLess(time.monotonic() - started, 1.2)  # about one call's time, not five
+        self.assertEqual([u["index"] for u in res["used"]], [0, 1, 2, 3, 4])
+
+    def test_a_refusal_keeps_the_other_spent_uses(self):
+        # All went out together: the ones NuqtaPass spent after the refused one are recorded too.
+        res, mocked = self._spend([POINTS_USE, CREDIT_USE, PACK_USE],
+                                  [answer("points"), refused("Not enough credit"), answer("pack")])
+        self.assertEqual(mocked.call_count, 3)
+        self.assertEqual((res["ok"], res["error"], res["index"]), (False, "refused", 1))
+        self.assertEqual(sorted(self.Use.search([("order_ref", "=", REF)]).mapped("use")), ["pack", "points"])
+        # The first failing line is the one named, also when an earlier one is unreachable.
+        res, _mocked = self._spend([CREDIT_USE, PACK_USE], [DOWN, refused("No uses left")])
+        self.assertEqual((res["error"], res["index"]), ("unreachable", 0))
 
     def test_unreachable_stops_payment(self):
         res, _mocked = self._spend([POINTS_USE], [DOWN])

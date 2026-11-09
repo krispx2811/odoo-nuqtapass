@@ -98,7 +98,20 @@ class TestPosArabic(TransactionCase):
 
     def test_credit_method_name_in_arabic(self):
         self.assertEqual(self.env["pos.payment.method"].with_context(lang="ar_001")._fields["nuqtapass_credit"]
-                         .get_description(self.env(context={"lang": "ar_001"}))["string"], "رصيد NuqtaPass")
+                         .get_description(self.env(context={"lang": "ar_001"}))["string"], "رصيد نقطة باس")
+
+    def test_credit_method_shows_its_arabic_name(self):
+        # The method shows in the till's list with Cash and Card: in the cashier's Arabic, "رصيد نقطة باس".
+        Method = self.env["pos.payment.method"]
+        method = Method._nuqtapass_credit_method(self.env.company)
+        Method._nuqtapass_ensure_all()  # what every upgrade runs (the method was made before Arabic was on)
+        self.assertEqual(method.with_context(lang="en_US").name, "NuqtaPass credit")
+        self.assertEqual(method.with_context(lang="ar_001").name, "رصيد نقطة باس")
+        # A shop's own name is kept.
+        method.with_context(lang="en_US").name = "Prepaid"
+        method.update_field_translations("name", {"ar_001": "مدفوع مقدماً"})
+        Method._nuqtapass_ensure_all()
+        self.assertEqual(method.with_context(lang="ar_001").name, "مدفوع مقدماً")
 
     def test_correction_words_in_arabic(self):
         config = self.config.with_context(lang="ar_001")

@@ -108,6 +108,44 @@ export function startingAmount({ orderTotal, cardWorth, capValue = null, decimal
     return smallest > 0 ? floorTo(smallest, decimals) : 0;
 }
 
+/** What a money box shows: what the cashier typed, or (until they type) its default for the order as it is now,
+ * so the default follows the amount due when other lines change it. */
+export function boxText(typed, start, decimals) {
+    return typed === null || typed === undefined ? (Number.isFinite(start) ? start : 0).toFixed(decimals) : typed;
+}
+
+/** A refund's payment split: its share of the NuqtaPass credit the order was paid with, back as credit, and the
+ * rest. `refundTotal` and `orderTotal` as positive amounts; never more credit than the order used nor than is given
+ * back. { credit, rest }, both >= 0. */
+export function refundSplit({ refundTotal, orderTotal, creditPaid, decimals }) {
+    if (!usable(refundTotal)) {
+        return { credit: 0, rest: 0 };
+    }
+    const total = roundTo(refundTotal, decimals);
+    if (!usable(creditPaid) || !usable(orderTotal)) {
+        return { credit: 0, rest: total };
+    }
+    const share = Math.min(1, refundTotal / orderTotal);
+    const credit = Math.min(roundTo(creditPaid * share, decimals), creditPaid, total);
+    return { credit, rest: roundTo(total - credit, decimals) };
+}
+
+/** The "NuqtaPass credit" method's button: the looked-up customer's credit card and how much of it to use (the
+ * amount due, its credit payment left out, up to the balance), or why not: { ok, card, amount } or { ok: false,
+ * reason: "customer" | "no_credit" | "nothing_due" }. `cards` is null until a customer is looked up. */
+export function creditPick({ cards, remainingDue, creditPaid = 0, decimals }) {
+    if (!Array.isArray(cards)) {
+        return { ok: false, reason: "customer" };
+    }
+    const card = cards.find((c) => c.type === "PREPAID" && usable(c.balance));
+    if (!card) {
+        return { ok: false, reason: "no_credit" };
+    }
+    const due = Math.max(0, (remainingDue || 0) + (creditPaid || 0));
+    const amount = creditAmount({ amount: card.balance, balance: card.balance, due, decimals });
+    return amount > 0 ? { ok: true, card, amount } : { ok: false, reason: "nothing_due" };
+}
+
 /** Prepaid credit to use: what was typed, no more than the balance or what is still due. */
 export function creditAmount({ amount, balance, due, decimals }) {
     if (!usable(amount)) {

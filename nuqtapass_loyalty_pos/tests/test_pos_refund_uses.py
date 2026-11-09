@@ -95,3 +95,16 @@ class TestPosRefundUses(NuqtaPassUsesCommon):
         order = self._sync([self._line(self.coffee, 2, 2.5)], [(self.cash_pm1, 5.0)])
         _row, body = self._row(self._refund(order))
         self.assertEqual((body["orderAmount"], body["returnUses"]), (5.0, {}))
+
+    def test_partial_refund_split_like_the_order_gives_its_credit_share_back(self):
+        # The till pre-fills a refund like the order was paid: half the order back is half the credit (1.000) as
+        # NuqtaPass credit and the rest (1.500) cash; NuqtaPass is given back what the credit line says.
+        order = self._sync([self._line(self.coffee, 2, 2.5)], [(self.credit_pm, 2.0), (self.cash_pm1, 3.0)])
+        self._used(order, "credit", PREPAID_CARD, amount=2.0)
+        coffee = order.lines.filtered(lambda line: line.product_id == self.coffee)
+        refund = self._refund(order, {coffee: 1}, credit_back=1.0)
+        cash = refund.payment_ids.filtered(lambda p: p.payment_method_id == self.cash_pm1)
+        self.assertAlmostEqual(cash.amount, -1.5)
+        _row, body = self._row(refund)
+        self.assertEqual(body["returnUses"], {"credit": 1.0})
+        self.assertAlmostEqual(body["amount"], 1.5)

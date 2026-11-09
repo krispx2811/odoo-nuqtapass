@@ -246,7 +246,7 @@ TERMS = {
     "NuqtaPass can't be reached: remove the NuqtaPass lines to take payment without them.":
         "ما قدرنا نوصل NuqtaPass. شيل بنود NuqtaPass عشان تكمل الدفع بدونها.",
     "NuqtaPass card": "بطاقة NuqtaPass",
-    "NuqtaPass credit": "رصيد NuqtaPass",
+    "NuqtaPass credit": "رصيد نقطة باس",
     "NuqtaPass is still recording this order. Press Validate again in a moment.":
         "NuqtaPass للحين يسجل هالطلب. اضغط «تصديق» مرة ثانية بعد شوي.",
     "NuqtaPass line": "بند NuqtaPass",
@@ -284,8 +284,8 @@ TERMS = {
     "Service pack (1 use)": "باقة الخدمات (استخدام واحد)",
     "Stamp reward": "مكافأة الأختام",
     "Stamp reward used": "انستخدمت مكافأة الأختام",
-    "The customer pays with prepaid credit bought at NuqtaPass. The till adds it from its NuqtaPass panel only, and NuqtaPass takes the amount off the card when the order is validated.":
-        "العميل يدفع من رصيد شراه من NuqtaPass. الكاشير يضيفه من خانة NuqtaPass بس، وNuqtaPass يخصم المبلغ من البطاقة لما يتأكد الطلب.",
+    "The customer pays with prepaid credit bought at NuqtaPass. It shows with the till's other methods, but adds a payment only for a looked-up customer's credit card (as the NuqtaPass panel does), and NuqtaPass takes the amount off the card when the order is validated.":
+        "العميل يدفع من رصيد شراه من NuqtaPass. يطلع مع طرق الدفع الثانية في الكاشير، بس ما يضيف دفعة إلا من بطاقة رصيد عميل انبحث عنه (مثل خانة NuqtaPass)، وNuqtaPass يخصم المبلغ من البطاقة لما يتأكد الطلب.",
     "This use is already recorded for this order.": "هالاستخدام مسجل من قبل لهالطلب.",
     "Type an amount": "اكتب المبلغ",
     "Use": "الاستخدام",
@@ -356,4 +356,27 @@ TERMS = {
     "There's no stamp to take off.": "ما فيه ختم ينشال.",
     "We couldn't finish this. Try again.": "ما قدرنا نكمل، حاول مرة ثانية.",
     "Reward ready: %(reward)s": "المكافأة جاهزة: %(reward)s",
+    # 2026-11-10: the "NuqtaPass credit" method in the till's own list.
+    "Look the customer up in the NuqtaPass panel first: the credit is taken from their card.":
+        "دوّر على العميل في خانة NuqtaPass أول: الرصيد ينخصم من بطاقته.",
+    "This customer has no NuqtaPass credit.": "هالعميل ما عنده رصيد في NuqtaPass.",
+    "Remove the NuqtaPass credit line and add it again with the customer looked up.":
+        "شيل بند رصيد NuqtaPass وأضفه مرة ثانية بعد ما تدوّر على العميل.",
+    # Till panel words (2026-11-09), kept from ar.po.
+    'Capped at the amount due (%(value)s)': 'بحد أقصى المبلغ المطلوب (%(value)s)',
+    "Capped at the card's worth (%(value)s)": 'بحد أقصى قيمة البطاقة (%(value)s)',
+    'Capped at the per-visit limit (%(value)s)': 'بحد أقصى حد الزيارة الواحدة (%(value)s)',
+    'No credit left on this card.': 'ما بقى رصيد بهالبطاقة.',
+    'No points to use yet.': 'ما فيه نقاط تنصرف للحين.',
+    'No uses left on this pack.': 'ما بقى استخدامات بهالباقة.',
+    'Nothing left to pay.': 'ما بقى شي للدفع.',
+    'Nothing on the order to take off.': 'ما فيه شي بالطلب ينخصم منه.',
+    "Points lowered to %(points)s (%(value)s off) so the order doesn't go below 0.": 'نزّلنا النقاط إلى %(points)s (خصم %(value)s) عشان ما ينزل الطلب تحت الصفر.',
+    'Points removed: the free item leaves nothing on the order for them to take off.': 'شلنا النقاط: الصنف المجاني ما خلّى شي في الطلب تنخصم منه.',
+    'Reward not ready yet.': 'المكافأة مو جاهزة للحين.',
+    'The NuqtaPass lines take off more than is on the order. Lower the points or remove a free item, then validate.': 'بنود NuqtaPass تخصم أكثر من قيمة الطلب. نزّل النقاط أو شيل صنف مجاني، بعدين أكّد الدفع.',
+    'This item is already free on this order: there is nothing left for it to make free.': 'هالصنف مجاني من قبل في هالطلب: ما بقى شي يصير مجاني.',
+    "This till isn't ready for NuqtaPass yet. Reload the till page, then try again.": 'هالكاشير مو جاهز للحين لاستخدام NuqtaPass. حدّث صفحة الكاشير وجرب مرة ثانية.',
+    'This voucher is used up.': 'هالقسيمة انصرفت.',
+    "Point of Sale Session": "جلسة نقطة البيع",
 }

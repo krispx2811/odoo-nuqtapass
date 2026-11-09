@@ -7,7 +7,8 @@
                 <!-- The amount reads left to right in the Arabic till too; the currency sits after it in reading order. -->
                 <div class="input-group input-group-lg o_nuqtapass_amount">
                     <input t-att-id="this.inputId" type="text" inputmode="decimal" autocomplete="off" dir="ltr"
-                           class="form-control o_nuqtapass_amount_input" t-model.proxy="this.state.amount"/>
+                           class="form-control o_nuqtapass_amount_input" t-att-value="this.amountText"
+                           t-on-input="(ev) => this.onInput(ev)"/>
                     <span class="input-group-text" dir="auto" t-out="this.currencyLabel"/>
                 </div>
                 <button type="submit" class="btn btn-primary btn-lg text-nowrap"

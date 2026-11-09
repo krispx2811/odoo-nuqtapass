@@ -1,7 +1,9 @@
 """The only place that talks HTTP to NuqtaPass. Never raises; never logs the key."""
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 
 import requests
+from requests.adapters import HTTPAdapter
 
 DEFAULT_BASE_URL = "https://sipcard-production-b91a.up.railway.app/api/pos"
 TIMEOUT = (5, 15)  # connect, read (seconds)
@@ -11,6 +13,8 @@ RETRYABLE_STATUSES = {401, 403, 408, 425, 429}
 # Part 1 codes that clear by themselves: a full stamp card (staff give the reward), an order another attempt
 # holds, an unexpected server error on /sale or /refund (422 POS_FAILED).
 RETRYABLE_CODES = {"CARD_FULL", "IN_PROGRESS", "POS_FAILED"}
+# The till's uses at Validate go out together (each is idempotent per orderRef + use): at most this many at once.
+MAX_PARALLEL = 8
 
 
 @dataclass(frozen=True)
@@ -31,6 +35,9 @@ class NuqtaPassClient:
             raise ValueError("NuqtaPass URL must use https")
         self._key = api_key
         self._base = base_url.rstrip("/")
+        # One keep-alive session for all of this client's calls (a till's Validate makes several).
+        self._session = requests.Session()
+        self._session.mount("https://", HTTPAdapter(pool_connections=1, pool_maxsize=MAX_PARALLEL))
 
     def ping(self):
         return self._call("GET", "/ping")
@@ -51,13 +58,22 @@ class NuqtaPassClient:
     def redeem(self, body):
         return self._call("POST", "/redeem", body=body)
 
+    def redeem_all(self, bodies):
+        """POST /redeem for each body, at the same time (so Validate takes about one call's time). The results in
+        the bodies' order. Safe to resend: NuqtaPass spends each use once per orderRef."""
+        bodies = list(bodies)
+        if len(bodies) <= 1:
+            return [self.redeem(body) for body in bodies]
+        with ThreadPoolExecutor(max_workers=min(len(bodies), MAX_PARALLEL)) as pool:
+            return list(pool.map(self.redeem, bodies))
+
     def adjust(self, body):
         """A POS manager's correction: a stamp added / undone or ± points, with a reason (Part 1 POST /adjust)."""
         return self._call("POST", "/adjust", body=body)
 
     def _call(self, method, path, params=None, body=None):
         try:
-            resp = requests.request(
+            resp = self._session.request(
                 method,
                 self._base + path,
                 params=params,
