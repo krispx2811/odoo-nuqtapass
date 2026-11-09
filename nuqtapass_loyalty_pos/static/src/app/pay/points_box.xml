@@ -14,6 +14,7 @@
                         t-att-disabled="this.props.busy or !this.plan.points">Use points</button>
             </div>
             <p class="o_nuqtapass_live mb-0 mt-1" role="status" aria-live="polite"><bdi t-out="this.liveLine"/></p>
+            <p t-if="this.cappedLine" class="o_nuqtapass_capped text-muted small mb-0"><bdi t-out="this.cappedLine"/></p>
         </form>
     </t>
 </templates>

@@ -25,14 +25,29 @@ class TestPosRefundUses(NuqtaPassUsesCommon):
         return row, row._payload()
 
     # ── earning ───────────────────────────────────────────────────────
-    def test_earns_on_what_was_paid_credit_included(self):
+    def test_earns_on_what_was_paid_without_nuqtapass(self):
         lines = [self._line(self.coffee, 4, 2.5), self._points_line(167, 5.01)]
         order = self._sync(lines, [(self.credit_pm, 2.5), (self.cash_pm1, 2.49)])
         sale = order.nuqtapass_sync_ids
         self.assertEqual(sale.kind, "sale")
-        # The discount lowers the total; the credit payment counts as paid.
-        self.assertAlmostEqual(sale.amount, 4.99)
+        # The points lower the total; the credit paid is NuqtaPass's value too, so it earns nothing either.
         self.assertAlmostEqual(order.amount_total, 4.99)
+        self.assertAlmostEqual(sale.amount, 2.49)
+
+    def test_points_credit_and_cash_earn_on_the_cash_only(self):
+        # Kareem's rule: 10.000 with 3.000 off in points, 4.000 in NuqtaPass credit and 3.000 cash earns on 3.000.
+        lines = [self._line(self.coffee, 4, 2.5), self._points_line(100, 3.0)]
+        order = self._sync(lines, [(self.credit_pm, 4.0), (self.cash_pm1, 3.0)])
+        self.assertAlmostEqual(order.nuqtapass_sync_ids.amount, 3.0)
+        # A full refund (the credit paid back): the same footing, so NuqtaPass takes back all it gave.
+        refund = self._refund(order, credit_back=4.0)
+        _row, body = self._row(refund)
+        self.assertAlmostEqual(body["orderAmount"], 3.0)
+        self.assertAlmostEqual(body["amount"], 3.0)
+
+    def test_order_paid_all_with_credit_earns_nothing(self):
+        order = self._sync([self._line(self.coffee, 2, 2.5)], [(self.credit_pm, 5.0)])
+        self.assertFalse(order.nuqtapass_sync_ids)  # nothing sent: NuqtaPass takes no sale of 0
 
     # ── refunds give back what the refunded lines used ────────────────
     def test_full_refund_gives_back_every_kind(self):
@@ -40,9 +55,11 @@ class TestPosRefundUses(NuqtaPassUsesCommon):
         refund = self._refund(order, credit_back=0.5)
         row, body = self._row(refund)
         self.assertEqual(body["orderRef"], order.pos_reference)
-        self.assertAlmostEqual(body["orderAmount"], order.amount_total)
+        # All of it was paid with NuqtaPass (0.5 left after the points and free items, paid with credit): the order
+        # earned nothing, so there is no amount to share by and no money (besides the credit) to give back.
+        self.assertNotIn("orderAmount", body)
         self.assertEqual(body["returnUses"], {"points": 167, "credit": 0.5, "pack": 1, "vouchers": [VOUCHER_CARD]})
-        self.assertAlmostEqual(body["amount"], abs(refund.amount_total))
+        self.assertEqual(body["amount"], 0)
         self.assertEqual(json.loads(row.return_uses)["points"], 167)
 
     def test_products_only_refund_names_nothing(self):

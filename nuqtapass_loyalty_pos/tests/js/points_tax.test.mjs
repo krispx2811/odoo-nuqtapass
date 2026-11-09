@@ -2,7 +2,7 @@
 // discount lines: one negative line per tax group, weighted by the group's tax-included share.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { splitPointsByTax } from "../../static/src/app/pay/points_tax.js";
+import { exactPointsTotal, splitPointsByTax } from "../../static/src/app/pay/points_tax.js";
 
 const VAT5 = { id: 5, amount_type: "percent", price_include: false };
 const VAT10_INCL = { id: 10, amount_type: "percent", price_include: true };
@@ -87,4 +87,34 @@ test("Validate spends the split lines as one points use (the sum)", async () => 
         ref: "a",
     });
     assert.equal(pointsUse([]), null);
+});
+
+test("the points lines take off exactly their value: the last line takes the rounding (Kareem, 28.160 due)", () => {
+    // A 5 % line priced before tax; its tax is rounded per line, as the till does.
+    const r3 = (n) => Math.round(n * 1000) / 1000;
+    const taxed = (price) => ({
+        price_unit: price,
+        get priceExcl() { return this.price_unit; },
+        get priceIncl() { return r3(this.price_unit * 1.05); },
+        setUnitPrice(p) { this.price_unit = r3(p); },
+    });
+    const items = [taxed(13.41), taxed(13.41)]; // 14.081 + 14.081 = 28.162 due
+    const value = 28.162;
+    const parts = splitPointsByTax(
+        items.map((l) => ({ taxes: [VAT5], included: l.priceIncl, excluded: l.priceExcl })),
+        { value, points: 939, decimals: 3 }
+    );
+    const pointsLines = parts.map((p) => taxed(p.priceUnit));
+    const order = { get priceIncl() { return r3([...items, ...pointsLines].reduce((n, l) => n + l.priceIncl, 0)); } };
+    exactPointsTotal(order, pointsLines.at(-1), 28.162 - value, 3);
+    assert.equal(order.priceIncl, 0);
+    // An untaxed points line moves one for one.
+    const plain = (price) => ({ price_unit: price, priceExcl: 0, get priceIncl() { return this.price_unit; },
+        setUnitPrice(p) { this.price_unit = r3(p); } });
+    const item = plain(28.16);
+    const off = plain(-28.13);
+    const order2 = { get priceIncl() { return r3(item.priceIncl + off.priceIncl); } };
+    exactPointsTotal(order2, off, 0, 3);
+    assert.equal(off.price_unit, -28.16);
+    assert.equal(order2.priceIncl, 0);
 });

@@ -1278,3 +1278,45 @@ msgstr "هالقسيمة انصرفت."
 #: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_panel.js:0
 msgid "This till isn't ready for NuqtaPass yet. Reload the till page, then try again."
 msgstr "هالكاشير مو جاهز للحين لاستخدام NuqtaPass. حدّث صفحة الكاشير وجرب مرة ثانية."
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_panel.js:0
+msgid "This item is already free on this order: there is nothing left for it to make free."
+msgstr "هالصنف مجاني من قبل في هالطلب: ما بقى شي يصير مجاني."
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_panel.js:0
+msgid "Points lowered to %(points)s (%(value)s off) so the order doesn't go below 0."
+msgstr "نزّلنا النقاط إلى %(points)s (خصم %(value)s) عشان ما ينزل الطلب تحت الصفر."
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_panel.js:0
+msgid "Points removed: the free item leaves nothing on the order for them to take off."
+msgstr "شلنا النقاط: الصنف المجاني ما خلّى شي في الطلب تنخصم منه."
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_validation.js:0
+msgid "The NuqtaPass lines take off more than is on the order. Lower the points or remove a free item, then validate."
+msgstr "بنود NuqtaPass تخصم أكثر من قيمة الطلب. نزّل النقاط أو شيل صنف مجاني، بعدين أكّد الدفع."
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/points_box.js:0
+msgid "Capped at the amount due (%(value)s)"
+msgstr "بحد أقصى المبلغ المطلوب (%(value)s)"
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/points_box.js:0
+msgid "Capped at the card's worth (%(value)s)"
+msgstr "بحد أقصى قيمة البطاقة (%(value)s)"
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/points_box.js:0
+msgid "Capped at the per-visit limit (%(value)s)"
+msgstr "بحد أقصى حد الزيارة الواحدة (%(value)s)"

@@ -73,6 +73,42 @@ class TestPosSpend(NuqtaPassUsesCommon):
         config.open_ui()
         self.assertIn(self.credit_pm, config.payment_method_ids)
 
+    def _take_off_the_till(self, method):
+        """As a till upgraded with its session open: the method isn't on it (Odoo refuses removing it then)."""
+        field = self.config._fields["payment_method_ids"]
+        self.env.cr.execute(f"DELETE FROM {field.relation} WHERE {field.column1} = %s AND {field.column2} = %s",
+                            (self.config.id, method.id))
+        self.config.invalidate_recordset(["payment_method_ids"])
+        self.assertNotIn(method, self.config.payment_method_ids)
+
+    def test_till_page_load_adds_the_credit_method_to_an_open_session(self):
+        # Kareem's till: a session opened before the upgrade never runs open_ui again; reloading the till page must
+        # still bring the method (on the till and in what the page loads).
+        self._take_off_the_till(self.credit_pm)
+        self.assertEqual(self.pos_session.state, "opened")
+        # A reload asks for the models it has cached (with their write dates).
+        data = self.pos_session.load_data({"models": ["pos.config", "pos.payment.method"], "records": {}})
+        self.assertIn(self.credit_pm, self.config.payment_method_ids)
+        config = data["pos.config"]["records"][0]
+        self.assertIn(self.credit_pm.id, config["payment_method_ids"])
+        methods = {pm["id"]: pm for pm in data["pos.payment.method"]["records"]}
+        self.assertTrue(methods[self.credit_pm.id]["nuqtapass_credit"])
+
+    def test_upgrade_makes_the_missing_credit_method(self):
+        # A database upgraded from a version without NuqtaPass credit (data/nuqtapass_credit.xml runs on every
+        # upgrade): the method is made and put on the company's tills; a second run changes nothing.
+        self._take_off_the_till(self.credit_pm)
+        self.credit_pm.nuqtapass_credit = False
+        self.env["pos.payment.method"]._nuqtapass_ensure_all()
+        method = self.env["pos.payment.method"].search(
+            [("nuqtapass_credit", "=", True), ("company_id", "=", self.env.company.id)])
+        self.assertEqual(len(method), 1)
+        self.assertIn(method, self.config.payment_method_ids)
+        self.assertEqual(method.outstanding_account_id.account_type, "liability_current")
+        self.env["pos.payment.method"]._nuqtapass_ensure_all()
+        self.assertEqual(self.env["pos.payment.method"].search_count(
+            [("nuqtapass_credit", "=", True), ("company_id", "=", self.env.company.id)]), 1)
+
     def test_new_till_gets_the_credit_method(self):
         config = self.env["pos.config"].create({"name": "Second till"})
         self.assertIn(self.credit_pm, config.payment_method_ids)

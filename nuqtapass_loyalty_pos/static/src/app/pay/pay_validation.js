@@ -3,7 +3,7 @@ import { _t } from "@web/core/l10n/translation";
 import { AlertDialog, ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
 import OrderPaymentValidation from "@point_of_sale/app/utils/order_payment_validation";
 import { spendUses } from "../nuqtapass_api";
-import { nuqtapassLines, orderUses, pointsLines, removeAllNuqtaPass } from "./nuqtapass_lines";
+import { belowZero, nuqtapassLines, orderUses, pointsLines, removeAllNuqtaPass } from "./nuqtapass_lines";
 
 /**
  * Validate spends the order's NuqtaPass uses (points, credit, a pack use, a reward, vouchers) before Odoo takes the
@@ -23,6 +23,14 @@ patch(OrderPaymentValidation.prototype, {
         const uses = order && !order.isRefund ? orderUses(order) : [];
         if (!uses.length) {
             return true;
+        }
+        if (nuqtapassLines(order).length && belowZero(this.pos, order)) {
+            // An item removed after its points or free item went on: NuqtaPass would take off more than is left.
+            this.pos.dialog.add(AlertDialog, {
+                title: _t("NuqtaPass"),
+                body: _t("The NuqtaPass lines take off more than is on the order. Lower the points or remove a free item, then validate."),
+            });
+            return false;
         }
         if (order.uiState.nuqtapassSpending) {
             return false; // the first press is still at NuqtaPass
