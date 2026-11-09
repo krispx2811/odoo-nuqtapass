@@ -110,6 +110,18 @@ class TestPosSpend(NuqtaPassUsesCommon):
         self.assertEqual(self.env["pos.payment.method"].search_count(
             [("nuqtapass_credit", "=", True), ("company_id", "=", self.env.company.id)]), 1)
 
+    def test_credit_method_gets_its_arabic_name_with_a_session_open(self):
+        # Kareem's till is open during the upgrade: the name's Arabic still goes on (Odoo 19 refuses changing an open
+        # session's method; nothing else the upgrade does is undone).
+        self.env["res.lang"]._activate_lang("ar_001")
+        self.assertEqual(self.pos_session.state, "opened")
+        self.assertIn(self.credit_pm, self.pos_session.payment_method_ids)
+        self.credit_pm.with_context(nuqtapass_name_only=True).update_field_translations(
+            "name", {"ar_001": "NuqtaPass credit"})  # as before this version
+        self.env["pos.payment.method"]._nuqtapass_ensure_all()
+        self.assertEqual(self.credit_pm.with_context(lang="ar_001").name, "رصيد نقطة باس")
+        self.assertEqual(self.credit_pm.with_context(lang="en_US").name, "NuqtaPass credit")
+
     def test_new_till_gets_the_credit_method(self):
         config = self.env["pos.config"].create({"name": "Second till"})
         self.assertIn(self.credit_pm, config.payment_method_ids)

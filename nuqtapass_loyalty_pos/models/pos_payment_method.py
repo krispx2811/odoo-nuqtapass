@@ -57,11 +57,26 @@ class PosPaymentMethod(models.Model):
         return method
 
     def _nuqtapass_arabic_name(self):
-        """The method's name in the till's Arabic: "رصيد نقطة باس", unless the shop renamed it."""
+        """The method's name in the till's Arabic: "رصيد نقطة باس", unless the shop renamed it. Also with a till's
+        session open (only the name's translation changes). Never raises."""
         langs = [code for code, _name in self.env["res.lang"].get_installed() if code.startswith("ar")]
-        for method in self.sudo():
-            if langs and method.with_context(lang="en_US").name == NAME:
-                method.update_field_translations("name", dict.fromkeys(langs, ARABIC_NAME))
+        for method in self.sudo().with_context(nuqtapass_name_only=True):
+            if not langs or method.with_context(lang="en_US").name != NAME:
+                continue
+            if all(method.with_context(lang=lang).name == ARABIC_NAME for lang in langs):
+                continue
+            try:
+                with self.env.cr.savepoint():
+                    method.update_field_translations("name", dict.fromkeys(langs, ARABIC_NAME))
+            except Exception:
+                _logger.exception("NuqtaPass: could not name the NuqtaPass credit method in Arabic")
+
+    def _is_write_forbidden(self, fields):
+        # Odoo refuses changing a method of an open session; its name's translation is harmless.
+        if self.env.context.get("nuqtapass_name_only") and set(fields) <= {"name"} and all(
+                self.mapped("nuqtapass_credit")):
+            return False
+        return super()._is_write_forbidden(fields)
 
     @api.model
     def _nuqtapass_liability_account(self, company):
@@ -84,6 +99,8 @@ class PosPaymentMethod(models.Model):
         for company in self.env["pos.config"].sudo().search([]).company_id:
             try:
                 with self.env.cr.savepoint():
-                    self._nuqtapass_credit_method(company)._nuqtapass_arabic_name()
+                    method = self._nuqtapass_credit_method(company)
             except Exception:  # a company without accounting set up: the till works without NuqtaPass credit
                 _logger.exception("NuqtaPass: could not add the NuqtaPass credit method for company %s", company.id)
+                continue
+            method._nuqtapass_arabic_name()
