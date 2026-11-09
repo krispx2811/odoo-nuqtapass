@@ -27,8 +27,8 @@ class TestPosAdjust(TransactionCase):
         super().setUpClass()
         cls.env.company.country_id = cls.env.ref("base.om")
         icp = cls.env["ir.config_parameter"].sudo()
-        icp.set_bool("nuqtapass_loyalty.till_enabled", True)
-        icp.set_str("nuqtapass_loyalty.api_key", "sip_test")
+        icp.set_param("nuqtapass_loyalty.till_enabled", "True")
+        icp.set_param("nuqtapass_loyalty.api_key", "sip_test")
         cls.config = cls.env["pos.config"].create({"name": "Till"})
         cls.manager = new_test_user(cls.env, "np_manager", groups=MANAGER_GROUP, name="Mona Al Hinai")
         cls.cashier = new_test_user(cls.env, "np_cashier", groups="point_of_sale.group_pos_user", name="Saif")
@@ -132,7 +132,7 @@ class TestPosAdjust(TransactionCase):
         self.assertEqual(res["error"], "unreachable")
 
     def test_till_switched_off(self):
-        self.env["ir.config_parameter"].sudo().set_bool("nuqtapass_loyalty.till_enabled", False)
+        self.env["ir.config_parameter"].sudo().set_param("nuqtapass_loyalty.till_enabled", "False")
         with patch.object(NuqtaPassClient, "adjust") as adjust:
             res = self._as(self.manager)._nuqtapass_adjust(STAMP_CARD, "stamp_add", None, "Missed one")
         adjust.assert_not_called()
