@@ -1,1 +1,1 @@
-# Test modules are added task by task.
+from . import test_phone
