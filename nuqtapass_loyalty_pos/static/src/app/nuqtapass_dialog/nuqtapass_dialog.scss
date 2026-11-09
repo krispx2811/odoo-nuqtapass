@@ -65,6 +65,7 @@
 // The payment screen's NuqtaPass panel: the same strips as the window, under the payment methods.
 .o_nuqtapass_pay {
     text-align: start;
+    // Every card the same: one band in the till's primary colour (the tier's colour is on the tier dot only).
     .o_nuqtapass_card {
         padding: 0.75rem 1rem;
         background-color: var(--bs-tertiary-bg, rgba(0, 0, 0, 0.03));
@@ -99,15 +100,31 @@
     }
 }
 
+// Wide layout: the panel is the last item of Odoo's right column, after the amount due and the payment lines. Odoo
+// sizes that column to the screen and lets only the payment lines' box grow and scroll, so a panel beside it squeezed
+// the lines to nothing and pushed a gap between them and the panel. With the panel there, the column scrolls as one
+// and the lines' box takes just its own height: amount, lines, panel, one under the other with the column's own gap.
+.payment-screen .center-content:has(.o_nuqtapass_pay_wide) {
+    overflow-y: auto;
+    // Odoo centres the amount when there is no payment line yet; "safe" keeps the top reachable when the panel makes
+    // the column taller than the screen (Bootstrap's utility is !important, hence ours).
+    justify-content: safe center !important;
+    .payment-summary {
+        flex: 0 0 auto;
+        overflow: visible;
+    }
+}
+
 .o_nuqtapass_pay_wide {
-    inline-size: 34rem;
-    max-inline-size: 100%;
+    inline-size: 100%;
+    max-inline-size: 40rem;
     align-self: center;
     flex-shrink: 0;
+    padding-block-end: 0.5rem;
 }
 
 // The customer's tier, next to them: a small dot of the tier's metal (the card's own tier colour from NuqtaPass), and the
-// points card's band takes the same colour. Without a colour the dot is a quiet ring in the text colour.
+// card bands stay the till's primary. Without a colour the dot is a quiet ring in the text colour.
 .o_nuqtapass_dialog,
 .o_nuqtapass_pay {
     .o_nuqtapass_tier {

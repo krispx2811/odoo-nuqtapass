@@ -3,10 +3,11 @@ import { _t } from "@web/core/l10n/translation";
 import { patch } from "@web/core/utils/patch";
 import { PaymentScreen } from "@point_of_sale/app/screens/payment_screen/payment_screen";
 import { usePos } from "@point_of_sale/app/hooks/pos_hook";
-import { bandStyle, cardLine, cardTitle, displayPhone, findCustomer, money, tierInfo } from "../nuqtapass_api";
+import { cardLine, cardTitle, displayPhone, findCustomer, money, tierInfo } from "../nuqtapass_api";
 import { user } from "@web/core/user";
 import { creditAmount, formatMoney, formatNumber, parseMoney } from "./nuqtapass_math";
 import {
+    cantAddLine,
     coverableLines,
     creditMethod,
     creditPayment,
@@ -64,9 +65,6 @@ export class NuqtaPassPayPanel extends Component {
         return tierInfo(this.cards);
     }
 
-    bandStyle(card) {
-        return bandStyle(card, this.tier);
-    }
 
     async lookUp(query = this.state.query.trim()) {
         if (!query || this.state.loading) {
@@ -131,19 +129,48 @@ export class NuqtaPassPayPanel extends Component {
         return this.currency?.decimals ?? this.pos.currency.decimal_places;
     }
 
-    canUse(card) {
+    /** Why this card can't be used on this order right now (shown in its place), or "" when its action shows. */
+    notNow(card) {
+        const ready = card.type === "PREPAID" ? creditMethod(this.pos) : rewardProduct(this.pos);
         switch (card.type) {
             case "POINTS":
-                return card.points > 0 && card.pointsPerUnit > 0 && Boolean(rewardProduct(this.pos));
+                if (!(card.points > 0 && card.pointsPerUnit > 0)) {
+                    return _t("No points to use yet.");
+                }
+                if (!(this.maxPointsValue > 0)) {
+                    return _t("Nothing on the order to take off.");
+                }
+                break;
             case "PREPAID":
-                return card.balance > 0 && Boolean(creditMethod(this.pos));
+                if (!(card.balance > 0)) {
+                    return _t("No credit left on this card.");
+                }
+                if (!(this.due > 0)) {
+                    return _t("Nothing left to pay.");
+                }
+                break;
             case "PACK":
-                return (card.usesLeft || card.packUses) > 0 && Boolean(rewardProduct(this.pos));
+                if (!((card.usesLeft || card.packUses) > 0)) {
+                    return _t("No uses left on this pack.");
+                }
+                break;
             case "STAMPS":
-                return card.rewardReady && Boolean(rewardProduct(this.pos));
+                if (!card.rewardReady) {
+                    return _t("Reward not ready yet.");
+                }
+                break;
             default:
-                return (card.voucher?.usesLeft ?? 0) > 0 && Boolean(rewardProduct(this.pos));
+                if (!((card.voucher?.usesLeft ?? 0) > 0)) {
+                    return _t("This voucher is used up.");
+                }
         }
+        if (!ready) {
+            return cantAddLine();
+        }
+        if (card.type !== "POINTS" && card.type !== "PREPAID" && !this.coverable.length) {
+            return _t("Add the item it covers to the order first.");
+        }
+        return "";
     }
 
     useOf(card) {

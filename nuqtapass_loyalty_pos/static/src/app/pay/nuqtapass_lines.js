@@ -14,6 +14,11 @@ export function rewardProduct(pos) {
     return pos.config.nuqtapass_reward_product_id || null;
 }
 
+/** Why a NuqtaPass line can't go on the order: the till loaded without NuqtaPass's product (or credit method). */
+export function cantAddLine() {
+    return _t("This till isn't ready for NuqtaPass yet. Reload the till page, then try again.");
+}
+
 export function creditMethod(pos) {
     return pos.config.payment_method_ids.find((pm) => pm.nuqtapass_credit) || null;
 }

@@ -5,11 +5,10 @@ import { _t } from "@web/core/l10n/translation";
 import { usePos } from "@point_of_sale/app/hooks/pos_hook";
 import { NuqtaPassPointsBox } from "../pay/points_box";
 import { NuqtaPassCorrectBox } from "../correct/correct_box";
-import { setPointsLine, totalWithoutPoints } from "../pay/nuqtapass_lines";
+import { cantAddLine, setPointsLine, totalWithoutPoints } from "../pay/nuqtapass_lines";
 import { formatNumber } from "../pay/nuqtapass_math";
 import {
     adjustCard,
-    bandStyle,
     cardLine,
     cardTitle,
     displayPhone,
@@ -93,9 +92,6 @@ export class NuqtaPassDialog extends Component {
         return this.state.result ? tierInfo(this.state.result.cards) : null;
     }
 
-    bandStyle(card) {
-        return bandStyle(card, this.tier);
-    }
 
     cardTitle(card) {
         return cardTitle(card);
@@ -129,6 +125,10 @@ export class NuqtaPassDialog extends Component {
                 value: money(plan.value, this.state.result.currency),
                 points: formatNumber(plan.points),
             });
+        } else {
+            this.state.done = "";
+            this.state.error = cantAddLine();
+            this.state.errorDetail = "";
         }
     }
 

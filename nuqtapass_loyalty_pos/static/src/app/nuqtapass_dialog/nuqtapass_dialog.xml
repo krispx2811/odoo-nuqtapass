@@ -27,8 +27,7 @@
                         No card yet. The customer gets one with their first purchase.
                     </p>
                     <div t-foreach="this.state.result.cards" t-as="card" t-key="card.cardId"
-                         class="o_nuqtapass_card d-flex flex-wrap align-items-center gap-2 py-2 px-3 mb-2 rounded"
-                         t-att-style="this.bandStyle(card)">
+                         class="o_nuqtapass_card d-flex flex-wrap align-items-center gap-2 py-2 px-3 mb-2 rounded">
                         <div class="flex-grow-1">
                             <!-- <bdi>: the shop's own voucher title and the numbers in the line keep their order in RTL. -->
                             <div class="o_nuqtapass_card_title small text-muted"><bdi t-out="this.cardTitle(card)"/></div>

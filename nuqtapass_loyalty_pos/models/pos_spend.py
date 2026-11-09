@@ -32,7 +32,7 @@ class PosConfig(models.Model):
         "product.product", "NuqtaPass reward product", compute="_compute_nuqtapass_reward_product_id")
 
     def _compute_nuqtapass_reward_product_id(self):
-        product = self.env.ref(REWARD_XMLID, raise_if_not_found=False) or self.env["product.product"]
+        product = self._nuqtapass_till_reward_product()
         for config in self:
             config.nuqtapass_reward_product_id = product
 
@@ -79,8 +79,21 @@ class PosConfig(models.Model):
         return super().open_ui()
 
     def _get_special_products(self):
-        return super()._get_special_products() | (
-            self.env.ref(REWARD_XMLID, raise_if_not_found=False) or self.env["product.product"])
+        return super()._get_special_products() | self._nuqtapass_till_reward_product()
+
+    @api.model
+    def _nuqtapass_till_reward_product(self):
+        """The reward product for the till's data, made now if missing (a till left open across the upgrade that
+        added it never runs open_ui again). Empty when the till channel is off or making it fails."""
+        product = self.env.ref(REWARD_XMLID, raise_if_not_found=False)
+        if product or not self.env["nuqtapass.sync"].sudo()._channel_enabled("till"):
+            return product or self.env["product.product"]
+        try:
+            with self.env.cr.savepoint():
+                return self._nuqtapass_reward_product()
+        except Exception:
+            _logger.exception("NuqtaPass: could not make the till's NuqtaPass product")
+            return self.env["product.product"]
 
     @api.model_create_multi
     def create(self, vals_list):
