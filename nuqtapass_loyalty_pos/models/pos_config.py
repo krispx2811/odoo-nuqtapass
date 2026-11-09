@@ -188,7 +188,7 @@ class PosConfig(models.Model):
         order = self._nuqtapass_order(order_id)
         currency = order.currency_id
         if not order or order.state not in PAID_STATES or order.is_refund \
-                or currency.compare_amounts(order.amount_total, 0) <= 0:
+                or currency.compare_amounts(order._nuqtapass_earn_amount(), 0) <= 0:
             return self._nuqtapass_error("bad_order", _("This order can't earn NuqtaPass points."))
         sale = self._nuqtapass_sale_row(order)
         if sale and not (sale.state == "failed" and sale.phone_invalid):

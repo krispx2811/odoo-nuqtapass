@@ -11,6 +11,8 @@ import {
     coverableLines,
     creditMethod,
     creditPayment,
+    fitPointsLine,
+    freeLineFits,
     lineFor,
     pointsLines,
     rewardProduct,
@@ -39,7 +41,7 @@ export class NuqtaPassPayPanel extends Component {
         if (focus) {
             delete this.props.order.uiState.nuqtapassFocus;
         }
-        this.state = useState({ query: "", loading: false, error: "", errorDetail: "", result: null, credit: "", pick: {}, focus });
+        this.state = useState({ query: "", loading: false, error: "", errorDetail: "", notice: "", result: null, credit: "", pick: {}, focus });
         const phone = this.props.order.nuqtapass_phone || this.props.order.partner_id?.phone;
         if (phone) {
             this.lookUp(phone);
@@ -270,8 +272,32 @@ export class NuqtaPassPayPanel extends Component {
         return { PACK: _t("Use pack"), STAMPS: _t("Give it free"), VOUCHER: _t("Use voucher") }[card.type];
     }
 
+    /** The free item's line, never taking the order below 0: a second free line on the same item is refused, and
+     * points worth more than what is left are lowered (with a notice). */
     async useOnItem(card) {
-        await setFreeLine(this.pos, this.order, card, this.useOf(card), this.picked(card));
+        const use = this.useOf(card);
+        const covered = this.picked(card);
+        this.state.error = "";
+        this.state.errorDetail = "";
+        this.state.notice = "";
+        if (covered && !freeLineFits(this.pos, this.order, use, covered, card.cardId)) {
+            this.state.error = _t("This item is already free on this order: there is nothing left for it to make free.");
+            return;
+        }
+        if (!(await setFreeLine(this.pos, this.order, card, use, covered))) {
+            return;
+        }
+        const pointsCardId = pointsLines(this.order)[0]?.nuqtapass_card_id;
+        const pointsCard = this.cards.find((c) => c.type === "POINTS" && c.cardId === pointsCardId);
+        const plan = await fitPointsLine(this.pos, this.order, pointsCard, this.decimals);
+        if (plan) {
+            this.state.notice = plan.points
+                ? _t("Points lowered to %(points)s (%(value)s off) so the order doesn't go below 0.", {
+                      points: formatNumber(plan.points),
+                      value: this.money(plan.value),
+                  })
+                : _t("Points removed: the free item leaves nothing on the order for them to take off.");
+        }
     }
 }
 

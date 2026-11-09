@@ -66,11 +66,24 @@ export class NuqtaPassPointsBox extends Component {
         }
         const points = formatNumber(plan.points);
         const line = plan.points === 1 ? _t("= 1 point") : _t("= %(points)s points", { points });
-        const typed = parseMoney(this.state.amount);
-        // Whole points: the discount can differ from what was typed by part of one point.
-        return Math.abs(typed - plan.value) >= 10 ** -this.decimals / 2
-            ? _t("%(points)s · %(value)s off", { points: line, value: money(plan.value, this.props.currency) })
-            : line;
+        // Whole points: always say what comes off (it can differ from what was typed by part of one point).
+        return _t("%(points)s · %(value)s off", { points: line, value: money(plan.value, this.props.currency) });
+    }
+
+    /** Why less than what was typed comes off (the amount due, the card's worth or the per-visit limit), or "". */
+    get cappedLine() {
+        const capped = this.plan.capped;
+        if (!capped) {
+            return "";
+        }
+        const value = money(capped.value, this.props.currency);
+        if (capped.reason === "due") {
+            return _t("Capped at the amount due (%(value)s)", { value });
+        }
+        if (capped.reason === "card") {
+            return _t("Capped at the card's worth (%(value)s)", { value });
+        }
+        return _t("Capped at the per-visit limit (%(value)s)", { value });
     }
 
     use() {

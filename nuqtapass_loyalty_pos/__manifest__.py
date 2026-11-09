@@ -14,13 +14,13 @@
         "views/pos_order_views.xml",
         "views/pos_config_views.xml",
         "views/nuqtapass_sync_views.xml",
+        "data/nuqtapass_credit.xml",
     ],
     "assets": {
         "point_of_sale._assets_pos": [
             "nuqtapass_loyalty_pos/static/src/**/*",
         ],
     },
-    "post_init_hook": "post_init_hook",
     "auto_install": True,
     "installable": True,
 }

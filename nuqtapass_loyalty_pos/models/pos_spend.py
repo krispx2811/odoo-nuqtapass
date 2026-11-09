@@ -66,16 +66,23 @@ class PosConfig(models.Model):
                                      "res_id": product.id, "noupdate": True})
         return product.with_env(self.env)
 
+    def _nuqtapass_prepare_till(self):
+        """Make sure these tills have what NuqtaPass needs: the reward product and the company's credit method on
+        each of them (an upgrade of an older version has neither yet). Never raises: the till must open anyway, and
+        NuqtaPass lines then can't be added."""
+        if not self or not self.env["nuqtapass.sync"].sudo()._channel_enabled("till"):
+            return
+        try:
+            with self.env.cr.savepoint():
+                self._nuqtapass_reward_product()
+                for company in self.company_id:
+                    self.env["pos.payment.method"]._nuqtapass_credit_method(company)
+        except Exception:
+            _logger.exception("NuqtaPass: could not prepare the till's NuqtaPass product or credit method")
+
     def open_ui(self):
-        # Opening the till: make sure it has what NuqtaPass needs (an upgrade of an older version has neither yet).
-        if self.env["nuqtapass.sync"].sudo()._channel_enabled("till"):
-            try:
-                with self.env.cr.savepoint():
-                    self._nuqtapass_reward_product()
-                    for company in self.company_id:
-                        self.env["pos.payment.method"]._nuqtapass_credit_method(company)
-            except Exception:  # the till must open even if this fails; NuqtaPass lines then can't be added
-                _logger.exception("NuqtaPass: could not prepare the till's NuqtaPass product or credit method")
+        # Opening the till from the back office.
+        self._nuqtapass_prepare_till()
         return super().open_ui()
 
     def _get_special_products(self):
@@ -106,6 +113,7 @@ class PosConfig(models.Model):
             if method and method not in config.payment_method_ids:
                 config.sudo().payment_method_ids = [(4, method.id)]
         return configs
+
 
     # ── Validate on the till: spend each use at NuqtaPass, once per order ─
     def _nuqtapass_clean_uses(self, uses):
@@ -223,3 +231,14 @@ class PosConfig(models.Model):
         if detail:
             answer["detail"] = detail
         return answer
+
+
+class PosSession(models.Model):
+    _inherit = "pos.session"
+
+    def load_data(self, models_to_load):
+        # The till page loading (every reload, also of a session opened before the upgrade, which never runs open_ui
+        # again; a reload asks for the models it has cached, so always): the credit method is put on the till before
+        # its config and payment methods are read. Cheap once it is there (two searches).
+        self.config_id._nuqtapass_prepare_till()
+        return super().load_data(models_to_load)

@@ -45,7 +45,10 @@ class PosPaymentMethod(models.Model):
         configs = self.env["pos.config"].sudo().search(
             [("company_id", "=", company.id), ("payment_method_ids", "not in", method.ids)])
         if configs:
-            configs.write({"payment_method_ids": [(4, method.id)]})
+            # Also a till with its session open (left open across the upgrade): adding a method is safe, and Odoo 19
+            # refuses any change to the methods then unless told to let it through.
+            configs.with_context(bypass_payment_method_ids_forbidden_change=True).write(
+                {"payment_method_ids": [(4, method.id)]})
         return method
 
     @api.model

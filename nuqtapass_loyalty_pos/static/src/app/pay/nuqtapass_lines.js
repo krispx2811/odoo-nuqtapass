@@ -1,6 +1,6 @@
 import { _t } from "@web/core/l10n/translation";
-import { formatNumber } from "./nuqtapass_math";
-import { pointsUse, splitPointsByTax } from "./points_tax";
+import { fitPoints, formatNumber } from "./nuqtapass_math";
+import { exactPointsTotal, pointsUse, splitPointsByTax } from "./points_tax";
 
 // The order's NuqtaPass lines and payment. Adding them spends nothing: Validate does (pay_validation.js).
 //  - points:  "NuqtaPass points", −value split over the order's tax groups (one line per group, with its taxes, as
@@ -47,10 +47,57 @@ export function pointsLines(order) {
     return order.lines.filter((line) => line.nuqtapass_use === "points");
 }
 
+/** The order's total before its NuqtaPass points lines (below 0 when free items cover more than is on it). */
+function rawTotalWithoutPoints(order) {
+    const off = pointsLines(order).reduce((sum, line) => sum + line.priceIncl, 0);
+    return order.priceIncl - off;
+}
+
 /** The order's total before its NuqtaPass points lines: what the points can take off at most. */
 export function totalWithoutPoints(order) {
-    const off = pointsLines(order).reduce((sum, line) => sum + line.priceIncl, 0);
-    return Math.max(0, order.priceIncl - off);
+    return Math.max(0, rawTotalWithoutPoints(order));
+}
+
+/** Half the till currency's smallest unit: totals closer to 0 than this are 0. */
+function halfUnit(pos) {
+    return 10 ** -(pos.currency?.decimal_places ?? 3) / 2;
+}
+
+/** Whether the order's total is below 0 (free items or points taking off more than is on it). */
+export function belowZero(pos, order) {
+    return order.priceIncl < -halfUnit(pos);
+}
+
+/** Whether making one unit of `covered` free (replacing the order's earlier line for this use) keeps the order's
+ * total before points at 0 or more: a second free line on the same item would not. */
+export function freeLineFits(pos, order, use, covered, cardId = null) {
+    const unit = covered.qty ? covered.priceIncl / covered.qty : 0;
+    const earlier = lineFor(order, use, use === "voucher" ? cardId : null);
+    const after = rawTotalWithoutPoints(order) - unit - (earlier ? earlier.priceIncl : 0);
+    return after >= -halfUnit(pos);
+}
+
+/**
+ * After a free item lowered the order's total: fewer points (or none) when their value is now more than the total
+ * without them, so the order never goes below 0. Answers the new { points, value }, or null when nothing changed.
+ */
+export async function fitPointsLine(pos, order, card, decimals) {
+    const lines = pointsLines(order);
+    if (!lines.length) {
+        return null;
+    }
+    const points = lines.reduce((sum, line) => sum + (line.nuqtapass_qty || 0), 0);
+    const value = lines.reduce((sum, line) => sum + Math.abs(line.priceIncl), 0);
+    const plan = fitPoints({ points, value, ppu: card?.pointsPerUnit, decimals, maxValue: totalWithoutPoints(order) });
+    if (plan.points === points) {
+        return null;
+    }
+    if (plan.points > 0) {
+        await setPointsLine(pos, order, card, plan);
+    } else {
+        lines.forEach((line) => order.removeOrderline(line));
+    }
+    return plan;
 }
 
 /** The lines the points are weighed over: the order's own lines (free-item lines too), not tips or combo parents. */
@@ -81,6 +128,7 @@ export async function setPointsLine(pos, order, card, { points, value }) {
         old.delete();
     }
     const decimals = pos.currency?.decimal_places ?? 3; // the line is in the till's currency
+    const before = order.priceIncl;
     const added = [];
     for (const part of splitPointsByTax(taxedLines(order), { value, points, decimals })) {
         const line = await pos.addLineToOrder(
@@ -104,8 +152,10 @@ export async function setPointsLine(pos, order, card, { points, value }) {
             added.push(line);
         }
     }
+    exactPointsTotal(order, added.at(-1), before - value, decimals);
     return added;
 }
+
 
 /** Make one unit of `covered` free with a pack use, a stamp reward or a voucher (replacing the earlier one). */
 export async function setFreeLine(pos, order, card, use, covered) {

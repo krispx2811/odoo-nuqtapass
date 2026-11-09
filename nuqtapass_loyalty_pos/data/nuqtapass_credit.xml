@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- On install and on every upgrade: each company with a till gets its "NuqtaPass credit" method, on all its tills
+         (a database upgraded from a version without NuqtaPass credit had none). Made once; later runs change nothing. -->
+    <function model="pos.payment.method" name="_nuqtapass_ensure_all"/>
+</odoo>

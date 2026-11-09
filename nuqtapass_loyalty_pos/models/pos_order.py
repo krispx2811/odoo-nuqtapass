@@ -93,8 +93,8 @@ class PosOrder(models.Model):
         if self.is_refund or currency.compare_amounts(self.amount_total, 0) < 0:
             self._nuqtapass_queue_refund(Sync)
             return
-        if currency.compare_amounts(self.amount_total, 0) <= 0:
-            return
+        if currency.compare_amounts(self._nuqtapass_earn_amount(), 0) <= 0:
+            return  # nothing to earn on: all of it paid with NuqtaPass (points off, credit), or a free order
         phone_vals = Sync._sale_phone_vals(self._nuqtapass_raw_phone(), self.company_id)
         if not phone_vals:
             return
@@ -105,7 +105,7 @@ class PosOrder(models.Model):
             # till device starts its names at "<till> - 000001", so names repeat across devices.
             "order_ref": self.pos_reference,
             **phone_vals,
-            "amount": self.amount_total,
+            "amount": self._nuqtapass_earn_amount(),
             "currency_id": currency.id,
             "occurred_at": self.date_order or fields.Datetime.now(),
             "branch": self.config_id.nuqtapass_branch or False,
@@ -114,11 +114,21 @@ class PosOrder(models.Model):
             "pos_order_id": self.id,
         })
 
+    def _nuqtapass_credit_paid(self):
+        """What this order's payments put on NuqtaPass credit (negative on a refund paying credit back)."""
+        return sum(self.payment_ids.filtered(lambda p: p.payment_method_id.nuqtapass_credit).mapped("amount"))
+
+    def _nuqtapass_earn_amount(self):
+        """What the order earns on: its total after the NuqtaPass discount lines (points, free items), less what was
+        paid with NuqtaPass credit. Value paid with NuqtaPass never earns again."""
+        self.ensure_one()
+        return self.currency_id.round(max(0.0, self.amount_total - self._nuqtapass_credit_paid()))
+
     # ── refunds ───────────────────────────────────────────────────────
     def _nuqtapass_queue_refund(self, Sync):
         """Queue this refund against the original order, when that order earned or used something at NuqtaPass.
 
-        Always sends the whole order's amount (`orderAmount`) and what the refunded lines gave back of its uses at
+        Always sends the whole order's amount it earned on (`orderAmount`, without NuqtaPass credit) and what the refunded lines gave back of its uses at
         payment (`returnUses`); `amount` is the money given back, 0 when only NuqtaPass lines were refunded.
         """
         currency = self.currency_id
@@ -130,7 +140,9 @@ class PosOrder(models.Model):
         if not sale and not uses:
             return  # the original never earned nor used anything, so there is nothing to take or give back
         returned = self._nuqtapass_return_uses()
-        amount = max(0.0, -self.amount_total)
+        # The money given back, less credit paid back: on the same footing as the sale's amount (which leaves out
+        # credit), so NuqtaPass's share of the order is right.
+        amount = currency.round(max(0.0, -self.amount_total + self._nuqtapass_credit_paid()))
         if currency.is_zero(amount) and not returned:
             return
         Sync._queue({
@@ -141,7 +153,7 @@ class PosOrder(models.Model):
             "refund_ref": self.pos_reference,
             "phone": sale.phone if sale else uses[:1].phone,
             "amount": 0.0 if currency.is_zero(amount) else amount,
-            "order_amount": original.amount_total,
+            "order_amount": original._nuqtapass_earn_amount(),
             "return_uses": json.dumps(returned),
             "currency_id": currency.id,
             "occurred_at": self.date_order or fields.Datetime.now(),

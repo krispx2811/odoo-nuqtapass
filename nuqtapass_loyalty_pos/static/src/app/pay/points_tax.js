@@ -64,3 +64,26 @@ export function pointsUse(lines) {
         ref: first.uuid,
     };
 }
+
+/**
+ * Each points line is priced before tax and rounded, so together they can take off a little more or less than the
+ * points' value (28.130 off for 28.160). The last line takes the difference, so the order comes to exactly
+ * `target` (0.000 when the points cover it all).
+ */
+export function exactPointsTotal(order, last, target, decimals) {
+    const unit = 10 ** -decimals;
+    const round = (n) => Math.round(n / unit) * unit;
+    for (let tries = 0; last && tries < 6; tries++) {
+        const diff = round(target - order.priceIncl);
+        if (Math.abs(diff) < unit / 2) {
+            return;
+        }
+        // The line's price before tax moves by its own tax-included / tax-excluded ratio.
+        const ratio = last.priceIncl && last.priceExcl ? last.priceExcl / last.priceIncl : 1;
+        let step = round(diff * ratio);
+        if (Math.abs(step) < unit / 2) {
+            step = Math.sign(diff) * unit;
+        }
+        last.setUnitPrice(round(last.price_unit + step));
+    }
+}
