@@ -1,0 +1,106 @@
+<section class="oe_container">
+  <div class="oe_row oe_spaced">
+    <h2 class="oe_slogan">NuqtaPass Loyalty for Odoo</h2>
+    <h3 class="oe_slogan">Stamps and points on Apple Wallet and Google Wallet cards, from every paid order</h3>
+    <div class="oe_span12">
+      <img class="oe_picture oe_screenshot" src="main_screenshot.png" alt="The NuqtaPass window on the Odoo till: the customer's cards with one action each"/>
+    </div>
+    <ul>
+      <li>Paid till orders and paid online-store orders earn stamps or points automatically when the order has a customer phone.</li>
+      <li>Refunds and credit notes take back what the order gave.</li>
+      <li>A NuqtaPass button on the till shows the customer's current cards: give a reward, use points or use a voucher in one tap.</li>
+      <li>Scan the customer's Wallet card with a 2D (QR) barcode scanner, or type their phone. Ordinary product barcodes keep working as before.</li>
+      <li>Forgot to add the customer? Add them after payment: the receipt screen asks for the phone or a card scan, and the order earns at once.</li>
+      <li>A new customer scans a QR code on the till to add their card to Apple Wallet or Google Wallet.</li>
+      <li>If NuqtaPass can't be reached, nothing is lost: orders are retried for 3 days and can be resent from the sync log.</li>
+      <li>English and Arabic, right-to-left on the till.</li>
+    </ul>
+    <div class="oe_span12">
+      <img class="oe_picture oe_screenshot" src="receipt_screenshot.png" alt="The receipt screen: the customer added after payment, the stamp earned and the QR code to add the card"/>
+    </div>
+
+    <h4>What is sent to NuqtaPass</h4>
+    <ul>
+      <li>For each paid order: the order reference, the customer's mobile number, the amount, the date and time it was paid, whether it came from the till or the online store, the NuqtaPass branch you set (if any), and the customer's name when the Odoo customer has one.</li>
+      <li>For each refund or credit note: the order reference, the refund reference, the amount and the date and time.</li>
+      <li>When the cashier looks a customer up or gives a reward: the phone typed or the Wallet card id scanned, and which card, voucher or how many points are used.</li>
+    </ul>
+    <p>Nothing else is sent: no products, no addresses, no e-mails and no payment details. Your NuqtaPass key stays on your Odoo server; the till and the browser never receive it. No card data is stored in Odoo; Odoo keeps a sync log of what it sent so you can check and resend.</p>
+    <div class="oe_span12">
+      <img class="oe_picture oe_screenshot" src="log_screenshot.png" alt="The NuqtaPass sync log: every order and refund sent, with its state"/>
+    </div>
+
+    <h4>Requirements</h4>
+    <ul>
+      <li>A NuqtaPass account on the Business plan (<a href="https://nuqtapass.com">nuqtapass.com</a>). The Odoo app itself is free.</li>
+      <li>Odoo 20.0 Community or Enterprise, on-premise or Odoo.sh. Odoo Online cannot install third-party apps with code.</li>
+      <li>Point of Sale and/or eCommerce. The till and online-store parts install themselves when those apps are installed.</li>
+      <li>For Wallet card scans: any 2D (QR) barcode scanner that types like a keyboard. Without one, type the phone.</li>
+    </ul>
+
+    <h4>Set up</h4>
+    <ol>
+      <li>In NuqtaPass: Settings → Integrations → Odoo → Create key.</li>
+      <li>In Odoo: Settings → NuqtaPass → paste the key → Test connection.</li>
+      <li>Optional: set the NuqtaPass branch for each till (Point of Sale settings) and each website.</li>
+    </ol>
+    <div class="oe_span12">
+      <img class="oe_picture oe_screenshot" src="settings_screenshot.png" alt="Settings → NuqtaPass: the key, Test connection and the till and online-store switches"/>
+    </div>
+
+    <h4>Support</h4>
+    <p>E-mail <a href="mailto:support@nuqtapass.com">support@nuqtapass.com</a>.</p>
+  </div>
+</section>
+
+<section class="oe_container oe_dark" dir="rtl" lang="ar">
+  <div class="oe_row oe_spaced" style="text-align: right;">
+    <h2 class="oe_slogan">ولاء NuqtaPass مع Odoo</h2>
+    <h3 class="oe_slogan">أختام ونقاط على بطاقات Apple Wallet و Google Wallet من كل طلب مدفوع</h3>
+    <div class="oe_span12">
+      <img class="oe_picture oe_screenshot" src="ar_till.png" alt="نافذة NuqtaPass في كاشير Odoo: بطاقات العميل، ولكل بطاقة زر واحد"/>
+    </div>
+    <ul>
+      <li>طلبات الكاشير والمتجر الإلكتروني المدفوعة تعطي أختام أو نقاط تلقائياً إذا فيها رقم جوال العميل.</li>
+      <li>الاسترجاع والإشعار الدائن يسحبون اللي أعطاه الطلب.</li>
+      <li>زر NuqtaPass في الكاشير يعرض بطاقات العميل الحالية: اصرف المكافأة أو النقاط أو استخدم القسيمة بضغطة وحدة.</li>
+      <li>امسح بطاقة العميل في Wallet بقارئ باركود ثنائي الأبعاد (QR)، أو اكتب رقمه. باركود المنتجات يشتغل مثل قبل.</li>
+      <li>نسيت تضيف العميل؟ أضفه بعد الدفع: شاشة الإيصال تطلب رقمه أو مسح بطاقته، والطلب ينحسب على طول.</li>
+      <li>العميل الجديد يمسح كود QR في الكاشير عشان يضيف بطاقته في Apple Wallet أو Google Wallet.</li>
+      <li>إذا انقطع الاتصال مع NuqtaPass ما يضيع شي: نعيد المحاولة لين ٣ أيام، وتقدر تعيد الإرسال من سجل المزامنة.</li>
+      <li>عربي وإنجليزي، والكاشير من اليمين لليسار.</li>
+    </ul>
+    <div class="oe_span12">
+      <img class="oe_picture oe_screenshot" src="ar_receipt.png" alt="شاشة الإيصال: العميل انضاف بعد الدفع والطلب انحسب له"/>
+    </div>
+
+    <h4>وش اللي ينرسل لـ NuqtaPass</h4>
+    <ul>
+      <li>لكل طلب مدفوع: رقم الطلب، رقم جوال العميل، المبلغ، تاريخ ووقت الدفع، هل الطلب من الكاشير أو المتجر الإلكتروني، فرع NuqtaPass اللي تحدده (إذا حددته)، واسم العميل إذا له اسم في Odoo.</li>
+      <li>لكل استرجاع أو إشعار دائن: رقم الطلب، رقم الاسترجاع، المبلغ، والتاريخ والوقت.</li>
+      <li>لما الكاشير يدوّر على عميل أو يصرف مكافأة: الرقم المكتوب أو رقم بطاقة Wallet الممسوحة، وأي بطاقة أو قسيمة أو كم نقطة انصرفت.</li>
+    </ul>
+    <p>ما ينرسل غير كذا: لا منتجات ولا عناوين ولا إيميلات ولا بيانات دفع. مفتاح NuqtaPass يبقى في سيرفر Odoo عندك، والكاشير والمتصفح ما يوصلهم أبداً. ما نحفظ أي بيانات بطاقات في Odoo؛ Odoo يحفظ سجل مزامنة باللي أرسله عشان تراجعه وتعيد الإرسال.</p>
+
+    <h4>المتطلبات</h4>
+    <ul>
+      <li>حساب NuqtaPass على باقة الأعمال (<a href="https://nuqtapass.com">nuqtapass.com</a>). تطبيق Odoo نفسه مجاني.</li>
+      <li>Odoo 20.0 (Community أو Enterprise) على سيرفرك أو على Odoo.sh. Odoo Online ما يقبل تطبيقات خارجية فيها كود.</li>
+      <li>نقطة البيع و/أو المتجر الإلكتروني. أجزاء الكاشير والمتجر تنزل لحالها لما تكون هالتطبيقات منزلة.</li>
+      <li>لمسح بطاقات Wallet: أي قارئ باركود ثنائي الأبعاد (QR) يكتب مثل الكيبورد. بدونه اكتب رقم الجوال.</li>
+    </ul>
+
+    <h4>التجهيز</h4>
+    <ol>
+      <li>في NuqtaPass: الإعدادات ← الربط ← Odoo ← أنشئ مفتاح.</li>
+      <li>في Odoo: الإعدادات ← NuqtaPass ← الصق المفتاح ← جرّب الربط.</li>
+      <li>اختياري: حدد فرع NuqtaPass لكل كاشير (إعدادات نقطة البيع) ولكل موقع.</li>
+    </ol>
+    <div class="oe_span12">
+      <img class="oe_picture oe_screenshot" src="ar_settings.png" alt="الإعدادات ← NuqtaPass: المفتاح وجرّب الربط"/>
+    </div>
+
+    <h4>الدعم</h4>
+    <p>راسلنا على <a href="mailto:support@nuqtapass.com">support@nuqtapass.com</a>.</p>
+  </div>
+</section>

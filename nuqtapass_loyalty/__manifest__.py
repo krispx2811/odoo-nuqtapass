@@ -6,6 +6,8 @@
     "author": "NuqtaPass",
     "website": "https://nuqtapass.com",
     "license": "LGPL-3",
+    "images": ["static/description/banner.png", "static/description/main_screenshot.png"],
+    "support": "support@nuqtapass.com",
     "depends": ["base_setup"],
     "external_dependencies": {"python": ["requests"]},
     "data": [
