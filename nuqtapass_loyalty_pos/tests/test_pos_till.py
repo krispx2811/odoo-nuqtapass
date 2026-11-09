@@ -253,3 +253,104 @@ class TestPosTill(TestPoSCommon):
         sale.assert_not_called()
         customer.assert_not_called()
         self.assertEqual((order.nuqtapass_sync_ids.state, order.nuqtapass_sync_ids.attempts), ("pending", 0))
+
+    # ── the receipt screen: add the customer after paying, earn at once ─
+    def _sold(self, card_type="POINTS", points=None, stamps=0):
+        return ok({"status": "OK", "duplicate": False,
+                   "result": {"cardType": card_type, "stamps": stamps,
+                              "points": (3 if card_type == "POINTS" else 0) if points is None else points}}, status=201)
+
+    def test_attach_phone_sends_now_and_answers_the_line(self):
+        order = self._paid_order(customer=False)
+        points = {"cardId": POINTS_CARD, "type": "POINTS", "points": 163, "pointsValue": 16.3, "current": True}
+        with patch.object(NuqtaPassClient, "sale", return_value=self._sold()) as sale, \
+                patch.object(NuqtaPassClient, "customer",
+                             return_value=ok({"walletAdded": True, "cards": [STAMPS, points]})) as customer:
+            res = self.config._nuqtapass_attach(order.id, "9123 4567")
+        sale.assert_called_once()
+        self.assertEqual(sale.call_args.args[0]["phone"], "+96891234567")
+        self.assertEqual(sale.call_args.args[0]["orderRef"], order.pos_reference)
+        customer.assert_called_once_with("+96891234567")
+        self.assertEqual(order.nuqtapass_phone, "+96891234567")
+        self.assertEqual(order.nuqtapass_sync_ids.state, "done")
+        self.assertEqual(res["earned"], {"cardType": "POINTS", "stamps": 0, "points": 3})
+        self.assertEqual((res["ok"], res["phone"], res["card"]["points"], res["show_qr"]),
+                         (True, "+96891234567", 163, False))
+
+    def test_attach_new_customer_earns_and_shows_the_qr(self):
+        order = self._paid_order(customer=False)
+        answer = ok({"walletAdded": False, "cardUrl": CARD_URL,
+                     "welcome": {"cardUrl": CARD_URL, "whatsapp": WHATSAPP, "sms": SMS}, "cards": [STAMPS]})
+        with patch.object(NuqtaPassClient, "sale", return_value=self._sold("STAMPS", stamps=1)), \
+                patch.object(NuqtaPassClient, "customer", return_value=answer):
+            res = self.config._nuqtapass_attach(order.id, "91234567")
+        self.assertEqual(res["earned"], {"cardType": "STAMPS", "stamps": 1, "points": 0})
+        self.assertEqual(res["card"]["cardId"], STAMP_CARD)
+        self.assertTrue(res["show_qr"])
+        self.assertEqual(res["welcome"], {"cardUrl": CARD_URL, "whatsapp": WHATSAPP, "sms": SMS})
+
+    def test_attach_scanned_card_uses_its_phone(self):
+        order = self._paid_order(customer=False)
+        by_card = ok({"phone": "+96894176872", "walletAdded": True, "cards": [STAMPS]})
+        with patch.object(NuqtaPassClient, "customer_by_card", return_value=by_card), \
+                patch.object(NuqtaPassClient, "sale", return_value=self._sold("STAMPS", stamps=1)) as sale, \
+                patch.object(NuqtaPassClient, "customer", return_value=ok({"walletAdded": True, "cards": [STAMPS]})):
+            res = self.config._nuqtapass_attach(order.id, STAMP_CARD)
+        self.assertEqual(sale.call_args.args[0]["phone"], "+96894176872")
+        self.assertEqual((res["ok"], order.nuqtapass_phone), (True, "+96894176872"))
+
+    def test_attach_unknown_card_is_refused_and_nothing_queued(self):
+        order = self._paid_order(customer=False)
+        missing = ApiResult(False, 404, None, "Card not found", "CARD_NOT_FOUND", False)
+        with patch.object(NuqtaPassClient, "customer_by_card", return_value=missing), \
+                patch.object(NuqtaPassClient, "sale") as sale:
+            res = self.config._nuqtapass_attach(order.id, STAMP_CARD)
+        sale.assert_not_called()
+        self.assertEqual(res["error"], "card_not_found")
+        self.assertFalse(order.nuqtapass_sync_ids)
+        self.assertFalse(order.nuqtapass_phone)
+
+    def test_attach_wrong_phone_queues_nothing(self):
+        order = self._paid_order(customer=False)
+        self.assertEqual(self.config._nuqtapass_attach(order.id, "9417872")["error"], "invalid_phone")
+        self.assertFalse(order.nuqtapass_sync_ids)
+
+    def test_attach_twice_sends_once(self):
+        order = self._paid_order(customer=False)
+        with patch.object(NuqtaPassClient, "sale", return_value=self._sold()) as sale, \
+                patch.object(NuqtaPassClient, "customer", return_value=ok({"walletAdded": True, "cards": []})):
+            self.assertTrue(self.config._nuqtapass_attach(order.id, "91234567")["ok"])
+            again = self.config._nuqtapass_attach(order.id, "98765432")
+        sale.assert_called_once()
+        self.assertEqual(again["error"], "already")
+        self.assertEqual(order.nuqtapass_phone, "+96891234567")
+
+    def test_attach_to_an_order_that_already_earns_is_refused(self):
+        order = self._paid_order()  # paid with the customer's phone
+        with patch.object(NuqtaPassClient, "sale") as sale:
+            self.assertEqual(self.config._nuqtapass_attach(order.id, "98765432")["error"], "already")
+        sale.assert_not_called()
+
+    def test_attach_only_to_a_paid_sale_of_this_till(self):
+        order = self._paid_order(customer=False)
+        other_till = self.env["pos.config"].create({"name": "Other till"})
+        draft = self.env["pos.order"].browse(self.env["pos.order"].sync_from_ui(
+            [self.create_ui_order_data([(self.product, 1)], {"state": "draft"})])["pos.order"][0]["id"])
+        refund = self.env["pos.order"].browse(order.refund()["res_id"])
+        with patch.object(NuqtaPassClient, "sale") as sale:
+            for config, order_id in ((other_till, order.id), (self.config, draft.id), (self.config, refund.id),
+                                     (self.config, 999999999), (self.config, "junk")):
+                with self.subTest(order_id=order_id):
+                    self.assertEqual(config._nuqtapass_attach(order_id, "91234567")["error"], "bad_order")
+        sale.assert_not_called()
+
+    def test_attach_offline_keeps_the_sale_for_later(self):
+        order = self._paid_order(customer=False)
+        down = ApiResult(False, None, None, "Could not reach NuqtaPass", "NETWORK", True)
+        with patch.object(NuqtaPassClient, "sale", return_value=down), \
+                patch.object(NuqtaPassClient, "customer") as customer:
+            res = self.config._nuqtapass_attach(order.id, "91234567")
+        customer.assert_not_called()
+        self.assertEqual((res["ok"], res["pending"], res["phone"]), (True, True, "+96891234567"))
+        self.assertIn("will earn", res["message"])
+        self.assertEqual(order.nuqtapass_sync_ids.state, "pending")

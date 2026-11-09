@@ -27,3 +27,7 @@ class NuqtaPassPosController(http.Controller):
     @http.route("/nuqtapass_loyalty/pos/after_payment", type="jsonrpc", auth="user", methods=["POST"])
     def after_payment(self, config_id, order_id):
         return self._config(config_id)._nuqtapass_after_payment(order_id)
+
+    @http.route("/nuqtapass_loyalty/pos/attach", type="jsonrpc", auth="user", methods=["POST"])
+    def attach(self, config_id, order_id, query):
+        return self._config(config_id)._nuqtapass_attach(order_id, query)
