@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="param_till_enabled" model="ir.config_parameter">
+        <field name="key">nuqtapass_loyalty.till_enabled</field>
+        <field name="value">True</field>
+    </record>
+    <record id="param_online_enabled" model="ir.config_parameter">
+        <field name="key">nuqtapass_loyalty.online_enabled</field>
+        <field name="value">True</field>
+    </record>
+</odoo>

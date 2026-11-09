@@ -8,7 +8,11 @@
     "license": "LGPL-3",
     "depends": ["base_setup"],
     "external_dependencies": {"python": ["requests"]},
-    "data": [],
+    "data": [
+        "security/ir.access.csv",
+        "data/ir_config_parameter.xml",
+        "data/ir_cron.xml",
+    ],
     "installable": True,
     "application": True,
 }
