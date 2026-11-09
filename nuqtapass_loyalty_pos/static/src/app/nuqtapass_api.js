@@ -3,6 +3,7 @@ import { _t } from "@web/core/l10n/translation";
 import { user } from "@web/core/user";
 import { generateQRCodeDataUrl } from "@point_of_sale/utils";
 import { formatMoney, formatNumber } from "./pay/nuqtapass_math";
+import { tierParts } from "./tiers";
 
 export function offlineMessage() {
     return _t(
@@ -172,4 +173,38 @@ export function earnedLine(earned, card) {
             : plus;
     }
     return _t("Sent. Nothing to earn on this card for this order.");
+}
+
+function memberLine(name, pct) {
+    switch (name) {
+        case "GOLD":
+            return _t("Gold member · %(pct)s cash-back", { pct });
+        case "SILVER":
+            return _t("Silver member · %(pct)s cash-back", { pct });
+        default:
+            return _t("Bronze member · %(pct)s cash-back", { pct });
+    }
+}
+
+/** The customer's tier from their current points card: { member, next, color } or null (no tiers at the shop).
+ * "Gold member · 10% cash-back", "230 more points to Gold" (Arabic: "عضو ذهبي · استرداد 10%", "باقي 230 نقطة للمستوى
+ * الذهبي"): one sentence per tier, so each reads naturally in Arabic. */
+export function tierInfo(cards) {
+    const card = (cards || []).find((c) => c.type === "POINTS" && c.tier);
+    const parts = card ? tierParts(card.tier) : null;
+    if (!parts) {
+        return null;
+    }
+    let next = null;
+    if (parts.next?.name === "GOLD") {
+        next = _t("%(points)s more points to Gold", { points: parts.next.points });
+    } else if (parts.next?.name === "SILVER") {
+        next = _t("%(points)s more points to Silver", { points: parts.next.points });
+    }
+    return { member: memberLine(parts.name, parts.pct), next, color: parts.color, cardId: card.cardId };
+}
+
+/** The card strip's start band in the tier's colour (NuqtaPass sends only "rgb(r, g, b)"; the server checks it). */
+export function bandStyle(card, tier) {
+    return tier?.color && card.cardId === tier.cardId ? `border-inline-start-color: ${tier.color}` : "";
 }

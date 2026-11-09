@@ -7,12 +7,14 @@ import { NuqtaPassPointsBox } from "../pay/points_box";
 import { setPointsLine, totalWithoutPoints } from "../pay/nuqtapass_lines";
 import { formatNumber } from "../pay/nuqtapass_math";
 import {
+    bandStyle,
     cardLine,
     cardTitle,
     displayPhone,
     findCustomer,
     money,
     redeemOnCard,
+    tierInfo,
     welcomeWithQr,
     willEarnLine,
 } from "../nuqtapass_api";
@@ -79,6 +81,14 @@ export class NuqtaPassDialog extends Component {
 
     get willEarn() {
         return this.props.forOrder && this.state.result ? willEarnLine(this.state.result.cards) : "";
+    }
+
+    get tier() {
+        return this.state.result ? tierInfo(this.state.result.cards) : null;
+    }
+
+    bandStyle(card) {
+        return bandStyle(card, this.tier);
     }
 
     cardTitle(card) {

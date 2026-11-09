@@ -3,7 +3,7 @@ import { _t } from "@web/core/l10n/translation";
 import { patch } from "@web/core/utils/patch";
 import { PaymentScreen } from "@point_of_sale/app/screens/payment_screen/payment_screen";
 import { usePos } from "@point_of_sale/app/hooks/pos_hook";
-import { cardLine, cardTitle, displayPhone, findCustomer, money } from "../nuqtapass_api";
+import { bandStyle, cardLine, cardTitle, displayPhone, findCustomer, money, tierInfo } from "../nuqtapass_api";
 import { user } from "@web/core/user";
 import { creditAmount, formatMoney, formatNumber, parseMoney } from "./nuqtapass_math";
 import {
@@ -53,6 +53,14 @@ export class NuqtaPassPayPanel extends Component {
 
     get cards() {
         return this.state.result?.cards || [];
+    }
+
+    get tier() {
+        return tierInfo(this.cards);
+    }
+
+    bandStyle(card) {
+        return bandStyle(card, this.tier);
     }
 
     async lookUp(query = this.state.query.trim()) {

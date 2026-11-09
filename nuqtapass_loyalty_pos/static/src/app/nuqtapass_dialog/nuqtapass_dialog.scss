@@ -110,3 +110,22 @@
     align-self: center;
     flex-shrink: 0;
 }
+
+// The customer's tier, next to them: a small dot of the tier's metal (the card's own tier colour from NuqtaPass), and the
+// points card's band takes the same colour. Without a colour the dot is a quiet ring in the text colour.
+.o_nuqtapass_dialog,
+.o_nuqtapass_pay {
+    .o_nuqtapass_tier {
+        font-variant-numeric: tabular-nums;
+        line-height: 1.4;
+    }
+    .o_nuqtapass_tier_dot {
+        inline-size: 0.75rem;
+        block-size: 0.75rem;
+        flex: 0 0 auto;
+        border-radius: 50%;
+        // A ring, so a pale metal (silver on a white till) still shows.
+        box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.18);
+        background-color: transparent;
+    }
+}

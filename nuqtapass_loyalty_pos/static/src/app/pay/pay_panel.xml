@@ -21,8 +21,14 @@
             <div t-if="this.state.error" class="text-danger mt-2" role="alert"><bdi t-out="this.state.error"/></div>
 
             <t t-if="this.state.result">
+                <div t-if="this.tier" class="o_nuqtapass_tier d-flex flex-wrap align-items-center column-gap-2 mb-2">
+                    <span class="o_nuqtapass_tier_dot" t-att-style="this.tier.color ? 'background-color: ' + this.tier.color : ''" aria-hidden="true"/>
+                    <span class="fw-semibold"><bdi t-out="this.tier.member"/></span>
+                    <span t-if="this.tier.next" class="text-muted"><bdi t-out="this.tier.next"/></span>
+                </div>
                 <p t-if="!this.cards.length" class="text-muted mb-0">No card yet. The customer gets one with their first purchase.</p>
-                <div t-foreach="this.cards" t-as="card" t-key="card.cardId" class="o_nuqtapass_card rounded mb-2">
+                <div t-foreach="this.cards" t-as="card" t-key="card.cardId" class="o_nuqtapass_card rounded mb-2"
+                     t-att-style="this.bandStyle(card)">
                     <div class="o_nuqtapass_card_title small text-muted"><bdi t-out="this.cardTitle(card)"/></div>
                     <div class="o_nuqtapass_card_line fs-5 fw-semibold"><bdi t-out="this.cardLine(card)"/></div>
                     <t t-set="done" t-value="this.applied(card)"/>

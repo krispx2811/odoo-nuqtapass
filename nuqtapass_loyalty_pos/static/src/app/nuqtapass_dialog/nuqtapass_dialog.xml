@@ -17,12 +17,18 @@
                 <div t-if="this.state.error" class="alert alert-warning" role="alert"><bdi t-out="this.state.error"/></div>
                 <div t-if="this.state.done" class="alert alert-success" role="status"><bdi t-out="this.state.done"/></div>
                 <t t-if="this.state.result">
-                    <div class="o_nuqtapass_who fs-4 fw-bold mb-2"><bdi dir="ltr" t-out="this.phoneText"/></div>
+                    <div class="o_nuqtapass_who fs-4 fw-bold mb-1"><bdi dir="ltr" t-out="this.phoneText"/></div>
+                    <div t-if="this.tier" class="o_nuqtapass_tier d-flex flex-wrap align-items-center column-gap-2 mb-2">
+                        <span class="o_nuqtapass_tier_dot" t-att-style="this.tier.color ? 'background-color: ' + this.tier.color : ''" aria-hidden="true"/>
+                        <span class="fw-semibold"><bdi t-out="this.tier.member"/></span>
+                        <span t-if="this.tier.next" class="text-muted"><bdi t-out="this.tier.next"/></span>
+                    </div>
                     <p t-if="!this.state.result.cards.length" class="text-muted mb-2">
                         No card yet. The customer gets one with their first purchase.
                     </p>
                     <div t-foreach="this.state.result.cards" t-as="card" t-key="card.cardId"
-                         class="o_nuqtapass_card d-flex flex-wrap align-items-center gap-2 py-2 px-3 mb-2 rounded">
+                         class="o_nuqtapass_card d-flex flex-wrap align-items-center gap-2 py-2 px-3 mb-2 rounded"
+                         t-att-style="this.bandStyle(card)">
                         <div class="flex-grow-1">
                             <!-- <bdi>: the shop's own voucher title and the numbers in the line keep their order in RTL. -->
                             <div class="o_nuqtapass_card_title small text-muted"><bdi t-out="this.cardTitle(card)"/></div>
