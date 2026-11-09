@@ -6,6 +6,7 @@
     "author": "NuqtaPass",
     "website": "https://nuqtapass.com",
     "license": "LGPL-3",
+    "support": "support@nuqtapass.com",
     "depends": ["nuqtapass_loyalty", "website_sale"],
     "data": [
         "data/ir_cron.xml",
