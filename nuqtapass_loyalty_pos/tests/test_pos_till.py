@@ -78,9 +78,9 @@ class TestPosTill(TestPoSCommon):
             self.assertEqual(self.config._nuqtapass_lookup(STAMP_CARD)["error"], "card_not_found")
 
     def test_lookup_by_card_when_till_off_or_no_key(self):
-        self.env["ir.config_parameter"].sudo().set_str("nuqtapass_loyalty.api_key", False)
+        self.env["ir.config_parameter"].sudo().set_param("nuqtapass_loyalty.api_key", False)
         self.assertEqual(self.config._nuqtapass_lookup(STAMP_CARD)["error"], "not_configured")
-        self.env["ir.config_parameter"].sudo().set_bool("nuqtapass_loyalty.till_enabled", False)
+        self.env["ir.config_parameter"].sudo().set_param("nuqtapass_loyalty.till_enabled", False)
         self.assertEqual(self.config._nuqtapass_lookup(STAMP_CARD)["error"], "disabled")
 
     def test_lookup_shows_only_current_cards(self):
@@ -359,10 +359,10 @@ class TestPosTill(TestPoSCommon):
     def test_till_page_knows_whether_nuqtapass_is_on(self):
         icp = self.env["ir.config_parameter"].sudo()
         self.assertTrue(self.config._load_pos_data_read(self.config, self.config)[0]["nuqtapass_till_on"])
-        icp.set_str("nuqtapass_loyalty.api_key", False)
+        icp.set_param("nuqtapass_loyalty.api_key", False)
         self.config.invalidate_recordset()
         self.assertFalse(self.config._load_pos_data_read(self.config, self.config)[0]["nuqtapass_till_on"])
-        icp.set_str("nuqtapass_loyalty.api_key", "sip_test")
-        icp.set_bool("nuqtapass_loyalty.till_enabled", False)
+        icp.set_param("nuqtapass_loyalty.api_key", "sip_test")
+        icp.set_param("nuqtapass_loyalty.till_enabled", False)
         self.config.invalidate_recordset()
         self.assertFalse(self.config._load_pos_data_read(self.config, self.config)[0]["nuqtapass_till_on"])

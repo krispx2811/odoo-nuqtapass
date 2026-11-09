@@ -11,8 +11,8 @@ class TestPosLateCustomer(TestPoSCommon):
         self.config = self.basic_config
         self.env.company.country_id = self.env.ref("base.om")
         icp = self.env["ir.config_parameter"].sudo()
-        icp.set_bool("nuqtapass_loyalty.till_enabled", True)
-        icp.set_str("nuqtapass_loyalty.api_key", "sip_test")
+        icp.set_param("nuqtapass_loyalty.till_enabled", "True")
+        icp.set_param("nuqtapass_loyalty.api_key", "sip_test")
         self.product = self.create_product("Coffee", self.categ_basic, 2.5, 1.0)
         self.customer.phone = "9123 4567"
         self.other_customer.phone = "9876 5432"
@@ -42,13 +42,14 @@ class TestPosLateCustomer(TestPoSCommon):
         order.nuqtapass_phone = "9876 5432"
         self.assertEqual(self._sales(order).phone, "+96898765432")
 
-    def test_paid_without_customer_earns_when_the_till_sends_the_customer_after_payment(self):
+    def test_odoo_19_ignores_a_paid_order_sent_again(self):
+        # Odoo 19 has no process_saved_payments: a paid order the till sends again is ignored ("sync ignored"),
+        # so a customer added after payment reaches the server only through the receipt box (the attach route).
         data = self._data()
         order = self._sync(data)
-        # The till sends a paid order again when the customer is changed after payment (Odoo: process_saved_payments).
         self._sync(dict(data, partner_id=self.customer.id))
-        self.assertEqual(order.partner_id, self.customer)
-        self.assertEqual(self._sales(order).phone, "+96891234567")
+        self.assertFalse(order.partner_id)
+        self.assertFalse(self._sales(order))
 
     def test_later_changes_never_queue_twice(self):
         order = self._sync(self._data())
@@ -77,7 +78,7 @@ class TestPosLateCustomer(TestPoSCommon):
 
     def test_till_switched_off_queues_nothing(self):
         order = self._sync(self._data())
-        self.env["ir.config_parameter"].sudo().set_bool("nuqtapass_loyalty.till_enabled", False)
+        self.env["ir.config_parameter"].sudo().set_param("nuqtapass_loyalty.till_enabled", False)
         order.partner_id = self.customer
         self.assertFalse(self._sales(order))
 

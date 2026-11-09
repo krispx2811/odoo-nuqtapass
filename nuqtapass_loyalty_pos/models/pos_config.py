@@ -27,7 +27,7 @@ class PosConfig(models.Model):
     def _compute_nuqtapass_till_on(self):
         Sync = self.env["nuqtapass.sync"].sudo()
         on = Sync._channel_enabled("till") and bool(
-            (self.env["ir.config_parameter"].sudo().get_str("nuqtapass_loyalty.api_key") or "").strip())
+            (self.env["ir.config_parameter"].sudo().get_param("nuqtapass_loyalty.api_key") or "").strip())
         for config in self:
             config.nuqtapass_till_on = on
 
