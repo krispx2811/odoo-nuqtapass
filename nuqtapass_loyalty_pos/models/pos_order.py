@@ -48,8 +48,8 @@ class PosOrder(models.Model):
                 "kind": "refund",
                 "channel": "till",
                 "order_ref": sale.order_ref,
-                # Several partial refunds share the name "<order> REFUND": add the id.
-                "refund_ref": f"{self.name} #{self.id}",
+                # The refund's own receipt number: partial refunds all share the name "<order> REFUND".
+                "refund_ref": self.pos_reference,
                 "phone": sale.phone,
                 "amount": abs(self.amount_total),
                 "currency_id": currency.id,
@@ -66,7 +66,9 @@ class PosOrder(models.Model):
         Sync._queue({
             "kind": "sale",
             "channel": "till",
-            "order_ref": self.name,
+            # Odoo's receipt number ("266-1-000001": year + device, till, number), not `name`: on Odoo 20 every
+            # till device starts its names at "<till> - 000001", so names repeat across devices.
+            "order_ref": self.pos_reference,
             "phone": phone,
             "amount": self.amount_total,
             "currency_id": currency.id,

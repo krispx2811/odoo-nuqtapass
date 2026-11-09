@@ -23,8 +23,12 @@ class TestPosQueue(TestPoSCommon):
         res = self.env["pos.order"].sync_from_ui([data])
         return self.env["pos.order"].browse(res["pos.order"][0]["id"])
 
-    def _refund(self, order):
+    def _refund(self, order, qty=None):
         refund = self.env["pos.order"].browse(order.refund()["res_id"])
+        if qty is not None:  # a partial refund: give back only `qty` of each line
+            refund.lines.write({"qty": -qty})
+            refund.lines._onchange_amount_line_all()
+            refund._compute_prices()
         self.make_payment(refund, self.cash_pm1, refund.amount_total)
         return refund
 
@@ -34,7 +38,9 @@ class TestPosQueue(TestPoSCommon):
         sync = order.nuqtapass_sync_ids
         self.assertEqual(len(sync), 1)
         self.assertEqual((sync.kind, sync.channel), ("sale", "till"))
-        self.assertEqual(sync.order_ref, order.name)
+        # Odoo's receipt number (pos_reference), not the per-device name.
+        self.assertTrue(order.pos_reference)
+        self.assertEqual(sync.order_ref, order.pos_reference)
         self.assertEqual(sync.phone, "+96891234567")
         self.assertEqual(sync.amount, order.amount_total)
         self.assertEqual(sync.branch, "Qurum")
@@ -71,12 +77,39 @@ class TestPosQueue(TestPoSCommon):
         self.assertEqual(len(sync), 1)
         self.assertEqual(sync.kind, "refund")
         self.assertEqual(sync.channel, "till")
-        self.assertEqual(sync.order_ref, order.name)
-        self.assertEqual(sync.refund_ref, f"{refund.name} #{refund.id}")
+        self.assertEqual(sync.order_ref, order.pos_reference)
+        self.assertEqual(sync.refund_ref, refund.pos_reference)
+        self.assertNotEqual(refund.pos_reference, order.pos_reference)
         self.assertEqual(sync.phone, "+96891234567")
         self.assertAlmostEqual(sync.amount, abs(refund.amount_total))
         # The sale row stays on the original order.
         self.assertEqual(order.nuqtapass_sync_ids.kind, "sale")
+
+    def test_two_devices_same_order_name_both_queue(self):
+        # Every till device (or a reset browser) numbers its orders from 000001, so on Odoo 20 two orders can
+        # share a name like "Shop - 000001". Their receipt numbers (pos_reference) differ by device.
+        first = self._pay(customer=self.customer, pos_reference=f"261-{self.config.id}-000001")
+        second = self._pay(customer=self.customer, pos_reference=f"262-{self.config.id}-000001")
+        self.assertEqual(first.name, second.name)
+        self.assertEqual(len(first.nuqtapass_sync_ids), 1)
+        self.assertEqual(len(second.nuqtapass_sync_ids), 1)
+        self.assertEqual(first.nuqtapass_sync_ids.order_ref, f"261-{self.config.id}-000001")
+        self.assertEqual(second.nuqtapass_sync_ids.order_ref, f"262-{self.config.id}-000001")
+        self.assertNotEqual(first.nuqtapass_sync_ids.dedupe_key, second.nuqtapass_sync_ids.dedupe_key)
+        self.assertEqual(
+            {s.nuqtapass_sync_ids._payload()["orderRef"] for s in first | second},
+            {f"261-{self.config.id}-000001", f"262-{self.config.id}-000001"},
+        )
+
+    def test_two_partial_refunds_queue_separately(self):
+        order = self._pay(customer=self.customer, qty=2)
+        first = self._refund(order, qty=1)
+        second = self._refund(order, qty=1)
+        self.assertEqual(first.name, second.name)  # both "<order> REFUND"
+        refs = (first.nuqtapass_sync_ids | second.nuqtapass_sync_ids).mapped("refund_ref")
+        self.assertEqual(sorted(refs), sorted([first.pos_reference, second.pos_reference]))
+        self.assertEqual(
+            set((first.nuqtapass_sync_ids | second.nuqtapass_sync_ids).mapped("order_ref")), {order.pos_reference})
 
     def test_refund_of_order_never_sent_is_ignored(self):
         order = self._pay()
