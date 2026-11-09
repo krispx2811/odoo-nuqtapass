@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.nuqtapass_loyalty</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="96"/>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app data-string="NuqtaPass" string="NuqtaPass" name="nuqtapass_loyalty" groups="base.group_system">
+                    <block title="Connection" id="nuqtapass_connection">
+                        <setting id="nuqtapass_key" string="NuqtaPass key"
+                                 help="Create it on nuqtapass.com: Settings → Integrations → Odoo. It is shown once.">
+                            <field name="nuqtapass_api_key" password="True" placeholder="sip_…"/>
+                            <div class="mt-2">
+                                <button name="action_nuqtapass_test_connection" type="object"
+                                        string="Test connection" class="btn-link"/>
+                            </div>
+                        </setting>
+                    </block>
+                    <block title="Earning" id="nuqtapass_channels">
+                        <setting id="nuqtapass_till" help="Paid till orders with a customer phone earn stamps or points.">
+                            <field name="nuqtapass_till_enabled"/>
+                        </setting>
+                        <setting id="nuqtapass_online" help="Paid online orders earn stamps or points.">
+                            <field name="nuqtapass_online_enabled"/>
+                        </setting>
+                        <setting id="nuqtapass_log" string="Sync log" help="Every order and refund sent to NuqtaPass.">
+                            <button name="%(nuqtapass_loyalty.action_nuqtapass_sync)d" type="action"
+                                    string="Open sync log" class="btn-link"/>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+</odoo>

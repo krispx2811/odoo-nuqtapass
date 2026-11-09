@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="nuqtapass_sync_view_list" model="ir.ui.view">
+        <field name="name">nuqtapass.sync.list</field>
+        <field name="model">nuqtapass.sync</field>
+        <field name="arch" type="xml">
+            <list create="false" decoration-danger="state == 'failed'" decoration-muted="state == 'pending'">
+                <field name="occurred_at"/>
+                <field name="kind"/>
+                <field name="channel"/>
+                <field name="order_ref"/>
+                <field name="refund_ref" optional="hide"/>
+                <field name="phone"/>
+                <field name="amount"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="state" widget="badge" decoration-success="state == 'done'" decoration-danger="state == 'failed'"/>
+                <field name="summary"/>
+                <field name="attempts" optional="hide"/>
+                <field name="next_attempt_at" optional="hide"/>
+                <button name="action_resend" type="object" string="Resend" icon="fa-repeat" invisible="state == 'done'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="nuqtapass_sync_view_form" model="ir.ui.view">
+        <field name="name">nuqtapass.sync.form</field>
+        <field name="model">nuqtapass.sync</field>
+        <field name="arch" type="xml">
+            <form create="false" edit="false">
+                <header>
+                    <button name="action_resend" type="object" string="Resend" class="btn-primary" invisible="state == 'done'"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="kind"/>
+                            <field name="channel"/>
+                            <field name="order_ref"/>
+                            <field name="refund_ref" invisible="kind != 'refund'"/>
+                            <field name="phone"/>
+                            <field name="amount"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="occurred_at"/>
+                            <field name="branch"/>
+                        </group>
+                        <group>
+                            <field name="summary"/>
+                            <field name="attempts"/>
+                            <field name="next_attempt_at"/>
+                            <field name="last_error"/>
+                            <field name="last_status_code"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="nuqtapass_sync_view_search" model="ir.ui.view">
+        <field name="name">nuqtapass.sync.search</field>
+        <field name="model">nuqtapass.sync</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="order_ref"/>
+                <field name="phone"/>
+                <filter name="failed" string="Failed" domain="[('state', '=', 'failed')]"/>
+                <filter name="pending" string="Waiting" domain="[('state', '=', 'pending')]"/>
+                <separator/>
+                <filter name="till" string="Till" domain="[('channel', '=', 'till')]"/>
+                <filter name="online" string="Online store" domain="[('channel', '=', 'online')]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_nuqtapass_sync" model="ir.actions.act_window">
+        <field name="name">NuqtaPass sync log</field>
+        <field name="res_model">nuqtapass.sync</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Nothing sent yet</p>
+            <p>Paid orders with a customer phone show up here when they are sent to NuqtaPass.</p>
+        </field>
+    </record>
+</odoo>

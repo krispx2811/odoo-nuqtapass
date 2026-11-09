@@ -12,6 +12,8 @@
         "security/ir.access.csv",
         "data/ir_config_parameter.xml",
         "data/ir_cron.xml",
+        "views/nuqtapass_sync_views.xml",
+        "views/res_config_settings_views.xml",
     ],
     "installable": True,
     "application": True,
