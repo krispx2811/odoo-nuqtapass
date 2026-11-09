@@ -1,4 +1,6 @@
+import { _t } from "@web/core/l10n/translation";
 import { NuqtaPassDialog } from "./nuqtapass_dialog/nuqtapass_dialog";
+import { rewardToAlert } from "./reward_alert";
 
 let closeOpenWindow = null;
 
@@ -22,7 +24,51 @@ export function openNuqtaPassWindow(pos, { query = "", result = null } = {}) {
                     order.nuqtapass_phone = phone;
                 }
             },
+            onFound: (res) => open && alertReward(pos, order, res.cards),
         },
         { onClose: () => (closeOpenWindow = null) }
     );
+}
+
+/**
+ * The reward-ready notice (spec 2026-11-09 §2): when a customer is set on an order and their stamp card is full or
+ * they hold an active voucher, a short notice with one button. Not blocking, and once per order.
+ *  - open order: the button goes to the payment screen, its NuqtaPass panel pointing at that card (or `onUse`, when
+ *    the panel is already showing);
+ *  - paid order (the customer added on the receipt screen): the button opens the NuqtaPass window to give it now.
+ */
+export function alertReward(pos, order, cards, { onUse = null } = {}) {
+    if (!order || !pos.config.nuqtapass_till_on || order.uiState?.nuqtapassAlerted) {
+        return false;
+    }
+    const alert = rewardToAlert(cards);
+    if (!alert) {
+        return false;
+    }
+    order.uiState.nuqtapassAlerted = true;
+    const message =
+        alert.kind === "reward"
+            ? _t("Reward ready: %(stamps)s of %(required)s stamps", { stamps: alert.stamps, required: alert.required })
+            : _t("Voucher: %(title)s", { title: alert.title });
+    const paid = Boolean(order.finalized);
+    let close = null;
+    const use = () => {
+        close?.();
+        if (onUse) {
+            onUse(alert.cardId);
+        } else if (paid) {
+            openNuqtaPassWindow(pos, { query: order.nuqtapass_phone || order.partner_id?.phone || "" });
+        } else {
+            closeOpenWindow?.();
+            order.uiState.nuqtapassFocus = alert.cardId;
+            pos.navigate("PaymentScreen", { orderUuid: order.uuid });
+        }
+    };
+    close = pos.notification.add(message, {
+        type: "info",
+        title: _t("NuqtaPass"),
+        autocloseDelay: 12000,
+        buttons: [{ name: paid ? _t("Open NuqtaPass") : _t("Use at payment"), primary: true, onClick: use }],
+    });
+    return true;
 }

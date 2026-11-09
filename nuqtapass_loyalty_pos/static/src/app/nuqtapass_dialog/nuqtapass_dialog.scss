@@ -122,3 +122,10 @@
         background-color: transparent;
     }
 }
+
+// The card the reward-ready notice pointed at: the band thickens and the strip gets the primary's own quiet tint.
+.o_nuqtapass_pay .o_nuqtapass_card.o_nuqtapass_focus {
+    border-inline-start-width: 6px;
+    background-color: rgba(var(--bs-primary-rgb, 113, 75, 103), 0.08);
+    box-shadow: 0 0 0 1px rgba(var(--bs-primary-rgb, 113, 75, 103), 0.35);
+}

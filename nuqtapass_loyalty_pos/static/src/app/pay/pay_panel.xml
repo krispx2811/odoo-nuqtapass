@@ -28,6 +28,7 @@
                 </div>
                 <p t-if="!this.cards.length" class="text-muted mb-0">No card yet. The customer gets one with their first purchase.</p>
                 <div t-foreach="this.cards" t-as="card" t-key="card.cardId" class="o_nuqtapass_card rounded mb-2"
+                     t-att-class="{'o_nuqtapass_focus': card.cardId === this.state.focus}"
                      t-att-style="this.bandStyle(card)">
                     <div class="o_nuqtapass_card_title small text-muted"><bdi t-out="this.cardTitle(card)"/></div>
                     <div class="o_nuqtapass_card_line fs-5 fw-semibold"><bdi t-out="this.cardLine(card)"/></div>

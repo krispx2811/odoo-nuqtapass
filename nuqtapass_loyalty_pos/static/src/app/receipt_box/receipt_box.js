@@ -6,6 +6,7 @@ import { FeedbackScreen } from "@point_of_sale/app/screens/feedback_screen/feedb
 import { useBarcodeReader } from "@point_of_sale/app/hooks/barcode_reader_hook";
 import { usePos } from "@point_of_sale/app/hooks/pos_hook";
 import { attachToOrder, earnedLine, scanKind, welcomeWithQr } from "../nuqtapass_api";
+import { alertReward } from "../open_window";
 
 /**
  * Under "Amount Paid", for a paid order with no customer phone: type the phone or scan the Wallet card, and the
@@ -54,6 +55,7 @@ export class NuqtaPassReceiptBox extends Component {
         this.props.order.nuqtapass_phone = res.phone;
         this.state.line = res.pending ? res.message : earnedLine(res.earned, res.card);
         this.state.welcome = res.show_qr ? welcomeWithQr(res.welcome) : null;
+        alertReward(this.pos, this.props.order, res.cards || []);
     }
 
     get title() {

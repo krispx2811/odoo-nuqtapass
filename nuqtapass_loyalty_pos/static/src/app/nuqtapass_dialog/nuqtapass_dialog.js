@@ -38,6 +38,8 @@ export class NuqtaPassDialog extends Component {
         whatsapp: t.string().optional(""),
         sms: t.string().optional(""),
         onCustomer: t.function().optional(),
+        // Called with each customer found (the reward-ready notice).
+        onFound: t.function().optional(),
         close: t.function(),
     });
 
@@ -143,6 +145,7 @@ export class NuqtaPassDialog extends Component {
         this.state.query = "";
         this.state.welcome = res.walletAdded ? null : welcomeWithQr(res.welcome);
         this.props.onCustomer?.(res.phone);
+        this.props.onFound?.(res);
     }
 
     async lookUp(query = this.state.query.trim()) {
