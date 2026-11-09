@@ -15,7 +15,7 @@
             </form>
             <div t-if="this.state.busy" class="text-muted mt-2" role="status">Loading…</div>
             <div t-if="this.state.error" class="text-danger mt-2" role="alert"><bdi t-out="this.state.error"/></div>
-            <p t-if="this.state.line" class="o_nuqtapass_earned fs-4 fw-semibold mb-0" role="status">
+            <p t-if="this.state.line" class="o_nuqtapass_earned fw-semibold mb-0" role="status">
                 <bdi t-out="this.state.line"/>
             </p>
             <div t-if="this.state.welcome" class="o_nuqtapass_qr text-center mt-2">

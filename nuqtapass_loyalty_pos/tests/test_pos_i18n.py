@@ -20,3 +20,7 @@ class TestPosArabic(TransactionCase):
     def test_order_tab_in_arabic(self):
         arch = self.env["pos.order"].with_context(lang="ar_001").get_view(view_type="form")["arch"]
         self.assertIn("أعد الإرسال", arch)
+
+    def test_card_refusal_in_arabic(self):
+        config = self.config.with_context(lang="ar_001")
+        self.assertEqual(config._nuqtapass_card_refused()["message"], "هالبطاقة مو من هالمحل.")

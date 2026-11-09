@@ -5,6 +5,11 @@
         text-align: start;
         unicode-bidi: plaintext;
     }
+    // The box is dir=ltr for phones and card ids; its Arabic hint still sits on the reading side ("end" of an LTR
+    // box is its right edge; a logical value, so Odoo's RTL flip (rtlcss) leaves it alone).
+    .o_rtl & .o_nuqtapass_query:placeholder-shown {
+        text-align: end;
+    }
     .o_nuqtapass_card_line,
     .o_nuqtapass_who {
         font-variant-numeric: tabular-nums;
