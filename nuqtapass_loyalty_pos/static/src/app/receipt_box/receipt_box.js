@@ -29,7 +29,7 @@ export class NuqtaPassReceiptBox extends Component {
     setup() {
         this.pos = usePos();
         this.barcodeReader = useService("barcode_reader");
-        this.state = useState({ query: "", busy: false, error: "", line: "", welcome: null, answered: false });
+        this.state = useState({ query: "", busy: false, error: "", errorDetail: "", line: "", welcome: null, answered: false });
         // A scan while the box isn't focused still lands here (the product screen isn't listening now).
         useBarcodeReader({ product: (code) => this.onScan(code) });
     }
@@ -51,10 +51,12 @@ export class NuqtaPassReceiptBox extends Component {
         this.props.onUse();
         this.state.busy = true;
         this.state.error = "";
+        this.state.errorDetail = "";
         const res = await attachToOrder(this.pos.config.id, this.props.order.id, query);
         this.state.busy = false;
         if (!res.ok) {
             this.state.error = res.message;
+            this.state.errorDetail = res.detail || "";
             return;
         }
         this.state.answered = true;

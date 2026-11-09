@@ -41,10 +41,33 @@ class TestPosArabic(TransactionCase):
         with patch.object(NuqtaPassClient, "redeem", return_value=down):
             res = config._nuqtapass_spend("261-1-000042", "+96891234567", [use])
         self.assertEqual(res["message"], "ما قدرنا نوصل NuqtaPass. شيل بنود NuqtaPass عشان تكمل الدفع بدونها.")
-        no = ApiResult(False, 400, None, "ما عنده نقاط كافية", "POINTS_TOO_SMALL", False)
+        no = ApiResult(False, 400, None, "Not enough points, or the card has expired. Balance: 40", None, False)
         with patch.object(NuqtaPassClient, "redeem", return_value=no):
             res = config._nuqtapass_spend("261-1-000042", "+96891234567", [use])
-        self.assertEqual(res["message"], "نقاط NuqtaPass: ما عنده نقاط كافية. شيل هالبند عشان تكمل الدفع بدونه.")
+        self.assertEqual(res["message"], "نقاط NuqtaPass: البطاقة ما فيها نقاط كافية. شيل هالبند عشان تكمل الدفع بدونه.")
+        self.assertNotIn("detail", res)
+        odd = ApiResult(False, 400, None, "Something brand new", "NEW_CODE", False)
+        with patch.object(NuqtaPassClient, "redeem", return_value=odd):
+            res = config._nuqtapass_spend("261-1-000042", "+96891234567", [use])
+        self.assertEqual(res["message"], "نقاط NuqtaPass: ما قدرنا نكمل، حاول مرة ثانية. شيل هالبند عشان تكمل الدفع بدونه.")
+        self.assertEqual(res["detail"], "Something brand new")
+
+    def test_refusals_by_code_in_arabic(self):
+        config = self.config.with_context(lang="ar_001")
+        line = config._nuqtapass_refusal
+        self.assertEqual(line(ApiResult(False, 400, None, "Card is full", "CARD_FULL", False)),
+                         ("البطاقة كاملة. أعطه المكافأة أول، بعدين ضيف أختام.", None))
+        self.assertEqual(line(ApiResult(False, 409, None, "Used on this iPhone", "VOUCHER_SAME_PHONE", False))[0],
+                         "هالآيفون استخدم هالعرض من قبل.")
+        self.assertEqual(line(ApiResult(False, 400, None, "Bad card id", "INVALID_CARD_ID", False))[0],
+                         "فيه شي ناقص. دوّر على العميل مرة ثانية.")
+        self.assertEqual(line(ApiResult(False, 400, None, "Per-visit limit is 5.000 OMR (100 points).", None, False)),
+                         ("هذا أكثر من حد النقاط للزيارة الوحدة في المحل.", None))
+        # Unknown: a plain Arabic line, NuqtaPass's English only as the tooltip.
+        self.assertEqual(line(ApiResult(False, 400, None, "Something brand new", "NEW_CODE", False)),
+                         ("ما قدرنا نكمل، حاول مرة ثانية.", "Something brand new"))
+        res = config._nuqtapass_failure(ApiResult(False, 400, None, "Something brand new", None, False))
+        self.assertEqual((res["message"], res["detail"]), ("ما قدرنا نكمل، حاول مرة ثانية.", "Something brand new"))
 
     def test_till_words_in_arabic(self):
         messages = {m["id"]: m["string"] for m in
@@ -66,6 +89,8 @@ class TestPosArabic(TransactionCase):
             "%(points)s more points to Gold": "باقي %(points)s نقطة للمستوى الذهبي",
             "Reward ready: %(stamps)s of %(required)s stamps": "المكافأة جاهزة · الأختام: %(stamps)s من %(required)s",
             "Correct": "تصحيح",
+            # 2026-11-09: the card's own reward.
+            "Reward ready: %(reward)s": "المكافأة جاهزة: %(reward)s",
             "Undo last stamp": "شيل آخر ختم",
         }
         for english, arabic in expected.items():

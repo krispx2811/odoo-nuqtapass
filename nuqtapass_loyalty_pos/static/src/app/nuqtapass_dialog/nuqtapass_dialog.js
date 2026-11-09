@@ -56,6 +56,7 @@ export class NuqtaPassDialog extends Component {
             query: this.props.startingQuery,
             loading: false,
             error: "",
+            errorDetail: "",
             done: "",
             result: null,
             // The card being corrected (POS managers only), or "".
@@ -124,6 +125,7 @@ export class NuqtaPassDialog extends Component {
         const lines = await setPointsLine(this.pos, this.order, card, plan);
         if (lines.length) {
             this.state.error = "";
+            this.state.errorDetail = "";
             this.state.done = _t("Added to the order: %(value)s off for %(points)s points. They're used when you validate.", {
                 value: money(plan.value, this.state.result.currency),
                 points: formatNumber(plan.points),
@@ -159,6 +161,7 @@ export class NuqtaPassDialog extends Component {
         }
         this.state.loading = true;
         this.state.error = "";
+        this.state.errorDetail = "";
         this.state.done = "";
         const res = await findCustomer(this.props.configId, query);
         this.state.loading = false;
@@ -168,6 +171,7 @@ export class NuqtaPassDialog extends Component {
             this.state.result = null;
             this.state.welcome = null;
             this.state.error = res.message;
+            this.state.errorDetail = res.detail || "";
         }
     }
 
@@ -180,6 +184,7 @@ export class NuqtaPassDialog extends Component {
     startCorrect(card) {
         this.state.correcting = card.cardId;
         this.state.error = "";
+        this.state.errorDetail = "";
         this.state.done = "";
     }
 
@@ -189,6 +194,7 @@ export class NuqtaPassDialog extends Component {
         }
         this.state.loading = true;
         this.state.error = "";
+        this.state.errorDetail = "";
         this.state.done = "";
         const res = await adjustCard(this.props.configId, body);
         this.state.loading = false;
@@ -198,6 +204,7 @@ export class NuqtaPassDialog extends Component {
             this.state.done = res.message;
         } else {
             this.state.error = res.message;
+            this.state.errorDetail = res.detail || "";
         }
     }
 
@@ -207,6 +214,7 @@ export class NuqtaPassDialog extends Component {
         }
         this.state.loading = true;
         this.state.error = "";
+        this.state.errorDetail = "";
         this.state.done = "";
         const res = await redeemOnCard(this.props.configId, this.state.result.phone, card.cardId, action, {
             voucherId: action === "voucher" ? card.voucher?.id || null : null,
@@ -217,6 +225,7 @@ export class NuqtaPassDialog extends Component {
             this.state.done = res.message;
         } else {
             this.state.error = res.message;
+            this.state.errorDetail = res.detail || "";
         }
     }
 }

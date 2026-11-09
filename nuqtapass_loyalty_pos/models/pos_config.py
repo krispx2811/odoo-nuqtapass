@@ -69,17 +69,12 @@ class PosConfig(models.Model):
         if result.status is None or result.status >= 500:
             return self._nuqtapass_error("unreachable", _(
                 "NuqtaPass can't be reached right now. The sale is saved and will earn when the connection is back."))
-        if result.code == "PLAN_UPGRADE_REQUIRED":
-            return self._nuqtapass_error("refused", _(
-                "Odoo comes with the NuqtaPass Business plan. Ask the shop owner to upgrade on nuqtapass.com."))
-        if result.code == "PLAN_ENDED":
-            return self._nuqtapass_error("refused", _(
-                "The shop's NuqtaPass plan has ended. The owner can renew it on nuqtapass.com."))
-        if result.status == 401:
+        if result.status == 401 and result.code not in self._nuqtapass_code_words():
             return self._nuqtapass_error("refused", _("NuqtaPass refused the key. Check it in Settings."))
         if result.status == 404:
             return self._nuqtapass_error("not_found", _("No NuqtaPass card for this phone yet."))
-        return self._nuqtapass_error("refused", result.error or _("NuqtaPass said no."))
+        # By NuqtaPass's code, in the till's language (models/pos_refusal.py).
+        return self._nuqtapass_refused(result)
 
     def _nuqtapass_lookup(self, query):
         """Find the customer by what was typed or scanned: a Wallet card's id, or a phone.

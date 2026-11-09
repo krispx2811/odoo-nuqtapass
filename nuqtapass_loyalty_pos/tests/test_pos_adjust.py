@@ -115,14 +115,16 @@ class TestPosAdjust(TransactionCase):
             self.assertEqual(manager._nuqtapass_adjust(POINTS_CARD, "points", -50, "Wrong sale")["message"],
                              "The card has no points to take off.")
 
-    def test_refusals_show_nuqtapass_words(self):
+    def test_refusals_show_the_tills_words_by_code(self):
         manager = self._as(self.manager)
-        for result in (refused("Card is full", "CARD_FULL"), refused("No stamps to undo"),
-                       refused("Prepaid credit and pack uses can't be corrected: use a sale or a refund",
-                               "NOT_ADJUSTABLE")):
+        for result, words in (
+                (refused("Card is full", "CARD_FULL"), "This card is full. Give the reward first, then add stamps again."),
+                (refused("No stamps to undo"), "No stamps to undo"),
+                (refused("Prepaid credit and pack uses can't be corrected: use a sale or a refund", "NOT_ADJUSTABLE"),
+                 "Credit and pack uses can't be corrected here: they change with sales and refunds.")):
             with self.subTest(code=result.code), patch.object(NuqtaPassClient, "adjust", return_value=result):
-                res = manager._nuqtapass_adjust(STAMP_CARD, "stamp_add", None, "Missed one")
-                self.assertEqual((res["ok"], res["error"], res["message"]), (False, "refused", result.error))
+                res = manager.with_context(lang="en_US")._nuqtapass_adjust(STAMP_CARD, "stamp_add", None, "Missed one")
+                self.assertEqual((res["ok"], res["error"], res["message"]), (False, "refused", words))
         with patch.object(NuqtaPassClient, "adjust", return_value=refused("Card not found", "CARD_NOT_FOUND", 404)):
             res = manager._nuqtapass_adjust(STAMP_CARD, "stamp_add", None, "Missed one")
         self.assertEqual(res["error"], "card_not_found")

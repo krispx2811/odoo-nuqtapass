@@ -14,7 +14,7 @@
                         t-att-disabled="this.state.busy or !this.state.query.trim()">Add</button>
             </form>
             <div t-if="this.state.busy" class="text-muted mt-2" role="status">Loading…</div>
-            <div t-if="this.state.error" class="text-danger mt-2" role="alert"><bdi t-out="this.state.error"/></div>
+            <div t-if="this.state.error" class="text-danger mt-2" role="alert" t-att-title="this.state.errorDetail or undefined"><bdi t-out="this.state.error"/></div>
             <p t-if="this.state.line" class="o_nuqtapass_earned fw-semibold mb-0" role="status">
                 <bdi t-out="this.state.line"/>
             </p>

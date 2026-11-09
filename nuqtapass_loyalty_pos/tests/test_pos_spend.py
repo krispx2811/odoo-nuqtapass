@@ -116,10 +116,10 @@ class TestPosSpend(NuqtaPassUsesCommon):
     def test_refused_use_stops_and_names_the_line(self):
         res, mocked = self._spend(
             [CREDIT_USE, POINTS_USE],
-            [answer("credit"), refused("Not enough points (1200 left)", "POINTS_TOO_SMALL")])
+            [answer("credit"), refused("Not enough points, or the card has expired. Balance: 1200")])
         self.assertEqual(mocked.call_count, 2)
         self.assertEqual((res["ok"], res["error"], res["index"]), (False, "refused", 1))
-        self.assertEqual(res["message"], "NuqtaPass points: Not enough points (1200 left). "
+        self.assertEqual(res["message"], "NuqtaPass points: Not enough points, or the card has expired. Balance: 1200. "
                                          "Remove this line to take payment without it.")
         # What was already used stays recorded; a new Validate resends it (NuqtaPass answers it as a duplicate).
         self.assertEqual(self.Use.search([("order_ref", "=", REF)]).mapped("use"), ["credit"])

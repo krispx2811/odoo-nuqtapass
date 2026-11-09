@@ -327,4 +327,34 @@ TERMS = {
     "Points corrected: %(change)s (all the card had) · %(total)s now.":
         "تعدّلت النقاط: %(change)s (كل اللي في البطاقة) · الرصيد الحين: %(total)s",
     "The card has no points to take off.": "البطاقة ما فيها نقاط تنقصها.",
+    # ── NuqtaPass's refusals by code (2026-11-09; models/pos_refusal.py). The words of apps/staff lib/apiError.ts
+    # and lib/odoo.ts failedReason for the same codes.
+    "This card is full. Give the reward first, then add stamps again.": "البطاقة كاملة. أعطه المكافأة أول، بعدين ضيف أختام.",
+    "This card isn't active any more (it was used up or has expired).": "هالبطاقة ما عادت فعّالة (انستخدمت أو انتهت).",
+    "That card wasn't found at this shop.": "ما لقينا هالبطاقة في هالمحل.",
+    "That card belongs to another shop.": "هالبطاقة تابعة لمحل ثاني.",
+    "This card changed at NuqtaPass. Look the customer up again.": "البطاقة تغيّرت في NuqtaPass. دوّر على العميل مرة ثانية.",
+    "This voucher changed at NuqtaPass. Look the customer up again.": "القسيمة تغيّرت في NuqtaPass. دوّر على العميل مرة ثانية.",
+    "This card is a different type, so it can't do that.": "هالبطاقة من نوع ثاني وما تسوي هالشي.",
+    "That amount is too small to earn a point.": "المبلغ صغير وما يجيب نقطة.",
+    "This iPhone already used this offer.": "هالآيفون استخدم هالعرض من قبل.",
+    "This order already used a different amount at NuqtaPass.": "هالطلب استخدم كمية ثانية في NuqtaPass من قبل.",
+    "NuqtaPass is still recording this order. Try again in a moment.": "NuqtaPass للحين يسجّل هالطلب. حاول مرة ثانية بعد شوي.",
+    "This order was refunded, so nothing more can be used on it.": "هالطلب انرجع، فما ينصرف عليه شي بعد.",
+    "Credit and pack uses can't be corrected here: they change with sales and refunds.":
+        "الرصيد واستخدامات الباقة ما تتصحح من هنا: تتغيّر مع البيع والمرتجع.",
+    "The shop's NuqtaPass access has ended. The owner can renew it on nuqtapass.com.":
+        "انتهى اشتراك المحل في NuqtaPass. صاحب المحل يقدر يجدده من nuqtapass.com.",
+    "The shop is paused at NuqtaPass, so the till can't use cards for now.":
+        "المحل موقوف في NuqtaPass، فالكاشير ما يقدر يستخدم البطاقات حالياً.",
+    "Loyalty cards are off for this shop at NuqtaPass.": "بطاقات الولاء موقّفة لهالمحل في NuqtaPass.",
+    "Too many tries. Wait a minute and try again.": "محاولات كثيرة. انتظر دقيقة وحاول مرة ثانية.",
+    "The card doesn't have enough points.": "البطاقة ما فيها نقاط كافية.",
+    "That's more than the shop's points limit for one visit.": "هذا أكثر من حد النقاط للزيارة الوحدة في المحل.",
+    "The card doesn't have enough credit.": "الرصيد في البطاقة ما يكفي.",
+    "The pack doesn't have that many uses left.": "الباقة ما فيها استخدامات كافية.",
+    "The stamp card isn't full yet.": "بطاقة الأختام للحين مو كاملة.",
+    "There's no stamp to take off.": "ما فيه ختم ينشال.",
+    "We couldn't finish this. Try again.": "ما قدرنا نكمل، حاول مرة ثانية.",
+    "Reward ready: %(reward)s": "المكافأة جاهزة: %(reward)s",
 }

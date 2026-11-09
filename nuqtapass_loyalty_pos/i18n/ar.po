@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0-20261102\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-09 19:04+0000\n"
-"PO-Revision-Date: 2026-11-09 19:04+0000\n"
+"POT-Creation-Date: 2026-11-09 20:16+0000\n"
+"PO-Revision-Date: 2026-11-09 20:16+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: ar\n"
@@ -275,6 +275,14 @@ msgid "Created on"
 msgstr "أنشئ في"
 
 #. module: nuqtapass_loyalty_pos
+#. odoo-python
+#: code:addons/nuqtapass_loyalty_pos/models/pos_refusal.py:0
+msgid ""
+"Credit and pack uses can't be corrected here: they change with sales and "
+"refunds."
+msgstr "الرصيد واستخدامات الباقة ما تتصحح من هنا: تتغيّر مع البيع والمرتجع."
+
+#. module: nuqtapass_loyalty_pos
 #. odoo-javascript
 #: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_panel.xml:0
 msgid "Credit to use"
@@ -372,6 +380,12 @@ msgid "Loading…"
 msgstr "جاري التحميل…"
 
 #. module: nuqtapass_loyalty_pos
+#. odoo-python
+#: code:addons/nuqtapass_loyalty_pos/models/pos_refusal.py:0
+msgid "Loyalty cards are off for this shop at NuqtaPass."
+msgstr "بطاقات الولاء موقّفة لهالمحل في NuqtaPass."
+
+#. module: nuqtapass_loyalty_pos
 #: model:ir.model.fields,help:nuqtapass_loyalty_pos.field_nuqtapass_pos_use__amount
 msgid ""
 "Money in the shop's NuqtaPass currency: the points' value or the credit "
@@ -465,6 +479,12 @@ msgstr "NuqtaPass للحين يسجل هالطلب. اضغط «تصديق» مر
 
 #. module: nuqtapass_loyalty_pos
 #. odoo-python
+#: code:addons/nuqtapass_loyalty_pos/models/pos_refusal.py:0
+msgid "NuqtaPass is still recording this order. Try again in a moment."
+msgstr "NuqtaPass للحين يسجّل هالطلب. حاول مرة ثانية بعد شوي."
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-python
 #: code:addons/nuqtapass_loyalty_pos/models/pos_config.py:0
 msgid "NuqtaPass is turned off for the till in Settings."
 msgstr "NuqtaPass موقّف للكاشير في الإعدادات."
@@ -514,18 +534,6 @@ msgid "NuqtaPass reward product"
 msgstr "منتج مكافأة NuqtaPass"
 
 #. module: nuqtapass_loyalty_pos
-#. odoo-python
-#: code:addons/nuqtapass_loyalty_pos/models/pos_spend.py:0
-msgid "NuqtaPass said no"
-msgstr "NuqtaPass رفض"
-
-#. module: nuqtapass_loyalty_pos
-#. odoo-python
-#: code:addons/nuqtapass_loyalty_pos/models/pos_config.py:0
-msgid "NuqtaPass said no."
-msgstr "NuqtaPass رفض الطلب."
-
-#. module: nuqtapass_loyalty_pos
 #: model:ir.model,name:nuqtapass_loyalty_pos.model_nuqtapass_sync
 #: model:ir.model.fields,field_description:nuqtapass_loyalty_pos.field_pos_order__nuqtapass_sync_ids
 #: model:ir.ui.menu,name:nuqtapass_loyalty_pos.menu_nuqtapass_sync_pos
@@ -554,7 +562,7 @@ msgstr "قسيمة NuqtaPass"
 
 #. module: nuqtapass_loyalty_pos
 #. odoo-python
-#: code:addons/nuqtapass_loyalty_pos/models/pos_config.py:0
+#: code:addons/nuqtapass_loyalty_pos/models/pos_refusal.py:0
 msgid ""
 "Odoo comes with the NuqtaPass Business plan. Ask the shop owner to upgrade "
 "on nuqtapass.com."
@@ -717,6 +725,7 @@ msgstr "النقاط أو استخدامات الباقة، و1 للمكافأة
 #. module: nuqtapass_loyalty_pos
 #. odoo-python
 #: code:addons/nuqtapass_loyalty_pos/models/pos_adjust.py:0
+#: code:addons/nuqtapass_loyalty_pos/models/pos_refusal.py:0
 msgid "Points: a whole number other than 0, like 50 or -50."
 msgstr "النقاط: رقم صحيح غير الصفر، مثل 50 أو ⁦-50⁩."
 
@@ -777,6 +786,12 @@ msgstr "أعد الإرسال"
 #: code:addons/nuqtapass_loyalty_pos/models/pos_config.py:0
 msgid "Reward given."
 msgstr "انعطت المكافأة."
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/open_window.js:0
+msgid "Reward ready: %(reward)s"
+msgstr "المكافأة جاهزة: %(reward)s"
 
 #. module: nuqtapass_loyalty_pos
 #. odoo-javascript
@@ -851,6 +866,7 @@ msgstr "عضو فضي · استرداد %(pct)s"
 #. odoo-python
 #: code:addons/nuqtapass_loyalty_pos/models/pos_adjust.py:0
 #: code:addons/nuqtapass_loyalty_pos/models/pos_config.py:0
+#: code:addons/nuqtapass_loyalty_pos/models/pos_refusal.py:0
 #: code:addons/nuqtapass_loyalty_pos/models/pos_spend.py:0
 msgid "Something is missing. Look the customer up again."
 msgstr "فيه شي ناقص. دوّر على العميل مرة ثانية."
@@ -887,6 +903,42 @@ msgstr "انشال ختم · الأختام الحين: %(stamps)s من %(requir
 
 #. module: nuqtapass_loyalty_pos
 #. odoo-python
+#: code:addons/nuqtapass_loyalty_pos/models/pos_refusal.py:0
+msgid "That amount is too small to earn a point."
+msgstr "المبلغ صغير وما يجيب نقطة."
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-python
+#: code:addons/nuqtapass_loyalty_pos/models/pos_refusal.py:0
+msgid "That card belongs to another shop."
+msgstr "هالبطاقة تابعة لمحل ثاني."
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-python
+#: code:addons/nuqtapass_loyalty_pos/models/pos_refusal.py:0
+msgid "That card wasn't found at this shop."
+msgstr "ما لقينا هالبطاقة في هالمحل."
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-python
+#: code:addons/nuqtapass_loyalty_pos/models/pos_refusal.py:0
+msgid "That's more than the shop's points limit for one visit."
+msgstr "هذا أكثر من حد النقاط للزيارة الوحدة في المحل."
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-python
+#: code:addons/nuqtapass_loyalty_pos/models/pos_refusal.py:0
+msgid "The card doesn't have enough credit."
+msgstr "الرصيد في البطاقة ما يكفي."
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-python
+#: code:addons/nuqtapass_loyalty_pos/models/pos_refusal.py:0
+msgid "The card doesn't have enough points."
+msgstr "البطاقة ما فيها نقاط كافية."
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-python
 #: code:addons/nuqtapass_loyalty_pos/models/pos_adjust.py:0
 msgid "The card has no points to take off."
 msgstr "البطاقة ما فيها نقاط تنقصها."
@@ -903,12 +955,69 @@ msgstr ""
 
 #. module: nuqtapass_loyalty_pos
 #. odoo-python
-#: code:addons/nuqtapass_loyalty_pos/models/pos_config.py:0
+#: code:addons/nuqtapass_loyalty_pos/models/pos_refusal.py:0
+msgid "The pack doesn't have that many uses left."
+msgstr "الباقة ما فيها استخدامات كافية."
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-python
+#: code:addons/nuqtapass_loyalty_pos/models/pos_refusal.py:0
+msgid "The shop is paused at NuqtaPass, so the till can't use cards for now."
+msgstr "المحل موقوف في NuqtaPass، فالكاشير ما يقدر يستخدم البطاقات حالياً."
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-python
+#: code:addons/nuqtapass_loyalty_pos/models/pos_refusal.py:0
+msgid ""
+"The shop's NuqtaPass access has ended. The owner can renew it on "
+"nuqtapass.com."
+msgstr ""
+"انتهى اشتراك المحل في NuqtaPass. صاحب المحل يقدر يجدده من nuqtapass.com."
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-python
+#: code:addons/nuqtapass_loyalty_pos/models/pos_refusal.py:0
 msgid ""
 "The shop's NuqtaPass plan has ended. The owner can renew it on "
 "nuqtapass.com."
 msgstr ""
 "انتهى اشتراك المحل في NuqtaPass. صاحب المحل يقدر يجدده من nuqtapass.com."
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-python
+#: code:addons/nuqtapass_loyalty_pos/models/pos_refusal.py:0
+msgid "The stamp card isn't full yet."
+msgstr "بطاقة الأختام للحين مو كاملة."
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-python
+#: code:addons/nuqtapass_loyalty_pos/models/pos_refusal.py:0
+msgid "There's no stamp to take off."
+msgstr "ما فيه ختم ينشال."
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-python
+#: code:addons/nuqtapass_loyalty_pos/models/pos_refusal.py:0
+msgid "This card changed at NuqtaPass. Look the customer up again."
+msgstr "البطاقة تغيّرت في NuqtaPass. دوّر على العميل مرة ثانية."
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-python
+#: code:addons/nuqtapass_loyalty_pos/models/pos_refusal.py:0
+msgid "This card is a different type, so it can't do that."
+msgstr "هالبطاقة من نوع ثاني وما تسوي هالشي."
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-python
+#: code:addons/nuqtapass_loyalty_pos/models/pos_refusal.py:0
+msgid "This card is full. Give the reward first, then add stamps again."
+msgstr "البطاقة كاملة. أعطه المكافأة أول، بعدين ضيف أختام."
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-python
+#: code:addons/nuqtapass_loyalty_pos/models/pos_refusal.py:0
+msgid "This card isn't active any more (it was used up or has expired)."
+msgstr "هالبطاقة ما عادت فعّالة (انستخدمت أو انتهت)."
 
 #. module: nuqtapass_loyalty_pos
 #. odoo-python
@@ -918,15 +1027,33 @@ msgstr "هالبطاقة مو من هالمحل."
 
 #. module: nuqtapass_loyalty_pos
 #. odoo-python
+#: code:addons/nuqtapass_loyalty_pos/models/pos_refusal.py:0
+msgid "This iPhone already used this offer."
+msgstr "هالآيفون استخدم هالعرض من قبل."
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-python
 #: code:addons/nuqtapass_loyalty_pos/models/pos_config.py:0
 msgid "This order already earns for %(phone)s."
 msgstr "هالطلب محسوب من قبل على الرقم: %(phone)s"
 
 #. module: nuqtapass_loyalty_pos
 #. odoo-python
+#: code:addons/nuqtapass_loyalty_pos/models/pos_refusal.py:0
+msgid "This order already used a different amount at NuqtaPass."
+msgstr "هالطلب استخدم كمية ثانية في NuqtaPass من قبل."
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-python
 #: code:addons/nuqtapass_loyalty_pos/models/pos_config.py:0
 msgid "This order can't earn NuqtaPass points."
 msgstr "هالطلب ما ينحسب له نقاط NuqtaPass."
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-python
+#: code:addons/nuqtapass_loyalty_pos/models/pos_refusal.py:0
+msgid "This order was refunded, so nothing more can be used on it."
+msgstr "هالطلب انرجع، فما ينصرف عليه شي بعد."
 
 #. module: nuqtapass_loyalty_pos
 #. odoo-javascript
@@ -958,9 +1085,21 @@ msgid "This use is already recorded for this order."
 msgstr "هالاستخدام مسجل من قبل لهالطلب."
 
 #. module: nuqtapass_loyalty_pos
+#. odoo-python
+#: code:addons/nuqtapass_loyalty_pos/models/pos_refusal.py:0
+msgid "This voucher changed at NuqtaPass. Look the customer up again."
+msgstr "القسيمة تغيّرت في NuqtaPass. دوّر على العميل مرة ثانية."
+
+#. module: nuqtapass_loyalty_pos
 #: model:ir.model.fields,field_description:nuqtapass_loyalty_pos.field_nuqtapass_sync__pos_order_id
 msgid "Till order"
 msgstr "طلب الكاشير"
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-python
+#: code:addons/nuqtapass_loyalty_pos/models/pos_refusal.py:0
+msgid "Too many tries. Wait a minute and try again."
+msgstr "محاولات كثيرة. انتظر دقيقة وحاول مرة ثانية."
 
 #. module: nuqtapass_loyalty_pos
 #. odoo-javascript
@@ -1049,6 +1188,12 @@ msgid "Voucher: %(title)s"
 msgstr "قسيمة: %(title)s"
 
 #. module: nuqtapass_loyalty_pos
+#. odoo-python
+#: code:addons/nuqtapass_loyalty_pos/models/pos_refusal.py:0
+msgid "We couldn't finish this. Try again."
+msgstr "ما قدرنا نكمل، حاول مرة ثانية."
+
+#. module: nuqtapass_loyalty_pos
 #: model:ir.model.fields,help:nuqtapass_loyalty_pos.field_pos_order__nuqtapass_used
 msgid ""
 "What this order used of the customer's NuqtaPass cards when it was paid."
@@ -1065,6 +1210,7 @@ msgstr ""
 #. module: nuqtapass_loyalty_pos
 #. odoo-python
 #: code:addons/nuqtapass_loyalty_pos/models/pos_adjust.py:0
+#: code:addons/nuqtapass_loyalty_pos/models/pos_refusal.py:0
 msgid "Write why, in 3 to 200 characters."
 msgstr "اكتب السبب، من 3 إلى 200 حرف."
 

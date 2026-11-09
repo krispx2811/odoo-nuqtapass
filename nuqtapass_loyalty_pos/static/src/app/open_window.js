@@ -1,4 +1,5 @@
 import { _t } from "@web/core/l10n/translation";
+import { user } from "@web/core/user";
 import { NuqtaPassDialog } from "./nuqtapass_dialog/nuqtapass_dialog";
 import { rewardToAlert } from "./reward_alert";
 
@@ -41,15 +42,23 @@ export function alertReward(pos, order, cards, { onUse = null } = {}) {
     if (!order || !pos.config.nuqtapass_till_on || order.uiState?.nuqtapassAlerted) {
         return false;
     }
-    const alert = rewardToAlert(cards);
+    const alert = rewardToAlert(cards, user.lang);
     if (!alert) {
         return false;
     }
     order.uiState.nuqtapassAlerted = true;
-    const message =
+    // The till's page reads left to right even in Arabic: an Arabic notice is its own right-to-left run, and the
+    // shop's reward (often English) is isolated inside it, so "المكافأة جاهزة: Free coffee" keeps its order.
+    const arabic = String(user.lang || "").startsWith("ar");
+    const reward = `\u2068${alert.reward}\u2069`;
+    const title = `\u2068${alert.title}\u2069`;
+    const text =
         alert.kind === "reward"
-            ? _t("Reward ready: %(stamps)s of %(required)s stamps", { stamps: alert.stamps, required: alert.required })
-            : _t("Voucher: %(title)s", { title: alert.title });
+            ? alert.reward
+                ? _t("Reward ready: %(reward)s", { reward })
+                : _t("Reward ready: %(stamps)s of %(required)s stamps", { stamps: alert.stamps, required: alert.required })
+            : _t("Voucher: %(title)s", { title });
+    const message = arabic ? `\u2067${text}\u2069` : text;
     const paid = Boolean(order.finalized);
     let close = null;
     const use = () => {
