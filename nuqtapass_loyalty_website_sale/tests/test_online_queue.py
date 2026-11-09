@@ -172,6 +172,8 @@ class TestOnlineByInvoice(AccountTestInvoicingCommon):
         self.assertEqual(refund.amount, credit.amount_total)
         payload = refund._payload()
         self.assertEqual((payload["orderRef"], payload["refundRef"]), (f"{order.name}#{order.id}", credit.name))
+        # Online orders use nothing at payment: the whole order is the basis and nothing is named.
+        self.assertEqual((payload["orderAmount"], payload["returnUses"]), (order.amount_total, {}))
 
     def test_two_credit_notes_queue_separately(self):
         order = self._order()

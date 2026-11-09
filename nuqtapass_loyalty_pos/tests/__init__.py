@@ -4,3 +4,5 @@ from . import test_pos_late_customer
 from . import test_pos_views
 from . import test_pos_i18n
 from . import test_pos_assets
+from . import test_pos_spend
+from . import test_pos_refund_uses

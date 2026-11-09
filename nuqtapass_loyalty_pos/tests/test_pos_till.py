@@ -51,7 +51,7 @@ class TestPosTill(TestPoSCommon):
         mocked.assert_called_once_with("+96891234567")
         self.assertTrue(res["ok"])
         self.assertEqual(res["phone"], "+96891234567")
-        self.assertEqual(res["cards"], [dict(STAMPS, current=True)])
+        self.assertEqual(res["cards"], [dict(STAMPS, current=True, pointsPerUnit=None, usesLeft=0, unit=None)])
         self.assertTrue(res["walletAdded"])
         self.assertIsNone(res["welcome"])
 

@@ -114,6 +114,51 @@ class TestSyncSend(TransactionCase):
             {"status": "OK", "duplicate": False, "result": {"cardType": "POINTS", "points": 4, "shortfall": {"points": 8}}})})
         self.assertEqual(refund.summary, "Points taken back: 4 · Points already used, not taken back: 8")
 
+    def test_refund_always_sends_order_amount_and_return_uses(self):
+        refund = self.Sync._queue({
+            "kind": "refund", "channel": "till", "order_ref": "Shop/0001", "refund_ref": "R2", "amount": 0,
+            "order_amount": 7.5, "return_uses": json.dumps({"points": 167, "credit": 2.5}),
+            "occurred_at": datetime(2026, 11, 9, 11, 0),
+        })
+        body = refund._payload()
+        self.assertEqual((body["amount"], body["orderAmount"], body["returnUses"]),
+                         (0, 7.5, {"points": 167, "credit": 2.5}))
+        plain = self.Sync._queue({
+            "kind": "refund", "channel": "till", "order_ref": "Shop/0001", "refund_ref": "R3", "amount": 2.5,
+            "order_amount": 2.5, "occurred_at": datetime(2026, 11, 9, 11, 0),
+        })
+        self.assertEqual(plain._payload()["returnUses"], {})
+        # A row queued before this version has no order amount: never send 0 (NuqtaPass refuses it).
+        old = self.Sync._queue({
+            "kind": "refund", "channel": "till", "order_ref": "Shop/0001", "refund_ref": "R4", "amount": 2.5,
+            "occurred_at": datetime(2026, 11, 9, 11, 0),
+        })
+        self.assertNotIn("orderAmount", old._payload())
+        self.assertEqual(old._payload()["returnUses"], {})
+
+    def test_refund_keeps_and_shows_what_came_back(self):
+        refund = self.Sync._queue({
+            "kind": "refund", "channel": "till", "order_ref": "Shop/0001", "refund_ref": "R5", "amount": 0,
+            "order_amount": 7.5, "return_uses": json.dumps({"points": 167}),
+            "occurred_at": datetime(2026, 11, 9, 11, 0),
+        })
+        self.rec.write({"state": "done"})
+        self._send(ok({"kind": "REFUND", "status": "OK", "duplicate": False, "cardId": "x",
+                       "result": {"cardType": "POINTS", "points": 0, "returned": {"r1": 167}},
+                       "pointsReturned": 167, "creditReturned": 2.5, "usesReturned": 1, "rewardReturned": True,
+                       "vouchersReturned": 1, "rewardNotReturned": False}), method="refund")
+        stored = json.loads(refund.response_json)["result"]
+        self.assertEqual({k: stored[k] for k in ("pointsReturned", "creditReturned", "usesReturned", "rewardReturned",
+                                                  "vouchersReturned", "rewardNotReturned")},
+                         {"pointsReturned": 167, "creditReturned": 2.5, "usesReturned": 1, "rewardReturned": True,
+                          "vouchersReturned": 1, "rewardNotReturned": False})
+        self.assertNotIn("returned", stored)
+        self.assertEqual(refund.summary, "Points given back: 167 · Credit given back: 2.5 · Pack uses given back: 1 · "
+                                         "Reward given back · Vouchers given back: 1")
+        refund.write({"response_json": json.dumps({"status": "OK", "duplicate": False,
+                                                   "result": {"rewardNotReturned": True}})})
+        self.assertEqual(refund.summary, "The stamp card is no longer active: the reward was not given back")
+
     def test_summary_for_failed(self):
         self._send(fail(False, 400, "phone invalid"))
         self.assertIn("phone invalid", self.rec.summary)

@@ -34,6 +34,8 @@ class AccountMove(models.Model):
                     "refund_ref": move.name,
                     "phone": sale.phone,
                     "amount": move.amount_total,
+                    # The share's basis; online orders use nothing at payment, so `returnUses` stays empty.
+                    "order_amount": order.amount_total,
                     "currency_id": move.currency_id.id,
                     "occurred_at": fields.Datetime.now(),
                     "company_id": move.company_id.id,

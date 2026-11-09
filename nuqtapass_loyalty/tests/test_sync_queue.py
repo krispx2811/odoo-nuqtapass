@@ -52,11 +52,12 @@ class TestSyncQueue(TransactionCase):
     def test_refund_payload(self):
         rec = self.Sync._queue({
             "kind": "refund", "channel": "online", "order_ref": "S00042", "refund_ref": "RINV/2026/0001",
-            "amount": 4.0, "currency_id": self.omr.id, "occurred_at": datetime(2026, 11, 9, 12, 30),
+            "amount": 4.0, "order_amount": 10.0, "currency_id": self.omr.id,
+            "occurred_at": datetime(2026, 11, 9, 12, 30),
         })
         self.assertEqual(rec._payload(), {
             "source": "odoo", "orderRef": "S00042", "refundRef": "RINV/2026/0001",
-            "amount": 4.0, "refundedAt": "2026-11-09T12:30:00Z",
+            "amount": 4.0, "refundedAt": "2026-11-09T12:30:00Z", "orderAmount": 10.0, "returnUses": {},
         })
 
     def test_two_refunds_of_one_order_are_separate(self):

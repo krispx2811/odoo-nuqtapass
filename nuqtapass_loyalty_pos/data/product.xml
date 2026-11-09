@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- The till's NuqtaPass lines (points off, a pack use, a free item): a service with no tax of its own. Loaded
+         by the till as a special product (pos.config._get_special_products), so it is not in the product list. -->
+    <record id="product_nuqtapass_reward" model="product.product">
+        <field name="name">NuqtaPass reward</field>
+        <field name="type">service</field>
+        <field name="list_price">0</field>
+        <field name="taxes_id" eval="[(5, 0, 0)]"/>
+        <field name="supplier_taxes_id" eval="[(5, 0, 0)]"/>
+        <field name="available_in_pos" eval="True"/>
+        <field name="sale_ok" eval="True"/>
+        <field name="purchase_ok" eval="False"/>
+        <field name="default_code">NUQTAPASS</field>
+    </record>
+</odoo>
