@@ -68,8 +68,8 @@ class TestOnlineByInvoice(AccountTestInvoicingCommon):
         self.env["sale.order"]._cron_nuqtapass_scan()
         sync = order.nuqtapass_sync_ids
         self.assertEqual(len(sync), 1)
-        # The online order's own reference ("S00023": one shared sale.order sequence per database).
-        self.assertEqual((sync.kind, sync.channel, sync.order_ref), ("sale", "online", order.name))
+        # "<name>#<id>" (e.g. "S00023#57"): the name alone is not unique by constraint (risk 13).
+        self.assertEqual((sync.kind, sync.channel, sync.order_ref), ("sale", "online", f"{order.name}#{order.id}"))
         self.assertEqual(sync.phone, "+96891234567")
         self.assertEqual(sync.amount, order.amount_total)
         self.assertEqual(sync.branch, "Online")
@@ -82,8 +82,17 @@ class TestOnlineByInvoice(AccountTestInvoicingCommon):
         self._invoice_and_pay(second)
         self.env["sale.order"]._cron_nuqtapass_scan()
         self.assertNotEqual(first.name, second.name)
-        self.assertEqual(first.nuqtapass_sync_ids.order_ref, first.name)
-        self.assertEqual(second.nuqtapass_sync_ids.order_ref, second.name)
+        self.assertEqual(first.nuqtapass_sync_ids.order_ref, f"{first.name}#{first.id}")
+        self.assertEqual(second.nuqtapass_sync_ids.order_ref, f"{second.name}#{second.id}")
+
+    def test_two_orders_renamed_alike_both_queue(self):
+        first, second = self._order(), self._order()
+        first.name = second.name = "S-SAME"
+        self._invoice_and_pay(first)
+        self._invoice_and_pay(second)
+        self.env["sale.order"]._cron_nuqtapass_scan()
+        refs = (first.nuqtapass_sync_ids.order_ref, second.nuqtapass_sync_ids.order_ref)
+        self.assertEqual(refs, (f"S-SAME#{first.id}", f"S-SAME#{second.id}"))
 
     def test_order_without_phone_not_queued(self):
         self.partner.phone = False
@@ -123,12 +132,12 @@ class TestOnlineByInvoice(AccountTestInvoicingCommon):
         refund = self.Sync.search([("kind", "=", "refund"), ("move_id", "=", credit.id)])
         self.assertEqual(len(refund), 1)
         self.assertEqual(refund.channel, "online")
-        self.assertEqual(refund.order_ref, order.name)
+        self.assertEqual(refund.order_ref, f"{order.name}#{order.id}")
         self.assertEqual(refund.refund_ref, credit.name)
         self.assertEqual(refund.phone, "+96891234567")
         self.assertEqual(refund.amount, credit.amount_total)
         payload = refund._payload()
-        self.assertEqual((payload["orderRef"], payload["refundRef"]), (order.name, credit.name))
+        self.assertEqual((payload["orderRef"], payload["refundRef"]), (f"{order.name}#{order.id}", credit.name))
 
     def test_two_credit_notes_queue_separately(self):
         order = self._order()
@@ -186,4 +195,4 @@ class TestOnlineByTransaction(AccountPaymentCommon):
         self.assertTrue(order._nuqtapass_is_fully_paid())
         sync = order.nuqtapass_sync_ids
         self.assertEqual(len(sync), 1)
-        self.assertEqual((sync.kind, sync.channel, sync.order_ref), ("sale", "online", order.name))
+        self.assertEqual((sync.kind, sync.channel, sync.order_ref), ("sale", "online", f"{order.name}#{order.id}"))

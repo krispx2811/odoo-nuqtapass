@@ -29,7 +29,7 @@ class AccountMove(models.Model):
                 Sync._queue({
                     "kind": "refund",
                     "channel": "online",
-                    "order_ref": sale.order_ref,
+                    "order_ref": sale.order_ref,  # the original order's "S00023#57"
                     # The credit note's own number (e.g. "RINV/2026/00001"): unique per posted journal entry.
                     "refund_ref": move.name,
                     "phone": sale.phone,

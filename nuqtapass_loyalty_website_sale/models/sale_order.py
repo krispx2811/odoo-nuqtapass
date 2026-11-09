@@ -32,6 +32,11 @@ class SaleOrder(models.Model):
             return currency.compare_amounts(sum(invoices.mapped("amount_total")), self.amount_total) >= 0
         return False
 
+    def _nuqtapass_order_ref(self):
+        """"S00023#57": the name is not unique by constraint (editable, per-company sequences), the id is."""
+        self.ensure_one()
+        return f"{self.name}#{self.id}"
+
     def _nuqtapass_queue_sale(self):
         Sync = self.env["nuqtapass.sync"].sudo()
         if not Sync._channel_enabled("online"):
@@ -48,9 +53,7 @@ class SaleOrder(models.Model):
                 Sync._queue({
                     "kind": "sale",
                     "channel": "online",
-                    # "S00023": one sale.order sequence (company_id False) per database, so unique in practice
-                    # (not a SQL constraint; the name stays editable). Unlike till names it is not per device.
-                    "order_ref": order.name,
+                    "order_ref": order._nuqtapass_order_ref(),
                     "phone": phone,
                     "amount": order.amount_total,
                     "currency_id": order.currency_id.id,
