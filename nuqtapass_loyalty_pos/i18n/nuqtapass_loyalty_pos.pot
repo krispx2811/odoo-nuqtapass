@@ -218,6 +218,12 @@ msgid "Only Point of Sale users can use NuqtaPass on the till."
 msgstr ""
 
 #. module: nuqtapass_loyalty_pos
+#. odoo-python
+#: code:addons/nuqtapass_loyalty_pos/models/pos_config.py:0
+msgid "Phone number looks wrong: %(phone)s"
+msgstr ""
+
+#. module: nuqtapass_loyalty_pos
 #: model:ir.model.fields,help:nuqtapass_loyalty_pos.field_pos_order__nuqtapass_phone
 msgid ""
 "Phone typed in the NuqtaPass window on the till; used before the customer's "
@@ -309,12 +315,6 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/nuqtapass_loyalty_pos/static/src/app/nuqtapass_api.js:0
 msgid "Stamp card"
-msgstr ""
-
-#. module: nuqtapass_loyalty_pos
-#. odoo-python
-#: code:addons/nuqtapass_loyalty_pos/models/pos_config.py:0
-msgid "That phone number doesn't look right."
 msgstr ""
 
 #. module: nuqtapass_loyalty_pos

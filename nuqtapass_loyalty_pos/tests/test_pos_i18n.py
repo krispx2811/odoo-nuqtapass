@@ -15,7 +15,7 @@ class TestPosArabic(TransactionCase):
     def test_till_message_in_arabic(self):
         config = self.config.with_context(lang="ar_001")
         _client, error = config._nuqtapass_prepare("12")
-        self.assertEqual(error["message"], "رقم الجوال مو صحيح. تأكد منه وحاول مرة ثانية.")
+        self.assertEqual(error["message"], "رقم الجوال شكله غلط: 12")
 
     def test_order_tab_in_arabic(self):
         arch = self.env["pos.order"].with_context(lang="ar_001").get_view(view_type="form")["arch"]

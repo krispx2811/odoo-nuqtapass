@@ -58,6 +58,9 @@ TERMS = {
     "Branch": "الفرع",
     "Customer Name": "اسم العميل",
     "Paid / refunded at": "وقت الدفع أو الإرجاع",
+    "Phone looks wrong": "رقم الجوال شكله غلط",
+    "Not a valid mobile number for its country, so it is not sent. Fix the phone and press Resend.":
+        "هذا مو رقم جوال صحيح لبلده، فما ينرسل. صحّح الرقم واضغط «أعد الإرسال».",
     "Attempts": "المحاولات",
     "Next try": "المحاولة الجاية",
     "Last Error": "آخر خطأ",
@@ -125,7 +128,7 @@ TERMS = {
     "Till order": "طلب الكاشير",
     # ── till: answers from the server ─────────────────────────────────
     "NuqtaPass is turned off for the till in Settings.": "NuqtaPass موقّف للكاشير في الإعدادات.",
-    "That phone number doesn't look right.": "رقم الجوال مو صحيح. تأكد منه وحاول مرة ثانية.",
+    "Phone number looks wrong: %(phone)s": "رقم الجوال شكله غلط: %(phone)s",
     "Add your NuqtaPass key in Settings first.": "حط مفتاح NuqtaPass في الإعدادات أول.",
     "NuqtaPass can't be reached right now. The sale is saved and will earn when the connection is back.":
         "ما قدرنا نوصل إلى NuqtaPass الحين. الطلب محفوظ، وبتنعطى الأختام أو النقاط أول ما يرجع الاتصال.",
