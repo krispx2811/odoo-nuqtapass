@@ -265,6 +265,10 @@ TERMS = {
     "Pack uses used: %(n)s": "استخدامات الباقة: %(n)s",
     "Paying %(amount)s with credit": "يدفع %(amount)s من الرصيد",
     "Point of Sale Order Line": "بند طلب نقطة البيع",
+    # Odoo 19 names these models in the plural.
+    "Point of Sale Order Lines": "بنود طلبات نقطة البيع",
+    "Point of Sale Payment Methods": "طرق الدفع في نقطة البيع",
+    "Point of Sale Payments": "دفعات نقطة البيع",
     "Point of Sale Payment": "دفعة نقطة البيع",
     "Point of Sale Payment Method": "طريقة الدفع في نقطة البيع",
     "Point of Sale": "نقطة البيع",
