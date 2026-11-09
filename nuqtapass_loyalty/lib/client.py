@@ -51,6 +51,10 @@ class NuqtaPassClient:
     def redeem(self, body):
         return self._call("POST", "/redeem", body=body)
 
+    def adjust(self, body):
+        """A POS manager's correction: a stamp added / undone or ± points, with a reason (Part 1 POST /adjust)."""
+        return self._call("POST", "/adjust", body=body)
+
     def _call(self, method, path, params=None, body=None):
         try:
             resp = requests.request(

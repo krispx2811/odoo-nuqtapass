@@ -53,6 +53,15 @@ class TestClient(TransactionCase):
         self.assertEqual(self.request.call_args.args, ("GET", DEFAULT_BASE_URL + "/customer"))
         self.assertEqual(self.request.call_args.kwargs["params"], {"card": "cccccccc-1111-4111-8111-111111111111"})
 
+    def test_adjust_posts_the_correction(self):
+        self.request.return_value = fake_response(200, {"success": True, "data": {"action": "stamp_undo"}})
+        body = {"cardId": "cccccccc-1111-4111-8111-111111111111", "action": "stamp_undo", "reason": "Pressed twice",
+                "staffName": "Mona"}
+        result = self.client.adjust(body)
+        self.assertTrue(result.ok)
+        self.assertEqual(self.request.call_args.args, ("POST", DEFAULT_BASE_URL + "/adjust"))
+        self.assertEqual(self.request.call_args.kwargs["json"], body)
+
     def test_network_error_is_retryable(self):
         self.request.side_effect = requests.exceptions.ConnectTimeout("boom")
         result = self.client.ping()
