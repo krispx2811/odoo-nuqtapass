@@ -1,8 +1,11 @@
 import { _t } from "@web/core/l10n/translation";
 import { formatNumber } from "./nuqtapass_math";
+import { pointsUse, splitPointsByTax } from "./points_tax";
 
 // The order's NuqtaPass lines and payment. Adding them spends nothing: Validate does (pay_validation.js).
-//  - points:  "NuqtaPass points", −value, no tax, the points in its note; one per order (pressing again replaces it)
+//  - points:  "NuqtaPass points", −value split over the order's tax groups (one line per group, with its taxes, as
+//             Odoo's own discounts: VAT is charged on the discounted price), the points in the note; pressing again
+//             replaces them
 //  - pack / reward / voucher: one unit of the item it covers made free (−its unit price, with its own taxes and
 //    discount, so the item nets to exactly 0)
 //  - credit:  a "NuqtaPass credit" payment line, one per order
@@ -34,10 +37,28 @@ export function coverableLines(order) {
     return order.lines.filter((line) => !line.nuqtapass_use && line.qty > 0 && line.price_unit > 0);
 }
 
-/** The order's total before its NuqtaPass points line: what the points can take off at most. */
+/** The order's points lines (one per tax group). */
+export function pointsLines(order) {
+    return order.lines.filter((line) => line.nuqtapass_use === "points");
+}
+
+/** The order's total before its NuqtaPass points lines: what the points can take off at most. */
 export function totalWithoutPoints(order) {
-    const line = lineFor(order, "points");
-    return Math.max(0, order.priceIncl - (line ? line.priceIncl : 0));
+    const off = pointsLines(order).reduce((sum, line) => sum + line.priceIncl, 0);
+    return Math.max(0, order.priceIncl - off);
+}
+
+/** The lines the points are weighed over: the order's own lines (free-item lines too), not tips or combo parents. */
+function taxedLines(order) {
+    return order.lines
+        .filter(
+            (line) =>
+                line.nuqtapass_use !== "points" &&
+                line.qty &&
+                !line.combo_line_ids?.length &&
+                !line.isTipLine?.()
+        )
+        .map((line) => ({ taxes: line.tax_ids || [], included: line.priceIncl, excluded: line.priceExcl }));
 }
 
 export function pointsNote(points) {
@@ -45,31 +66,40 @@ export function pointsNote(points) {
     return points === 1 ? _t("1 point used") : _t("%(points)s points used", { points: n });
 }
 
-/** Put the order's points line (replacing the one there). */
+/** Put the order's points lines, one per tax group (replacing those there). Answers the lines added. */
 export async function setPointsLine(pos, order, card, { points, value }) {
     const product = rewardProduct(pos);
     if (!product) {
-        return null;
+        return [];
     }
-    lineFor(order, "points")?.delete();
-    const line = await pos.addLineToOrder(
-        {
-            product_id: product,
-            product_tmpl_id: product.product_tmpl_id,
-            price_unit: -value,
-            qty: 1,
-            tax_ids: [],
-            nuqtapass_use: "points",
-            nuqtapass_card_id: card.cardId,
-            nuqtapass_qty: points,
-            nuqtapass_label: _t("NuqtaPass points"),
-        },
-        order,
-        { force: true },
-        false
-    );
-    line?.setCustomerNote(pointsNote(points));
-    return line;
+    for (const old of pointsLines(order)) {
+        old.delete();
+    }
+    const decimals = pos.currency?.decimal_places ?? 3; // the line is in the till's currency
+    const added = [];
+    for (const part of splitPointsByTax(taxedLines(order), { value, points, decimals })) {
+        const line = await pos.addLineToOrder(
+            {
+                product_id: product,
+                product_tmpl_id: product.product_tmpl_id,
+                price_unit: part.priceUnit,
+                qty: 1,
+                tax_ids: part.taxes.map((tax) => ["link", tax]),
+                nuqtapass_use: "points",
+                nuqtapass_card_id: card.cardId,
+                nuqtapass_qty: part.points,
+                nuqtapass_label: _t("NuqtaPass points"),
+            },
+            order,
+            { force: true },
+            false
+        );
+        if (line) {
+            line.setCustomerNote(pointsNote(part.points));
+            added.push(line);
+        }
+    }
+    return added;
 }
 
 /** Make one unit of `covered` free with a pack use, a stamp reward or a voucher (replacing the earlier one). */
@@ -134,11 +164,12 @@ export function removeAllNuqtaPass(order) {
 
 /** What Validate sends to the spend route, with each line's name for a refusal. */
 export function orderUses(order) {
-    const uses = [];
+    const points = pointsUse(pointsLines(order));
+    const uses = points ? [points] : [];
     for (const line of nuqtapassLines(order)) {
         const base = { use: line.nuqtapass_use, card_id: line.nuqtapass_card_id, label: line.nuqtapass_label || line.full_product_name };
         if (line.nuqtapass_use === "points") {
-            uses.push({ ...base, points: line.nuqtapass_qty, ref: line.uuid });
+            continue; // one use for all of them, above
         } else if (line.nuqtapass_use === "pack") {
             uses.push({ ...base, uses: 1, ref: line.uuid });
         } else if (line.nuqtapass_use === "voucher") {

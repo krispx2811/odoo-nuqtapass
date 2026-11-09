@@ -11,6 +11,7 @@ import {
     creditMethod,
     creditPayment,
     lineFor,
+    pointsLines,
     rewardProduct,
     setCreditPayment,
     setFreeLine,
@@ -131,19 +132,27 @@ export class NuqtaPassPayPanel extends Component {
                   }
                 : null;
         }
-        const use = card.type === "POINTS" ? "points" : this.useOf(card);
-        const line = lineFor(this.order, use, card.type === "VOUCHER" ? card.cardId : null);
+        if (card.type === "POINTS") {
+            const lines = pointsLines(this.order);
+            if (!lines.length) {
+                return null;
+            }
+            const value = lines.reduce((sum, line) => sum + Math.abs(line.priceIncl), 0);
+            const points = lines.reduce((sum, line) => sum + (line.nuqtapass_qty || 0), 0);
+            return {
+                label: _t("On this order: %(value)s off · %(points)s points", {
+                    value: this.money(value),
+                    points: formatNumber(points),
+                }),
+                remove: () => lines.forEach((line) => this.order.removeOrderline(line)),
+            };
+        }
+        const line = lineFor(this.order, this.useOf(card), card.type === "VOUCHER" ? card.cardId : null);
         if (!line) {
             return null;
         }
         const off = this.money(Math.abs(line.priceIncl));
-        const label =
-            use === "points"
-                ? _t("On this order: %(value)s off · %(points)s points", {
-                      value: off,
-                      points: formatNumber(line.nuqtapass_qty),
-                  })
-                : _t("On this order: %(line)s · %(value)s off", { line: line.full_product_name, value: off });
+        const label = _t("On this order: %(line)s · %(value)s off", { line: line.full_product_name, value: off });
         return { label, remove: () => this.order.removeOrderline(line) };
     }
 

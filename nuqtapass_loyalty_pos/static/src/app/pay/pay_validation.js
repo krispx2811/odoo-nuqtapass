@@ -3,7 +3,7 @@ import { _t } from "@web/core/l10n/translation";
 import { AlertDialog, ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
 import OrderPaymentValidation from "@point_of_sale/app/utils/order_payment_validation";
 import { spendUses } from "../nuqtapass_api";
-import { nuqtapassLines, orderUses, removeAllNuqtaPass } from "./nuqtapass_lines";
+import { nuqtapassLines, orderUses, pointsLines, removeAllNuqtaPass } from "./nuqtapass_lines";
 
 /**
  * Validate spends the order's NuqtaPass uses (points, credit, a pack use, a reward, vouchers) before Odoo takes the
@@ -79,8 +79,9 @@ patch(OrderPaymentValidation.prototype, {
             }
             return;
         }
-        const line = nuqtapassLines(order).find((l) => l.uuid === use.ref);
-        if (line) {
+        // Points: every one of its lines (one per tax group).
+        const lines = use.use === "points" ? pointsLines(order) : nuqtapassLines(order).filter((l) => l.uuid === use.ref);
+        for (const line of lines) {
             order.removeOrderline(line);
         }
     },

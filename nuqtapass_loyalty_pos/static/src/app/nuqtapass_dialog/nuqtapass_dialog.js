@@ -104,8 +104,8 @@ export class NuqtaPassDialog extends Component {
 
     /** Spent at payment, not now: the line can be removed at no cost. */
     async usePoints(card, plan) {
-        const line = await setPointsLine(this.pos, this.order, card, plan);
-        if (line) {
+        const lines = await setPointsLine(this.pos, this.order, card, plan);
+        if (lines.length) {
             this.state.error = "";
             this.state.done = _t("Added to the order: %(value)s off for %(points)s points. They're used when you validate.", {
                 value: money(plan.value, this.state.result.currency),
