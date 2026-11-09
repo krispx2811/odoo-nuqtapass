@@ -2,12 +2,15 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
+    boxText,
     creditAmount,
+    creditPick,
     fitPoints,
     formatMoney,
     formatNumber,
     parseMoney,
     planPoints,
+    refundSplit,
     pointsFor,
     startingAmount,
     valueOfPoints,
@@ -148,4 +151,54 @@ test("fitPoints: points that no longer fit the order's total (a free item went o
     assert.deepEqual(fitPoints({ ...base, points: 250, value: 7.5, maxValue: 0 }), { points: 0, value: 0 });
     // The points card isn't known (no rate): the points come off.
     assert.deepEqual(fitPoints({ ppu: undefined, decimals: 3, points: 250, value: 7.5, maxValue: 2 }), { points: 0, value: 0 });
+});
+
+test("a money box follows its default until the cashier types", () => {
+    // Kareem's till: the credit box kept 0.020 while 20.13 was due after other NuqtaPass lines changed the order.
+    assert.equal(boxText(null, 0.02, 3), "0.020");
+    assert.equal(boxText(null, 20.13, 3), "20.130"); // the amount due changed: the default follows it
+    assert.equal(boxText(undefined, 5, 2), "5.00");
+    assert.equal(boxText("3", 20.13, 3), "3"); // typed: kept as typed
+    assert.equal(boxText("", 20.13, 3), ""); // cleared by the cashier: stays empty
+    assert.equal(boxText(null, NaN, 3), "0.000");
+});
+
+test("a refund gives back its share of the NuqtaPass credit as credit, the rest as the order's other method", () => {
+    // Whole order: 2.000 credit + 3.000 cash → 2.000 back as credit, 3.000 as cash.
+    assert.deepEqual(refundSplit({ refundTotal: 5, orderTotal: 5, creditPaid: 2, decimals: 3 }), { credit: 2, rest: 3 });
+    // Half the order back: half of each.
+    assert.deepEqual(refundSplit({ refundTotal: 2.5, orderTotal: 5, creditPaid: 2, decimals: 3 }), { credit: 1, rest: 1.5 });
+    // A third: rounded to the currency, the two still add up to the refund.
+    const third = refundSplit({ refundTotal: 1, orderTotal: 3, creditPaid: 2, decimals: 3 });
+    assert.deepEqual(third, { credit: 0.667, rest: 0.333 });
+    // Paid all with credit: all back as credit.
+    assert.deepEqual(refundSplit({ refundTotal: 20.13, orderTotal: 20.13, creditPaid: 20.13, decimals: 3 }), {
+        credit: 20.13,
+        rest: 0,
+    });
+    // No credit on the order: everything the other way.
+    assert.deepEqual(refundSplit({ refundTotal: 4, orderTotal: 4, creditPaid: 0, decimals: 3 }), { credit: 0, rest: 4 });
+    // Never more credit than the order used, nor than is given back.
+    assert.deepEqual(refundSplit({ refundTotal: 9, orderTotal: 5, creditPaid: 2, decimals: 3 }), { credit: 2, rest: 7 });
+    assert.deepEqual(refundSplit({ refundTotal: 0, orderTotal: 5, creditPaid: 2, decimals: 3 }), { credit: 0, rest: 0 });
+});
+
+test("the NuqtaPass credit method's button takes the due up to the balance, or says why not", () => {
+    const prepaid = { type: "PREPAID", cardId: "b", balance: 9 };
+    const points = { type: "POINTS", cardId: "a", points: 100 };
+    assert.deepEqual(creditPick({ cards: [points, prepaid], remainingDue: 20.13, decimals: 3 }), {
+        ok: true,
+        card: prepaid,
+        amount: 9,
+    });
+    assert.equal(creditPick({ cards: [prepaid], remainingDue: 4.25, decimals: 3 }).amount, 4.25);
+    // A credit line already on: the due it covers counts again (pressing it again replaces it).
+    assert.equal(creditPick({ cards: [prepaid], remainingDue: 0, creditPaid: 3, decimals: 3 }).amount, 3);
+    assert.deepEqual(creditPick({ cards: null, remainingDue: 5, decimals: 3 }), { ok: false, reason: "customer" });
+    assert.deepEqual(creditPick({ cards: [points], remainingDue: 5, decimals: 3 }), { ok: false, reason: "no_credit" });
+    assert.deepEqual(creditPick({ cards: [{ ...prepaid, balance: 0 }], remainingDue: 5, decimals: 3 }), {
+        ok: false,
+        reason: "no_credit",
+    });
+    assert.deepEqual(creditPick({ cards: [prepaid], remainingDue: 0, decimals: 3 }), { ok: false, reason: "nothing_due" });
 });

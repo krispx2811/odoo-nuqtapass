@@ -3,7 +3,7 @@ import { _t } from "@web/core/l10n/translation";
 import { AlertDialog, ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
 import OrderPaymentValidation from "@point_of_sale/app/utils/order_payment_validation";
 import { spendUses } from "../nuqtapass_api";
-import { belowZero, nuqtapassLines, orderUses, pointsLines, removeAllNuqtaPass } from "./nuqtapass_lines";
+import { belowZero, creditPayment, nuqtapassLines, orderUses, pointsLines, removeAllNuqtaPass } from "./nuqtapass_lines";
 
 /**
  * Validate spends the order's NuqtaPass uses (points, credit, a pack use, a reward, vouchers) before Odoo takes the
@@ -20,6 +20,16 @@ patch(OrderPaymentValidation.prototype, {
 
     async nuqtapassSpend() {
         const order = this.order;
+        const credit = order && !order.isRefund ? creditPayment(order) : null;
+        if (credit && !credit.nuqtapass_card_id && credit.getAmount() > 0) {
+            // A NuqtaPass credit line that no customer's card is behind (e.g. an order reopened from elsewhere):
+            // never taken as plain money that NuqtaPass doesn't spend.
+            this.pos.dialog.add(AlertDialog, {
+                title: _t("NuqtaPass"),
+                body: _t("Remove the NuqtaPass credit line and add it again with the customer looked up."),
+            });
+            return false;
+        }
         const uses = order && !order.isRefund ? orderUses(order) : [];
         if (!uses.length) {
             return true;

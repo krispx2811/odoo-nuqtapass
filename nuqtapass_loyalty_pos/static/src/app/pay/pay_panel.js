@@ -3,9 +3,10 @@ import { _t } from "@web/core/l10n/translation";
 import { patch } from "@web/core/utils/patch";
 import { PaymentScreen } from "@point_of_sale/app/screens/payment_screen/payment_screen";
 import { usePos } from "@point_of_sale/app/hooks/pos_hook";
+import { AlertDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
 import { cardLine, cardTitle, displayPhone, findCustomer, money, tierInfo } from "../nuqtapass_api";
 import { user } from "@web/core/user";
-import { creditAmount, formatMoney, formatNumber, parseMoney } from "./nuqtapass_math";
+import { boxText, creditAmount, creditPick, formatMoney, formatNumber, parseMoney } from "./nuqtapass_math";
 import {
     cantAddLine,
     coverableLines,
@@ -41,7 +42,7 @@ export class NuqtaPassPayPanel extends Component {
         if (focus) {
             delete this.props.order.uiState.nuqtapassFocus;
         }
-        this.state = useState({ query: "", loading: false, error: "", errorDetail: "", notice: "", result: null, credit: "", pick: {}, focus });
+        this.state = useState({ query: "", loading: false, error: "", errorDetail: "", notice: "", result: null, credit: null, pick: {}, focus });
         const phone = this.props.order.nuqtapass_phone || this.props.order.partner_id?.phone;
         if (phone) {
             this.lookUp(phone);
@@ -80,17 +81,18 @@ export class NuqtaPassPayPanel extends Component {
         this.state.loading = false;
         if (!res.ok) {
             this.state.result = null;
+            delete this.order.uiState.nuqtapassCards;
             this.state.error = res.message;
             this.state.errorDetail = res.detail || "";
             return;
         }
         this.state.result = res;
+        // For the "NuqtaPass credit" payment method's button (the payment screen's own list).
+        this.order.uiState.nuqtapassCards = res.cards;
+        this.order.uiState.nuqtapassDecimals = this.decimals;
         this.state.query = "";
         this.order.nuqtapass_phone = res.phone;
-        const prepaid = res.cards.find((c) => c.type === "PREPAID");
-        if (prepaid) {
-            this.state.credit = this.creditStart(prepaid).toFixed(this.decimals);
-        }
+        this.state.credit = null; // the default again: it follows the amount due until the cashier types
         if (this.state.focus) {
             this.focusCard(this.state.focus);
         }
@@ -107,6 +109,7 @@ export class NuqtaPassPayPanel extends Component {
 
     changeCustomer() {
         this.state.result = null;
+        delete this.order.uiState.nuqtapassCards;
         this.state.error = "";
         this.state.errorDetail = "";
     }
@@ -234,9 +237,18 @@ export class NuqtaPassPayPanel extends Component {
         return creditAmount({ amount: card.balance, balance: card.balance, due: this.due, decimals: this.decimals });
     }
 
+    /** The credit box: the amount due (up to the balance) until the cashier types in it. */
+    creditText(card) {
+        return boxText(this.state.credit, this.creditStart(card), this.decimals);
+    }
+
+    onCreditInput(ev) {
+        this.state.credit = ev.target.value;
+    }
+
     creditToUse(card) {
         return creditAmount({
-            amount: parseMoney(this.state.credit),
+            amount: parseMoney(this.creditText(card)),
             balance: card.balance,
             due: this.due,
             decimals: this.decimals,
@@ -306,13 +318,36 @@ patch(PaymentScreen, {
 });
 
 patch(PaymentScreen.prototype, {
-    /** NuqtaPass credit is added from the NuqtaPass panel only (it is checked against the card); a refund may pay
-     * it back with the method itself. Odoo 19 lists `payment_methods_from_config` (20.0: showPaymentMethod). */
-    setup() {
-        super.setup(...arguments);
-        if (!this.currentOrder?.isRefund) {
-            this.payment_methods_from_config = this.payment_methods_from_config.filter((pm) => !pm.nuqtapass_credit);
+    /** "NuqtaPass credit" shows with the till's other methods (finance sees what each payment was), but never adds a
+     * plain line: like the panel's "Use credit", it takes the looked-up customer's credit card, the amount due up to
+     * its balance (editable on the numpad), and Validate spends it at NuqtaPass. A refund pays it back as usual. */
+    async addNewPaymentLine(paymentMethod, args = {}) {
+        if (!paymentMethod.nuqtapass_credit || this.isRefundOrder) {
+            return super.addNewPaymentLine(paymentMethod, args);
         }
+        const order = this.currentOrder;
+        const pick = creditPick({
+            cards: order.uiState?.nuqtapassCards || null,
+            remainingDue: order.remainingDue,
+            creditPaid: creditPayment(order)?.getAmount() || 0,
+            decimals: order.uiState?.nuqtapassDecimals ?? this.pos.currency.decimal_places,
+        });
+        if (!pick.ok) {
+            const body = {
+                customer: _t("Look the customer up in the NuqtaPass panel first: the credit is taken from their card."),
+                no_credit: _t("This customer has no NuqtaPass credit."),
+                nothing_due: _t("Nothing left to pay."),
+            }[pick.reason];
+            this.dialog.add(AlertDialog, { title: _t("NuqtaPass"), body });
+            return false;
+        }
+        const payment = setCreditPayment(this.pos, order, pick.card, pick.amount);
+        if (!payment) {
+            this.dialog.add(AlertDialog, { title: _t("NuqtaPass"), body: cantAddLine() });
+            return false;
+        }
+        this.numberBuffer.set(payment.getAmount().toString());
+        return true;
     },
 
     get nuqtapassPanel() {

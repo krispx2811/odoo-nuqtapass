@@ -2,7 +2,7 @@ import { Component, useState } from "@odoo/owl";
 import { _t } from "@web/core/l10n/translation";
 import { user } from "@web/core/user";
 import { money } from "../nuqtapass_api";
-import { formatMoney, formatNumber, parseMoney, planPoints, startingAmount } from "./nuqtapass_math";
+import { boxText, formatMoney, formatNumber, parseMoney, planPoints, startingAmount } from "./nuqtapass_math";
 
 /**
  * Points as money: the cashier types an amount in NuqtaPass's currency and sees the points it takes, live
@@ -23,15 +23,25 @@ export class NuqtaPassPointsBox extends Component {
     };
 
     setup() {
-        const decimals = this.decimals;
-        this.state = useState({
-            amount: startingAmount({
-                orderTotal: this.props.maxValue,
-                cardWorth: this.props.card.pointsValue,
-                capValue: this.props.cap?.value ?? null,
-                decimals,
-            }).toFixed(decimals),
+        // null until the cashier types: the box then shows its default for the order as it is now.
+        this.state = useState({ amount: null });
+    }
+
+    get start() {
+        return startingAmount({
+            orderTotal: this.props.maxValue,
+            cardWorth: this.props.card.pointsValue,
+            capValue: this.props.cap?.value ?? null,
+            decimals: this.decimals,
         });
+    }
+
+    get amountText() {
+        return boxText(this.state.amount, this.start, this.decimals);
+    }
+
+    onInput(ev) {
+        this.state.amount = ev.target.value;
     }
 
     get decimals() {
@@ -48,7 +58,7 @@ export class NuqtaPassPointsBox extends Component {
 
     get plan() {
         return planPoints({
-            amount: parseMoney(this.state.amount),
+            amount: parseMoney(this.amountText),
             ppu: this.props.card.pointsPerUnit,
             decimals: this.decimals,
             cardPoints: this.props.card.points,
@@ -60,7 +70,7 @@ export class NuqtaPassPointsBox extends Component {
     get liveLine() {
         const plan = this.plan;
         if (!plan.points) {
-            return Number.isNaN(parseMoney(this.state.amount))
+            return Number.isNaN(parseMoney(this.amountText))
                 ? _t("Type an amount")
                 : _t("Nothing to take off");
         }

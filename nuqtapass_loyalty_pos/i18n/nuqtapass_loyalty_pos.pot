@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0-20261102\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-09 20:16+0000\n"
-"PO-Revision-Date: 2026-11-09 20:16+0000\n"
+"POT-Creation-Date: 2026-11-09 21:52+0000\n"
+"PO-Revision-Date: 2026-11-09 21:52+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -163,7 +163,7 @@ msgstr ""
 
 #. module: nuqtapass_loyalty_pos
 #. odoo-javascript
-#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_panel.xml:0
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_panel.js:0
 msgid "Add the item it covers to the order first."
 msgstr ""
 
@@ -216,6 +216,24 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/nuqtapass_loyalty_pos/static/src/app/correct/correct_box.xml:0
 msgid "Cancel"
+msgstr ""
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/points_box.js:0
+msgid "Capped at the amount due (%(value)s)"
+msgstr ""
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/points_box.js:0
+msgid "Capped at the card's worth (%(value)s)"
+msgstr ""
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/points_box.js:0
+msgid "Capped at the per-visit limit (%(value)s)"
 msgstr ""
 
 #. module: nuqtapass_loyalty_pos
@@ -296,6 +314,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:nuqtapass_loyalty_pos.field_pos_order_line__display_name
 #: model:ir.model.fields,field_description:nuqtapass_loyalty_pos.field_pos_payment__display_name
 #: model:ir.model.fields,field_description:nuqtapass_loyalty_pos.field_pos_payment_method__display_name
+#: model:ir.model.fields,field_description:nuqtapass_loyalty_pos.field_pos_session__display_name
 #: model:ir.model.fields,field_description:nuqtapass_loyalty_pos.field_res_config_settings__display_name
 msgid "Display Name"
 msgstr ""
@@ -345,6 +364,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:nuqtapass_loyalty_pos.field_pos_order_line__id
 #: model:ir.model.fields,field_description:nuqtapass_loyalty_pos.field_pos_payment__id
 #: model:ir.model.fields,field_description:nuqtapass_loyalty_pos.field_pos_payment_method__id
+#: model:ir.model.fields,field_description:nuqtapass_loyalty_pos.field_pos_session__id
 #: model:ir.model.fields,field_description:nuqtapass_loyalty_pos.field_res_config_settings__id
 msgid "ID"
 msgstr ""
@@ -371,6 +391,14 @@ msgstr ""
 #: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_panel.xml:0
 #: code:addons/nuqtapass_loyalty_pos/static/src/app/receipt_box/receipt_box.xml:0
 msgid "Loading…"
+msgstr ""
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_panel.js:0
+msgid ""
+"Look the customer up in the NuqtaPass panel first: the credit is taken from "
+"their card."
 msgstr ""
 
 #. module: nuqtapass_loyalty_pos
@@ -401,8 +429,38 @@ msgstr ""
 
 #. module: nuqtapass_loyalty_pos
 #. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_panel.js:0
+msgid "No credit left on this card."
+msgstr ""
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_panel.js:0
+msgid "No points to use yet."
+msgstr ""
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_panel.js:0
+msgid "No uses left on this pack."
+msgstr ""
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
 #: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_panel.xml:0
 msgid "Nothing is used until you validate."
+msgstr ""
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_panel.js:0
+msgid "Nothing left to pay."
+msgstr ""
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_panel.js:0
+msgid "Nothing on the order to take off."
 msgstr ""
 
 #. module: nuqtapass_loyalty_pos
@@ -416,6 +474,7 @@ msgstr ""
 #: code:addons/nuqtapass_loyalty_pos/static/src/app/control_buttons/control_buttons.xml:0
 #: code:addons/nuqtapass_loyalty_pos/static/src/app/nuqtapass_dialog/nuqtapass_dialog.js:0
 #: code:addons/nuqtapass_loyalty_pos/static/src/app/open_window.js:0
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_panel.js:0
 #: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_panel.xml:0
 #: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_validation.js:0
 #: model:ir.model.fields,field_description:nuqtapass_loyalty_pos.field_pos_order__nuqtapass_status
@@ -664,6 +723,11 @@ msgid "Point of Sale Payments"
 msgstr ""
 
 #. module: nuqtapass_loyalty_pos
+#: model:ir.model,name:nuqtapass_loyalty_pos.model_pos_session
+msgid "Point of Sale Session"
+msgstr ""
+
+#. module: nuqtapass_loyalty_pos
 #: model:ir.model.fields.selection,name:nuqtapass_loyalty_pos.selection__nuqtapass_pos_use__use__points
 msgid "Points"
 msgstr ""
@@ -684,6 +748,22 @@ msgstr ""
 #. odoo-python
 #: code:addons/nuqtapass_loyalty_pos/models/pos_adjust.py:0
 msgid "Points corrected: %(change)s · %(total)s now."
+msgstr ""
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_panel.js:0
+msgid ""
+"Points lowered to %(points)s (%(value)s off) so the order doesn't go below "
+"0."
+msgstr ""
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_panel.js:0
+msgid ""
+"Points removed: the free item leaves nothing on the order for them to take "
+"off."
 msgstr ""
 
 #. module: nuqtapass_loyalty_pos
@@ -760,6 +840,14 @@ msgstr ""
 #. module: nuqtapass_loyalty_pos
 #. odoo-javascript
 #: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_validation.js:0
+msgid ""
+"Remove the NuqtaPass credit line and add it again with the customer looked "
+"up."
+msgstr ""
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_validation.js:0
 msgid "Remove this line"
 msgstr ""
 
@@ -772,6 +860,12 @@ msgstr ""
 #. odoo-python
 #: code:addons/nuqtapass_loyalty_pos/models/pos_config.py:0
 msgid "Reward given."
+msgstr ""
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_panel.js:0
+msgid "Reward not ready yet."
 msgstr ""
 
 #. module: nuqtapass_loyalty_pos
@@ -913,6 +1007,14 @@ msgid "That's more than the shop's points limit for one visit."
 msgstr ""
 
 #. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_validation.js:0
+msgid ""
+"The NuqtaPass lines take off more than is on the order. Lower the points or "
+"remove a free item, then validate."
+msgstr ""
+
+#. module: nuqtapass_loyalty_pos
 #. odoo-python
 #: code:addons/nuqtapass_loyalty_pos/models/pos_refusal.py:0
 msgid "The card doesn't have enough credit."
@@ -933,9 +1035,10 @@ msgstr ""
 #. module: nuqtapass_loyalty_pos
 #: model:ir.model.fields,help:nuqtapass_loyalty_pos.field_pos_payment_method__nuqtapass_credit
 msgid ""
-"The customer pays with prepaid credit bought at NuqtaPass. The till adds it "
-"from its NuqtaPass panel only, and NuqtaPass takes the amount off the card "
-"when the order is validated."
+"The customer pays with prepaid credit bought at NuqtaPass. It shows with the"
+" till's other methods, but adds a payment only for a looked-up customer's "
+"credit card (as the NuqtaPass panel does), and NuqtaPass takes the amount "
+"off the card when the order is validated."
 msgstr ""
 
 #. module: nuqtapass_loyalty_pos
@@ -1009,9 +1112,23 @@ msgid "This card isn't from this shop."
 msgstr ""
 
 #. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_panel.js:0
+msgid "This customer has no NuqtaPass credit."
+msgstr ""
+
+#. module: nuqtapass_loyalty_pos
 #. odoo-python
 #: code:addons/nuqtapass_loyalty_pos/models/pos_refusal.py:0
 msgid "This iPhone already used this offer."
+msgstr ""
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_panel.js:0
+msgid ""
+"This item is already free on this order: there is nothing left for it to "
+"make free."
 msgstr ""
 
 #. module: nuqtapass_loyalty_pos
@@ -1063,6 +1180,14 @@ msgid "This point of sale no longer exists."
 msgstr ""
 
 #. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/nuqtapass_lines.js:0
+msgid ""
+"This till isn't ready for NuqtaPass yet. Reload the till page, then try "
+"again."
+msgstr ""
+
+#. module: nuqtapass_loyalty_pos
 #: model:ir.model.constraint,message:nuqtapass_loyalty_pos.constraint_nuqtapass_pos_use_use_unique
 msgid "This use is already recorded for this order."
 msgstr ""
@@ -1071,6 +1196,12 @@ msgstr ""
 #. odoo-python
 #: code:addons/nuqtapass_loyalty_pos/models/pos_refusal.py:0
 msgid "This voucher changed at NuqtaPass. Look the customer up again."
+msgstr ""
+
+#. module: nuqtapass_loyalty_pos
+#. odoo-javascript
+#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_panel.js:0
+msgid "This voucher is used up."
 msgstr ""
 
 #. module: nuqtapass_loyalty_pos
@@ -1198,94 +1329,4 @@ msgstr ""
 #. module: nuqtapass_loyalty_pos
 #: model_terms:ir.ui.view,arch_db:nuqtapass_loyalty_pos.res_config_settings_view_form_nuqtapass_pos
 msgid "e.g. Qurum"
-msgstr ""
-
-#. module: nuqtapass_loyalty_pos
-#. odoo-javascript
-#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_panel.js:0
-msgid "No points to use yet."
-msgstr ""
-
-#. module: nuqtapass_loyalty_pos
-#. odoo-javascript
-#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_panel.js:0
-msgid "Nothing on the order to take off."
-msgstr ""
-
-#. module: nuqtapass_loyalty_pos
-#. odoo-javascript
-#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_panel.js:0
-msgid "No credit left on this card."
-msgstr ""
-
-#. module: nuqtapass_loyalty_pos
-#. odoo-javascript
-#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_panel.js:0
-msgid "Nothing left to pay."
-msgstr ""
-
-#. module: nuqtapass_loyalty_pos
-#. odoo-javascript
-#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_panel.js:0
-msgid "No uses left on this pack."
-msgstr ""
-
-#. module: nuqtapass_loyalty_pos
-#. odoo-javascript
-#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_panel.js:0
-msgid "Reward not ready yet."
-msgstr ""
-
-#. module: nuqtapass_loyalty_pos
-#. odoo-javascript
-#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_panel.js:0
-msgid "This voucher is used up."
-msgstr ""
-
-#. module: nuqtapass_loyalty_pos
-#. odoo-javascript
-#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_panel.js:0
-msgid "This till isn't ready for NuqtaPass yet. Reload the till page, then try again."
-msgstr ""
-
-#. module: nuqtapass_loyalty_pos
-#. odoo-javascript
-#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_panel.js:0
-msgid "This item is already free on this order: there is nothing left for it to make free."
-msgstr ""
-
-#. module: nuqtapass_loyalty_pos
-#. odoo-javascript
-#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_panel.js:0
-msgid "Points lowered to %(points)s (%(value)s off) so the order doesn't go below 0."
-msgstr ""
-
-#. module: nuqtapass_loyalty_pos
-#. odoo-javascript
-#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_panel.js:0
-msgid "Points removed: the free item leaves nothing on the order for them to take off."
-msgstr ""
-
-#. module: nuqtapass_loyalty_pos
-#. odoo-javascript
-#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/pay_validation.js:0
-msgid "The NuqtaPass lines take off more than is on the order. Lower the points or remove a free item, then validate."
-msgstr ""
-
-#. module: nuqtapass_loyalty_pos
-#. odoo-javascript
-#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/points_box.js:0
-msgid "Capped at the amount due (%(value)s)"
-msgstr ""
-
-#. module: nuqtapass_loyalty_pos
-#. odoo-javascript
-#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/points_box.js:0
-msgid "Capped at the card's worth (%(value)s)"
-msgstr ""
-
-#. module: nuqtapass_loyalty_pos
-#. odoo-javascript
-#: code:addons/nuqtapass_loyalty_pos/static/src/app/pay/points_box.js:0
-msgid "Capped at the per-visit limit (%(value)s)"
 msgstr ""
