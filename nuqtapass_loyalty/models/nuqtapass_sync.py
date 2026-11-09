@@ -2,6 +2,8 @@ import json
 import logging
 from datetime import timezone
 
+import psycopg2.errors
+
 from odoo import api, fields, models
 
 from odoo.addons.nuqtapass_loyalty.lib.backoff import next_retry_delay
@@ -210,6 +212,28 @@ class NuqtapassSync(models.Model):
             "next_attempt_at": now + delay if delay else False,
         })
 
+    def _claim(self):
+        """The rows of `self` this transaction may send now: still pending and not held by another transaction.
+
+        Locks them until this transaction ends, so the till's send-now and the cron never send one row at the same
+        moment (NuqtaPass would answer the second 409 IN_PROGRESS and the row would wait a minute).
+        """
+        if not self:
+            return self
+        self.flush_recordset(["state"])
+        try:
+            with self.env.cr.savepoint(flush=False):
+                self.env.cr.execute(
+                    "SELECT id FROM nuqtapass_sync WHERE id IN %s AND state = 'pending' FOR UPDATE SKIP LOCKED",
+                    [tuple(self.ids)],
+                )
+                ids = {row[0] for row in self.env.cr.fetchall()}
+        except psycopg2.errors.SerializationFailure:
+            return self.browse()  # changed by a transaction that committed after this one began: it is handled
+        claimed = self.filtered(lambda r: r.id in ids)
+        claimed.invalidate_recordset()  # read what the lock now guarantees, not an older cached state
+        return claimed.filtered(lambda r: r.state == "pending")
+
     @api.model
     def _due(self, now, limit=200):
         return self.search(
@@ -223,7 +247,8 @@ class NuqtapassSync(models.Model):
         now = now or fields.Datetime.now()
         due = self._due(now, limit)
         for rec in due:
-            rec._send_one(now)
+            if rec._claim():
+                rec._send_one(now)
         return due
 
     @api.model
@@ -233,7 +258,8 @@ class NuqtapassSync(models.Model):
         cron = self.env["ir.cron"]
         cron._commit_progress(remaining=len(due))
         for rec in due:
-            rec._send_one(now)
+            if rec._claim():  # the lock lasts until _commit_progress commits this row
+                rec._send_one(now)
             if not cron._commit_progress(processed=1):
                 break
 

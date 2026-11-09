@@ -2,7 +2,7 @@ import json
 from datetime import datetime, timedelta
 from unittest.mock import patch
 
-from odoo import fields
+from odoo import SUPERUSER_ID, api, fields, sql_db
 from odoo.tests import TransactionCase, tagged
 
 from odoo.addons.nuqtapass_loyalty.lib.client import ApiResult, NuqtaPassClient
@@ -137,3 +137,59 @@ class TestSyncSend(TransactionCase):
         with patch.object(type(self.Sync), "_nuqtapass_current_phone", return_value="9417 6872"):
             self.rec.action_resend()
         self.assertEqual((self.rec.state, self.rec.phone, self.rec.phone_invalid), ("pending", "+96894176872", False))
+
+    def test_claim_takes_only_pending_rows(self):
+        self.assertEqual(self.rec._claim(), self.rec)
+        self.rec.write({"state": "done"})
+        self.assertFalse(self.rec._claim())
+
+    def test_row_claimed_elsewhere_is_skipped(self):
+        with patch.object(type(self.Sync), "_claim", return_value=self.Sync.browse()):
+            mocked = self._send(ok({"status": "OK"}))
+        mocked.assert_not_called()
+        self.assertEqual((self.rec.state, self.rec.attempts), ("pending", 0))
+
+
+@tagged("post_install", "-at_install", "nuqtapass")
+class TestSyncRowLock(TransactionCase):
+    """A row another transaction is sending (locked) is skipped, with real separate database connections."""
+
+    def _connection(self):
+        cr = sql_db.db_connect(self.env.cr.dbname).cursor()
+        self.addCleanup(cr.close)
+        return cr
+
+    def test_locked_row_is_skipped_until_released(self):
+        setup = self._connection()
+        setup.execute("""
+            INSERT INTO nuqtapass_sync (company_id, kind, channel, state, order_ref, dedupe_key, phone, amount,
+                                        occurred_at, next_attempt_at, attempts)
+            VALUES (%s, 'sale', 'till', 'pending', 'LOCK/1', 'sale|LOCK/1|', '+96891234567', 1,
+                    now() at time zone 'utc', now() at time zone 'utc' + interval '3 seconds', 0)
+            RETURNING id""", [self.env.company.id])
+        row_id = setup.fetchone()[0]
+        # Committed so the other connections see it; due only for this test's "now" (+5 s), not for a cron
+        # worker of a running Odoo that scans test databases too.
+        setup.commit()
+
+        def cleanup():
+            setup.rollback()
+            setup.execute("DELETE FROM nuqtapass_sync WHERE id = %s", [row_id])
+            setup.commit()
+        self.addCleanup(cleanup)
+
+        other = self._connection()  # e.g. the till's send-now, mid-request
+        other.execute("SELECT id FROM nuqtapass_sync WHERE id = %s FOR UPDATE", [row_id])
+        cron = self._connection()
+        cron_env = api.Environment(cron, SUPERUSER_ID, {})
+        now = fields.Datetime.now() + timedelta(seconds=5)
+        with patch.object(NuqtaPassClient, "sale", return_value=ok({"status": "OK"})) as mocked:
+            cron_env["nuqtapass.sync"]._send_due(now=now)
+            mocked.assert_not_called()
+            self.assertEqual(cron_env["nuqtapass.sync"].browse(row_id).attempts, 0)
+            cron.rollback()
+            other.rollback()  # released: now it can be sent
+            cron_env.invalidate_all()
+            cron_env["nuqtapass.sync"]._send_due(now=now)
+        self.assertEqual(cron_env["nuqtapass.sync"].browse(row_id).attempts, 1)
+        cron.rollback()

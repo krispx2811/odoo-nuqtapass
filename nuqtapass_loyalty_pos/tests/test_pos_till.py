@@ -1,5 +1,7 @@
+from datetime import timedelta
 from unittest.mock import patch
 
+from odoo import fields
 from odoo.tests import tagged
 
 from odoo.addons.nuqtapass_loyalty.lib.client import ApiResult, NuqtaPassClient
@@ -193,3 +195,25 @@ class TestPosTill(TestPoSCommon):
             res = self.config._nuqtapass_lookup("9417872")
         mocked.assert_not_called()
         self.assertEqual(res, {"ok": False, "error": "invalid_phone", "message": "Phone number looks wrong: 9417872"})
+
+    def test_after_payment_and_cron_send_the_row_once(self):
+        order = self._paid_order()
+        Sync = self.env["nuqtapass.sync"].sudo()
+        sold = ok({"status": "OK", "duplicate": False, "result": {"stamps": 1}}, status=201)
+        with patch.object(NuqtaPassClient, "sale", return_value=sold) as sale, \
+                patch.object(NuqtaPassClient, "customer", return_value=ok({"walletAdded": True, "cards": []})):
+            self.config._nuqtapass_after_payment(order.id)
+            Sync._send_due(now=fields.Datetime.now() + timedelta(seconds=5))
+            self.config._nuqtapass_after_payment(order.id)
+        sale.assert_called_once()
+        self.assertEqual(order.nuqtapass_sync_ids.state, "done")
+
+    def test_after_payment_skips_a_row_the_cron_is_sending(self):
+        order = self._paid_order()
+        Sync = type(self.env["nuqtapass.sync"])
+        with patch.object(Sync, "_claim", return_value=self.env["nuqtapass.sync"]), \
+                patch.object(NuqtaPassClient, "sale") as sale, patch.object(NuqtaPassClient, "customer") as customer:
+            self.assertEqual(self.config._nuqtapass_after_payment(order.id), QUIET)
+        sale.assert_not_called()
+        customer.assert_not_called()
+        self.assertEqual((order.nuqtapass_sync_ids.state, order.nuqtapass_sync_ids.attempts), ("pending", 0))

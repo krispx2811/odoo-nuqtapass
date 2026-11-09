@@ -106,11 +106,10 @@ class PosConfig(models.Model):
         sale = Sync.search([("kind", "=", "sale"), ("pos_order_id", "=", order.id)], limit=1)
         if not sale:
             return QUIET  # no phone, or the till is switched off: nothing was queued
-        if sale.state == "pending" and not sale.attempts:
-            # Skip the send if another transaction holds the row: the cron is sending it right now.
-            self.env.cr.execute("SELECT id FROM nuqtapass_sync WHERE id = %s FOR UPDATE SKIP LOCKED", [sale.id])
-            if self.env.cr.fetchone():
-                sale._send_one()
+        # Only a first send, and only when no other transaction holds the row (the cron may be sending it right
+        # now); a row already sent is never sent again.
+        if sale.state == "pending" and not sale.attempts and sale._claim() and not sale.attempts:
+            sale._send_one()
         if sale.state != "done":
             return QUIET  # NuqtaPass not reached yet: no card to show; the cron retries
         client = Sync._get_client()
