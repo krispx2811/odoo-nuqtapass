@@ -137,3 +137,41 @@ class TestCustomer(TransactionCase):
         cleaned = clean_customer(part1_answer(cards=[card]))["cards"][0]
         self.assertIsNone(cleaned["pointsPerUnit"])
         self.assertEqual(len(cleaned["unit"]), 40)
+
+    # ── tiers (2026-11-09): the current points card's tier, whitelisted ─
+    def _points(self, **over):
+        return dict({"cardId": "aaaaaaaa-2222-4222-8222-222222222222", "type": "POINTS", "points": 1404,
+                     "current": True}, **over)
+
+    def test_keeps_a_good_tier(self):
+        tier = {"name": "SILVER", "cashbackPct": 7.5, "next": {"name": "GOLD", "pointsToGo": 3800},
+                "color": "rgb(213, 220, 228)"}
+        card = clean_customer(part1_answer(cards=[self._points(tier=tier)]))["cards"][0]
+        self.assertEqual(card["tier"], tier)
+        gold = {"name": "GOLD", "cashbackPct": 10, "next": None}
+        card = clean_customer(part1_answer(cards=[self._points(tier=gold)]))["cards"][0]
+        self.assertEqual(card["tier"], {"name": "GOLD", "cashbackPct": 10, "next": None, "color": None})
+
+    def test_no_tier_key_without_one(self):
+        self.assertNotIn("tier", clean_customer(part1_answer())["cards"][0])
+        self.assertNotIn("tier", clean_customer(part1_answer(cards=[self._points()]))["cards"][0])
+
+    def test_bad_tiers_are_dropped(self):
+        for bad in ({"name": "PLATINUM", "cashbackPct": 5, "next": None},
+                    {"name": "GOLD", "cashbackPct": -1, "next": None},
+                    {"name": "GOLD", "cashbackPct": "10", "next": None},
+                    {"name": "GOLD", "cashbackPct": 101, "next": None},
+                    {"name": "BRONZE", "cashbackPct": 5, "next": {"name": "BRONZE", "pointsToGo": 3}},
+                    {"name": "BRONZE", "cashbackPct": 5, "next": {"name": "SILVER", "pointsToGo": -3}},
+                    {"name": "BRONZE", "cashbackPct": 5, "next": {"name": "SILVER", "pointsToGo": 2.5}},
+                    "GOLD", None):
+            with self.subTest(bad=bad):
+                card = clean_customer(part1_answer(cards=[self._points(tier=bad)]))["cards"][0]
+                self.assertNotIn("tier", card)
+
+    def test_an_unsafe_tier_colour_is_dropped_not_the_tier(self):
+        for color in ("red;background:url(x)", "rgb(1, 2, 3);x", "#fff", 5):
+            with self.subTest(color=color):
+                tier = {"name": "GOLD", "cashbackPct": 10, "next": None, "color": color}
+                card = clean_customer(part1_answer(cards=[self._points(tier=tier)]))["cards"][0]
+                self.assertIsNone(card["tier"]["color"])

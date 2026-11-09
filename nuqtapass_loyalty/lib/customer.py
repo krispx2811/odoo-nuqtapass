@@ -15,6 +15,9 @@ SMS_PREFIX = "sms:"
 MAX_LINK = 2000
 MAX_UNIT = 40
 CURRENCY_CODE = re.compile(r"^[A-Z]{3}$")
+TIERS = ("BRONZE", "SILVER", "GOLD")
+# The tier's colour goes into a style attribute on the till: only NuqtaPass's own "rgb(r, g, b)" shape.
+TIER_COLOR = re.compile(r"^rgb\(\d{1,3}, ?\d{1,3}, ?\d{1,3}\)$")
 
 
 def _number(value):
@@ -47,6 +50,25 @@ def _limits(value):
     return {"pointsPerVisit": None}
 
 
+def _tier(value):
+    """The current points card's tier ({name, cashbackPct, next: {name, pointsToGo} or None, color}), or None."""
+    if not isinstance(value, dict) or value.get("name") not in TIERS:
+        return None
+    pct = value.get("cashbackPct")
+    if not isinstance(pct, (int, float)) or isinstance(pct, bool) or not 0 <= pct <= 100:
+        return None
+    nxt = value.get("next")
+    if nxt is not None:
+        to_go = nxt.get("pointsToGo") if isinstance(nxt, dict) else None
+        if not isinstance(nxt, dict) or nxt.get("name") not in TIERS[1:] or not isinstance(to_go, int) \
+                or isinstance(to_go, bool) or to_go < 0:
+            return None
+        nxt = {"name": nxt["name"], "pointsToGo": to_go}
+    color = value.get("color")
+    color = color if isinstance(color, str) and TIER_COLOR.match(color) else None
+    return {"name": value["name"], "cashbackPct": pct, "next": nxt, "color": color}
+
+
 def _link(value, prefix):
     if isinstance(value, str) and value.startswith(prefix) and len(value) <= MAX_LINK:
         return value
@@ -75,6 +97,10 @@ def _card(card):
     clean["usesLeft"] = _number(card.get("usesLeft"))
     unit = card.get("unit")
     clean["unit"] = unit.strip()[:MAX_UNIT] if isinstance(unit, str) and unit.strip() else None
+    # Only on the current points card, when the shop's plan has tiers.
+    tier = _tier(card.get("tier"))
+    if tier:
+        clean["tier"] = tier
     return clean
 
 
