@@ -44,6 +44,24 @@ class TestPosSpend(NuqtaPassUsesCommon):
         self.assertIn(method, self.config.payment_method_ids)
         self.assertEqual(self.env["pos.payment.method"]._nuqtapass_credit_method(self.env.company), method)
 
+    def test_reward_product_is_made_when_missing(self):
+        # Not XML data: an upgrade loads this module before `sale`, whose required product fields then stay empty.
+        # It is made at run time, once, with the whole registry loaded.
+        self.env["ir.model.data"].search([("module", "=", "nuqtapass_loyalty_pos"),
+                                          ("name", "=", "product_nuqtapass_reward")]).unlink()
+        product = self.env["pos.config"]._nuqtapass_reward_product()
+        self.assertTrue(product)
+        self.assertNotEqual(product, self.reward)
+        self.assertEqual(self.env.ref("nuqtapass_loyalty_pos.product_nuqtapass_reward"), product)
+        self.assertEqual((product.type, product.taxes_id.ids, product.available_in_pos), ("service", [], True))
+        self.assertEqual(self.env["pos.config"]._nuqtapass_reward_product(), product)
+
+    def test_opening_a_till_adds_the_credit_method(self):
+        config = self.env["pos.config"].create({"name": "Third till"})
+        config.payment_method_ids -= self.credit_pm
+        config.open_ui()
+        self.assertIn(self.credit_pm, config.payment_method_ids)
+
     def test_new_till_gets_the_credit_method(self):
         config = self.env["pos.config"].create({"name": "Second till"})
         self.assertIn(self.credit_pm, config.payment_method_ids)
