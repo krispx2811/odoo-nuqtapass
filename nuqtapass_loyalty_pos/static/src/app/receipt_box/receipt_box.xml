@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-name="nuqtapass_loyalty_pos.ReceiptBox">
+        <!-- .stop: a click anywhere on the receipt screen means "Continue". -->
+        <section class="o_nuqtapass_receipt_box bg-view border rounded-3 p-3 mt-3" aria-labelledby="o_nuqtapass_box_title"
+                 t-on-click.stop="() => this.props.onUse()">
+            <h2 id="o_nuqtapass_box_title" class="fs-6 fw-semibold mb-2" t-out="this.title"/>
+            <form t-if="!this.state.answered" class="d-flex gap-2" t-on-submit.prevent="() => this.add()">
+                <label class="visually-hidden" for="o_nuqtapass_box_query">Phone or scan card</label>
+                <input id="o_nuqtapass_box_query" type="text" inputmode="tel" dir="ltr"
+                       class="form-control form-control-lg o_nuqtapass_query" t-model="state.query"
+                       placeholder="Phone or scan card" autocomplete="off" spellcheck="false"/>
+                <button type="submit" class="btn btn-primary btn-lg px-4 text-nowrap"
+                        t-att-disabled="this.state.busy or !this.state.query.trim()">Add</button>
+            </form>
+            <div t-if="this.state.busy" class="text-muted mt-2" role="status">Loading…</div>
+            <div t-if="this.state.error" class="text-danger mt-2" role="alert"><bdi t-out="this.state.error"/></div>
+            <p t-if="this.state.line" class="o_nuqtapass_earned fw-semibold mb-0" role="status">
+                <bdi t-out="this.state.line"/>
+            </p>
+            <div t-if="this.state.welcome" class="o_nuqtapass_qr text-center mt-2">
+                <img t-att-src="this.state.welcome.qr" width="160" height="160" alt="QR code of the card"/>
+                <p class="fw-bold mt-2 mb-0">Scan to add your card</p>
+            </div>
+        </section>
+    </t>
+
+    <!-- Odoo 19: the box sits under "Payment Successful" on the receipt screen (20.0: under FeedbackScreen's summary). -->
+    <t t-name="nuqtapass_loyalty_pos.ReceiptScreen" t-inherit="point_of_sale.ReceiptScreen" t-inherit-mode="extension">
+        <xpath expr="//div[hasclass('receipt-options')]" position="before">
+            <NuqtaPassReceiptBox t-if="this.nuqtapassAsk or this.nuqtapassAsked" order="this.currentOrder"
+                                 onUse="() => this.nuqtapassUse()"/>
+        </xpath>
+    </t>
+
+    <t t-name="nuqtapass_loyalty_pos.FeedbackScreen" t-inherit="point_of_sale.FeedbackScreen" t-inherit-mode="extension">
+        <xpath expr="//div[@t-ref='amount']" position="after">
+            <NuqtaPassReceiptBox t-if="this.nuqtapassAsk or this.nuqtapassAsked" order="this.currentOrder"
+                                 onUse="() => this.nuqtapassUse()"/>
+        </xpath>
+    </t>
+</templates>

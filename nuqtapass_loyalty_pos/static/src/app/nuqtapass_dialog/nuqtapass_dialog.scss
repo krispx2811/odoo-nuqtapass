@@ -1,14 +1,18 @@
-.o_nuqtapass_dialog {
-    .o_nuqtapass_phone {
+// The till's own Bootstrap/Odoo tokens only, so the window follows the till's theme (light, dark, RTL).
+.o_nuqtapass_dialog,
+.o_nuqtapass_receipt_box {
+    .o_nuqtapass_query {
         text-align: start;
         unicode-bidi: plaintext;
     }
-    .o_nuqtapass_card {
-        text-align: start;
-        border-inline-start-width: 4px !important;
+    // The box is dir=ltr for phones and card ids; its Arabic hint still sits on the reading side ("end" of an LTR
+    // box is its right edge; a logical value, so Odoo's RTL flip (rtlcss) leaves it alone).
+    .o_rtl & .o_nuqtapass_query:placeholder-shown {
+        text-align: end;
     }
-    .o_nuqtapass_points {
-        inline-size: 8rem;
+    .o_nuqtapass_card_line,
+    .o_nuqtapass_who {
+        font-variant-numeric: tabular-nums;
     }
     .o_nuqtapass_qr img {
         // A QR code must stay black on white to scan, whatever the till's theme.
@@ -16,5 +20,49 @@
         padding: 8px;
         max-inline-size: 100%;
         block-size: auto;
+    }
+}
+
+.o_nuqtapass_dialog {
+    // One quiet strip per card, like the card in the customer's Wallet: a start-side band, no box inside a box.
+    .o_nuqtapass_card {
+        background-color: var(--bs-tertiary-bg, rgba(0, 0, 0, 0.03));
+        border-inline-start: 4px solid var(--bs-primary);
+        text-align: start;
+    }
+    .o_nuqtapass_points {
+        inline-size: 7rem;
+    }
+}
+
+.o_nuqtapass_receipt_box {
+    // Not min(30rem, 92%): libsass reads min() as its own function and fails on mixed units.
+    inline-size: 30rem;
+    max-inline-size: 92%;
+    margin-block-end: 1rem;
+    text-align: start;
+    .o_nuqtapass_earned {
+        // The answer is what the cashier reads out: larger than the box's title.
+        font-size: 1.5rem;
+        font-variant-numeric: tabular-nums;
+    }
+}
+
+// Odoo 19: on the receipt screen the box takes the width of the "Payment Successful" column, like Odoo's own
+// e-mail box below it (20.0 sizes it for FeedbackScreen's centred summary instead).
+.receipt-screen .o_nuqtapass_receipt_box {
+    inline-size: auto;
+    max-inline-size: none;
+    margin-block-start: 0 !important;
+}
+
+// When the till skips the receipt screen (FeedbackScreen), Odoo's huge amount gives the box room.
+.feedback-screen:has(.o_nuqtapass_receipt_box) {
+    .amount {
+        font-size: clamp(5rem, 24vmin, 22rem);
+    }
+    .checkmark-wrapper {
+        width: clamp(56px, 10vmin, 110px);
+        height: clamp(56px, 10vmin, 110px);
     }
 }
