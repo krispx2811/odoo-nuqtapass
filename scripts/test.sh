@@ -26,4 +26,11 @@ fi
 if grep -q "invalid module names" "$LOG"; then
   echo "TESTS FAILED (module not found)"; exit 1
 fi
+# A manifest for another Odoo version is skipped with a warning ("incompatible version"), and then no test runs.
+if grep -qE "incompatible version|not installable" "$LOG"; then
+  echo "TESTS FAILED (module not installable on this Odoo version)"; exit 1
+fi
+if ! grep -qE "of [1-9][0-9]* tests" "$LOG"; then
+  echo "TESTS FAILED (no test ran)"; exit 1
+fi
 echo "TESTS PASSED"
