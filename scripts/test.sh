@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# Run the NuqtaPass module tests in a throwaway database.
+#   scripts/test.sh                       → all three modules
+#   scripts/test.sh nuqtapass_loyalty     → one module
+set -euo pipefail
+cd "$(dirname "$0")/../docker"
+MODULES="${1:-nuqtapass_loyalty,nuqtapass_loyalty_pos,nuqtapass_loyalty_website_sale}"
+TAGS="$(echo "$MODULES" | sed -E 's/(^|,)/\1\//g')"
+DB="test_$(date +%s)"
+LOG="$(mktemp)"
+set +e
+docker compose run --rm odoo odoo -c /etc/odoo/odoo.conf -d "$DB" -i "$MODULES" \
+  --test-tags "$TAGS" --stop-after-init --log-level=test --http-port=8169 2>&1 | tee "$LOG"
+set -e
+docker compose exec -T db dropdb -U odoo --if-exists "$DB" >/dev/null 2>&1 || true
+if grep -qE "(FAIL|ERROR):|[1-9][0-9]* failed|[1-9][0-9]* error\(s\)" "$LOG"; then
+  echo "TESTS FAILED"; exit 1
+fi
+# A module Odoo can't find is only a warning, and then none of its tests run: that is not a pass.
+if grep -q "invalid module names" "$LOG"; then
+  echo "TESTS FAILED (module not found)"; exit 1
+fi
+echo "TESTS PASSED"

@@ -1,0 +1,28 @@
+# Local Odoo for developing and testing the NuqtaPass modules.
+# Usage (from this folder):  docker compose up -d   →  http://localhost:${ODOO_PORT}
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: odoo
+      POSTGRES_PASSWORD: odoo
+      POSTGRES_DB: postgres
+    volumes:
+      - db-data:/var/lib/postgresql/data
+  odoo:
+    image: odoo:${ODOO_VERSION:?set ODOO_VERSION in docker/.env}
+    depends_on:
+      - db
+    ports:
+      - "${ODOO_PORT:-8069}:8069"
+    environment:
+      HOST: db
+      USER: odoo
+      PASSWORD: odoo
+    volumes:
+      - ..:/mnt/extra-addons:rw
+      - ./odoo.conf:/etc/odoo/odoo.conf:ro
+      - odoo-data:/var/lib/odoo
+volumes:
+  db-data: {}
+  odoo-data: {}
