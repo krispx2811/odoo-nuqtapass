@@ -59,6 +59,14 @@ class TestPosArabic(TransactionCase):
             "Service pack (1 use)": "باقة الخدمات (استخدام واحد)",
             "Remove NuqtaPass lines": "شيل بنود NuqtaPass",
             "Nothing is used until you validate.": "ما ينصرف شي إلا لما تأكد الدفع.",
+            # 2026-11-09: tiers, the reward-ready notice, corrections.
+            "Gold member · %(pct)s cash-back": "عضو ذهبي · استرداد %(pct)s",
+            "Silver member · %(pct)s cash-back": "عضو فضي · استرداد %(pct)s",
+            "Bronze member · %(pct)s cash-back": "عضو برونزي · استرداد %(pct)s",
+            "%(points)s more points to Gold": "باقي %(points)s نقطة للمستوى الذهبي",
+            "Reward ready: %(stamps)s of %(required)s stamps": "المكافأة جاهزة · الأختام: %(stamps)s من %(required)s",
+            "Correct": "تصحيح",
+            "Undo last stamp": "شيل آخر ختم",
         }
         for english, arabic in expected.items():
             self.assertEqual(messages.get(english), arabic, english)
@@ -66,3 +74,10 @@ class TestPosArabic(TransactionCase):
     def test_credit_method_name_in_arabic(self):
         self.assertEqual(self.env["pos.payment.method"].with_context(lang="ar_001")._fields["nuqtapass_credit"]
                          .get_description(self.env(context={"lang": "ar_001"}))["string"], "رصيد NuqtaPass")
+
+    def test_correction_words_in_arabic(self):
+        config = self.config.with_context(lang="ar_001")
+        self.assertEqual(config._nuqtapass_adjusted("stamp_undo", None, {"stamps": 3, "stampsRequired": 6}),
+                         "انشال ختم · الأختام الحين: 3 من 6")
+        self.assertEqual(config._nuqtapass_adjusted("points", 50, {"delta": 50, "points": 1454}),
+                         "تعدّلت النقاط: \u2066+50\u2069 · الرصيد الحين: 1,454")

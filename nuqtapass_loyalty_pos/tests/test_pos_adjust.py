@@ -98,7 +98,7 @@ class TestPosAdjust(TransactionCase):
         with patch.object(NuqtaPassClient, "adjust", return_value=done) as adjust:
             res = self._as(self.manager)._nuqtapass_adjust(POINTS_CARD, "points", 50, "Missed sale")
         self.assertEqual(adjust.call_args.args[0]["delta"], 50)
-        self.assertEqual(res, {"ok": True, "message": "Points corrected: +50 · 1,454 now."})
+        self.assertEqual(res, {"ok": True, "message": "Points corrected: \u2066+50\u2069 · 1,454 now."})
 
     def test_points_take_off_and_the_cap_at_zero(self):
         taken = ok({"action": "points", "type": "POINTS", "delta": -40, "points": 1364, "totalPointsEarned": 2000})
@@ -107,10 +107,10 @@ class TestPosAdjust(TransactionCase):
         manager = self._as(self.manager)
         with patch.object(NuqtaPassClient, "adjust", return_value=taken):
             self.assertEqual(manager._nuqtapass_adjust(POINTS_CARD, "points", -40, "Wrong sale")["message"],
-                             "Points corrected: -40 · 1,364 now.")
+                             "Points corrected: \u2066-40\u2069 · 1,364 now.")
         with patch.object(NuqtaPassClient, "adjust", return_value=capped):
             self.assertEqual(manager._nuqtapass_adjust(POINTS_CARD, "points", -50, "Wrong sale")["message"],
-                             "Points corrected: -12 (all the card had) · 0 now.")
+                             "Points corrected: \u2066-12\u2069 (all the card had) · 0 now.")
         with patch.object(NuqtaPassClient, "adjust", return_value=none):
             self.assertEqual(manager._nuqtapass_adjust(POINTS_CARD, "points", -50, "Wrong sale")["message"],
                              "The card has no points to take off.")

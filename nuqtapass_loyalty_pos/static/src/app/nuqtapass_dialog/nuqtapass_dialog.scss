@@ -1,4 +1,6 @@
-// The till's own Bootstrap/Odoo tokens only, so the window follows the till's theme (light, dark, RTL).
+// The till's own Bootstrap/Odoo tokens only, so the window follows the till's theme (light, dark, RTL). The till
+// defines Odoo's --primary but not Bootstrap's --bs-primary, so every colour has the till's own as its fallback (a
+// var() with nothing to fall back on drops the whole declaration: the card bands never showed).
 .o_nuqtapass_dialog,
 .o_nuqtapass_receipt_box {
     .o_nuqtapass_query {
@@ -27,7 +29,7 @@
     // One quiet strip per card, like the card in the customer's Wallet: a start-side band, no box inside a box.
     .o_nuqtapass_card {
         background-color: var(--bs-tertiary-bg, rgba(0, 0, 0, 0.03));
-        border-inline-start: 4px solid var(--bs-primary);
+        border-inline-start: 4px solid var(--bs-primary, var(--primary, #71639e));
         text-align: start;
     }
     .o_nuqtapass_points {
@@ -66,7 +68,7 @@
     .o_nuqtapass_card {
         padding: 0.75rem 1rem;
         background-color: var(--bs-tertiary-bg, rgba(0, 0, 0, 0.03));
-        border-inline-start: 4px solid var(--bs-primary);
+        border-inline-start: 4px solid var(--bs-primary, var(--primary, #71639e));
     }
     .o_nuqtapass_card_line,
     .o_nuqtapass_who,
@@ -126,8 +128,8 @@
 // The card the reward-ready notice pointed at: the band thickens and the strip gets the primary's own quiet tint.
 .o_nuqtapass_pay .o_nuqtapass_card.o_nuqtapass_focus {
     border-inline-start-width: 6px;
-    background-color: rgba(var(--bs-primary-rgb, 113, 75, 103), 0.08);
-    box-shadow: 0 0 0 1px rgba(var(--bs-primary-rgb, 113, 75, 103), 0.35);
+    background-color: rgba(var(--bs-primary-rgb, 113, 99, 158), 0.08);
+    box-shadow: 0 0 0 1px rgba(var(--bs-primary-rgb, 113, 99, 158), 0.35);
 }
 
 // A POS manager's correction: under a hairline inside the card's strip, so it reads as part of that card.

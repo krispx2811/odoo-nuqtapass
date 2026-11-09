@@ -297,4 +297,33 @@ TERMS = {
     "Voucher used": "انستخدمت القسيمة",
     "What this order used of the customer's NuqtaPass cards when it was paid.":
         "اللي استخدمه هالطلب من بطاقات العميل في NuqtaPass وقت الدفع.",
+    # ── tiers, reward-ready notice, corrections (2026-11-09) ──────────
+    # Tier names as NuqtaPass says them (apps/staff: "عضو فضي · استرداد 7%", "باقي %s نقطة للمستوى الذهبي").
+    "Gold member · %(pct)s cash-back": "عضو ذهبي · استرداد %(pct)s",
+    "Silver member · %(pct)s cash-back": "عضو فضي · استرداد %(pct)s",
+    "Bronze member · %(pct)s cash-back": "عضو برونزي · استرداد %(pct)s",
+    "%(points)s more points to Gold": "باقي %(points)s نقطة للمستوى الذهبي",
+    "%(points)s more points to Silver": "باقي %(points)s نقطة للمستوى الفضي",
+    "Reward ready: %(stamps)s of %(required)s stamps": "المكافأة جاهزة · الأختام: %(stamps)s من %(required)s",
+    "Voucher: %(title)s": "قسيمة: %(title)s",
+    "Use at payment": "استخدمها وقت الدفع",
+    "Open NuqtaPass": "افتح NuqtaPass",
+    "Correct": "تصحيح",
+    "Correction": "التصحيح",
+    "Undo last stamp": "شيل آخر ختم",
+    "Add a stamp": "أضف ختم",
+    "Points to add or take off": "كم نقطة تزيد أو تنقص",
+    "Reason (goes in the NuqtaPass log)": "السبب (ينحفظ في سجل NuqtaPass)",
+    "For example: pressed twice": "مثلاً: انضغط مرتين",
+    "Save correction": "احفظ التصحيح",
+    "Cancel": "إلغاء",
+    "Only Point of Sale administrators can correct cards.": "التصحيح لمسؤولي نقطة البيع بس.",
+    "Write why, in 3 to 200 characters.": "اكتب السبب، من 3 إلى 200 حرف.",
+    "Points: a whole number other than 0, like 50 or -50.": "النقاط: رقم صحيح غير الصفر، مثل 50 أو \u2066-50\u2069.",
+    "Stamp added: %(stamps)s of %(required)s now.": "انضاف ختم · الأختام الحين: %(stamps)s من %(required)s",
+    "Stamp taken off: %(stamps)s of %(required)s now.": "انشال ختم · الأختام الحين: %(stamps)s من %(required)s",
+    "Points corrected: %(change)s · %(total)s now.": "تعدّلت النقاط: %(change)s · الرصيد الحين: %(total)s",
+    "Points corrected: %(change)s (all the card had) · %(total)s now.":
+        "تعدّلت النقاط: %(change)s (كل اللي في البطاقة) · الرصيد الحين: %(total)s",
+    "The card has no points to take off.": "البطاقة ما فيها نقاط تنقصها.",
 }
