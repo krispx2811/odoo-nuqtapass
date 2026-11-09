@@ -20,6 +20,16 @@ class PosConfig(models.Model):
         "NuqtaPass branch",
         help="Branch id, code or name in NuqtaPass. Empty: NuqtaPass tags the visit 'Odoo'.",
     )
+    # Read by the till page (pos.config loads all its fields): the receipt-screen box and Wallet-card scans only
+    # appear when the till switch is on and there is a key. Not the key itself: that never leaves the server.
+    nuqtapass_till_on = fields.Boolean("NuqtaPass on the till", compute="_compute_nuqtapass_till_on")
+
+    def _compute_nuqtapass_till_on(self):
+        Sync = self.env["nuqtapass.sync"].sudo()
+        on = Sync._channel_enabled("till") and bool(
+            (self.env["ir.config_parameter"].sudo().get_str("nuqtapass_loyalty.api_key") or "").strip())
+        for config in self:
+            config.nuqtapass_till_on = on
 
     # ── the till window (called by controllers/main.py) ───────────────
     def _nuqtapass_error(self, error, message):
