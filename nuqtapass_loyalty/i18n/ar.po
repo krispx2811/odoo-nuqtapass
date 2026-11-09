@@ -1,0 +1,420 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* nuqtapass_loyalty
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 20.0-20261102\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-09 14:10+0000\n"
+"PO-Revision-Date: 2026-11-09 14:10+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: ar\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5;\n"
+
+#. module: nuqtapass_loyalty
+#. odoo-python
+#: code:addons/nuqtapass_loyalty/models/nuqtapass_sync.py:0
+msgid "(NuqtaPass already had it)"
+msgstr "(وصل NuqtaPass من قبل)"
+
+#. module: nuqtapass_loyalty
+#: model:ir.model.fields,field_description:nuqtapass_loyalty.field_nuqtapass_sync__amount
+msgid "Amount"
+msgstr "المبلغ"
+
+#. module: nuqtapass_loyalty
+#: model:ir.model.fields,field_description:nuqtapass_loyalty.field_nuqtapass_sync__attempts
+msgid "Attempts"
+msgstr "المحاولات"
+
+#. module: nuqtapass_loyalty
+#: model:ir.model.fields,field_description:nuqtapass_loyalty.field_nuqtapass_sync__branch
+msgid "Branch"
+msgstr "الفرع"
+
+#. module: nuqtapass_loyalty
+#: model:ir.model.fields,field_description:nuqtapass_loyalty.field_nuqtapass_sync__channel
+msgid "Channel"
+msgstr "القناة"
+
+#. module: nuqtapass_loyalty
+#: model:ir.model.fields,field_description:nuqtapass_loyalty.field_nuqtapass_sync__company_id
+msgid "Company"
+msgstr "الشركة"
+
+#. module: nuqtapass_loyalty
+#: model:ir.model,name:nuqtapass_loyalty.model_res_config_settings
+msgid "Config Settings"
+msgstr "تهيئة الإعدادات"
+
+#. module: nuqtapass_loyalty
+#. odoo-python
+#: code:addons/nuqtapass_loyalty/models/res_config_settings.py:0
+msgid "Connected to %(shop)s."
+msgstr "تم الربط مع: %(shop)s"
+
+#. module: nuqtapass_loyalty
+#: model_terms:ir.ui.view,arch_db:nuqtapass_loyalty.res_config_settings_view_form
+msgid "Connection"
+msgstr "الربط"
+
+#. module: nuqtapass_loyalty
+#. odoo-python
+#: code:addons/nuqtapass_loyalty/models/res_config_settings.py:0
+msgid "Could not connect: %(error)s"
+msgstr "ما قدرنا نربط: %(error)s"
+
+#. module: nuqtapass_loyalty
+#. odoo-python
+#: code:addons/nuqtapass_loyalty/models/res_config_settings.py:0
+msgid "Could not connect: the NuqtaPass address setting is wrong."
+msgstr "ما قدرنا نربط: عنوان NuqtaPass في الإعدادات مو صحيح."
+
+#. module: nuqtapass_loyalty
+#: model_terms:ir.ui.view,arch_db:nuqtapass_loyalty.res_config_settings_view_form
+msgid ""
+"Create it on nuqtapass.com: Settings → Integrations → Odoo. It is shown "
+"once."
+msgstr ""
+"سوّ المفتاح في nuqtapass.com من الإعدادات ← الربط ← Odoo. يطلع مرة وحدة بس، "
+"فانسخه على طول."
+
+#. module: nuqtapass_loyalty
+#: model:ir.model.fields,field_description:nuqtapass_loyalty.field_nuqtapass_sync__create_uid
+msgid "Created by"
+msgstr "أنشئ بواسطة"
+
+#. module: nuqtapass_loyalty
+#: model:ir.model.fields,field_description:nuqtapass_loyalty.field_nuqtapass_sync__create_date
+msgid "Created on"
+msgstr "أنشئ في"
+
+#. module: nuqtapass_loyalty
+#: model:ir.model.fields,field_description:nuqtapass_loyalty.field_nuqtapass_sync__currency_id
+msgid "Currency"
+msgstr "العملة"
+
+#. module: nuqtapass_loyalty
+#: model:ir.model.fields,field_description:nuqtapass_loyalty.field_nuqtapass_sync__customer_name
+msgid "Customer Name"
+msgstr "اسم العميل"
+
+#. module: nuqtapass_loyalty
+#: model:ir.model.fields,field_description:nuqtapass_loyalty.field_nuqtapass_sync__dedupe_key
+msgid "Dedupe Key"
+msgstr "مفتاح منع التكرار"
+
+#. module: nuqtapass_loyalty
+#: model:ir.model.fields,field_description:nuqtapass_loyalty.field_nuqtapass_sync__display_name
+#: model:ir.model.fields,field_description:nuqtapass_loyalty.field_res_config_settings__display_name
+msgid "Display Name"
+msgstr "اسم العرض"
+
+#. module: nuqtapass_loyalty
+#: model:ir.model.fields,field_description:nuqtapass_loyalty.field_res_config_settings__nuqtapass_till_enabled
+msgid "Earn at the till"
+msgstr "أختام ونقاط من الكاشير"
+
+#. module: nuqtapass_loyalty
+#: model:ir.model.fields,field_description:nuqtapass_loyalty.field_res_config_settings__nuqtapass_online_enabled
+msgid "Earn in the online store"
+msgstr "أختام ونقاط من المتجر الإلكتروني"
+
+#. module: nuqtapass_loyalty
+#: model_terms:ir.ui.view,arch_db:nuqtapass_loyalty.res_config_settings_view_form
+msgid "Earning"
+msgstr "الأختام والنقاط"
+
+#. module: nuqtapass_loyalty
+#: model_terms:ir.ui.view,arch_db:nuqtapass_loyalty.res_config_settings_view_form
+msgid "Every order and refund sent to NuqtaPass."
+msgstr "كل طلب ومرتجع انرسل إلى NuqtaPass."
+
+#. module: nuqtapass_loyalty
+#: model:ir.model.fields.selection,name:nuqtapass_loyalty.selection__nuqtapass_sync__state__failed
+#: model_terms:ir.ui.view,arch_db:nuqtapass_loyalty.nuqtapass_sync_view_search
+msgid "Failed"
+msgstr "فشل"
+
+#. module: nuqtapass_loyalty
+#. odoo-python
+#: code:addons/nuqtapass_loyalty/models/nuqtapass_sync.py:0
+msgid "Failed: %(error)s"
+msgstr "فشل: %(error)s"
+
+#. module: nuqtapass_loyalty
+#: model:ir.model.fields,field_description:nuqtapass_loyalty.field_nuqtapass_sync__id
+#: model:ir.model.fields,field_description:nuqtapass_loyalty.field_res_config_settings__id
+msgid "ID"
+msgstr "المُعرف"
+
+#. module: nuqtapass_loyalty
+#: model:ir.model.fields,field_description:nuqtapass_loyalty.field_nuqtapass_sync__kind
+msgid "Kind"
+msgstr "النوع"
+
+#. module: nuqtapass_loyalty
+#: model:ir.model.fields,field_description:nuqtapass_loyalty.field_nuqtapass_sync__last_error
+msgid "Last Error"
+msgstr "آخر خطأ"
+
+#. module: nuqtapass_loyalty
+#: model:ir.model.fields,field_description:nuqtapass_loyalty.field_nuqtapass_sync__last_status_code
+msgid "Last Status Code"
+msgstr "آخر رمز حالة"
+
+#. module: nuqtapass_loyalty
+#: model:ir.model.fields,field_description:nuqtapass_loyalty.field_nuqtapass_sync__write_uid
+msgid "Last Updated by"
+msgstr "آخر تحديث بواسطة"
+
+#. module: nuqtapass_loyalty
+#: model:ir.model.fields,field_description:nuqtapass_loyalty.field_nuqtapass_sync__write_date
+msgid "Last Updated on"
+msgstr "آخر تحديث في"
+
+#. module: nuqtapass_loyalty
+#: model:ir.model.fields,field_description:nuqtapass_loyalty.field_nuqtapass_sync__next_attempt_at
+msgid "Next try"
+msgstr "المحاولة الجاية"
+
+#. module: nuqtapass_loyalty
+#. odoo-python
+#: code:addons/nuqtapass_loyalty/models/nuqtapass_sync.py:0
+msgid "No NuqtaPass key in Settings"
+msgstr "ما فيه مفتاح NuqtaPass في الإعدادات"
+
+#. module: nuqtapass_loyalty
+#: model_terms:ir.actions.act_window,help:nuqtapass_loyalty.action_nuqtapass_sync
+msgid "Nothing sent yet"
+msgstr "ما انرسل شي للحين"
+
+#. module: nuqtapass_loyalty
+#: model:ir.model.fields,field_description:nuqtapass_loyalty.field_nuqtapass_sync__summary
+#: model_terms:ir.ui.view,arch_db:nuqtapass_loyalty.res_config_settings_view_form
+msgid "NuqtaPass"
+msgstr "NuqtaPass"
+
+#. module: nuqtapass_loyalty
+#: model:ir.module.module,shortdesc:base.module_nuqtapass_loyalty
+msgid "NuqtaPass Loyalty"
+msgstr "ولاء NuqtaPass"
+
+#. module: nuqtapass_loyalty
+#: model:ir.model.fields,field_description:nuqtapass_loyalty.field_nuqtapass_sync__response_json
+msgid "NuqtaPass answer"
+msgstr "رد NuqtaPass"
+
+#. module: nuqtapass_loyalty
+#. odoo-python
+#: code:addons/nuqtapass_loyalty/models/nuqtapass_sync.py:0
+msgid "NuqtaPass is still working on this order"
+msgstr "NuqtaPass للحين يشتغل على هالطلب"
+
+#. module: nuqtapass_loyalty
+#: model:ir.model.fields,field_description:nuqtapass_loyalty.field_res_config_settings__nuqtapass_api_key
+#: model_terms:ir.ui.view,arch_db:nuqtapass_loyalty.res_config_settings_view_form
+msgid "NuqtaPass key"
+msgstr "مفتاح NuqtaPass"
+
+#. module: nuqtapass_loyalty
+#: model:ir.model,name:nuqtapass_loyalty.model_nuqtapass_sync
+msgid "NuqtaPass sync"
+msgstr "مزامنة NuqtaPass"
+
+#. module: nuqtapass_loyalty
+#: model:ir.actions.act_window,name:nuqtapass_loyalty.action_nuqtapass_sync
+msgid "NuqtaPass sync log"
+msgstr "سجل مزامنة NuqtaPass"
+
+#. module: nuqtapass_loyalty
+#: model:ir.actions.server,name:nuqtapass_loyalty.ir_cron_nuqtapass_send_ir_actions_server
+msgid "NuqtaPass: send orders and refunds"
+msgstr "NuqtaPass: إرسال الطلبات والمرتجعات"
+
+#. module: nuqtapass_loyalty
+#: model:ir.model.fields.selection,name:nuqtapass_loyalty.selection__nuqtapass_sync__channel__online
+#: model_terms:ir.ui.view,arch_db:nuqtapass_loyalty.nuqtapass_sync_view_search
+msgid "Online store"
+msgstr "المتجر الإلكتروني"
+
+#. module: nuqtapass_loyalty
+#: model_terms:ir.ui.view,arch_db:nuqtapass_loyalty.res_config_settings_view_form
+msgid "Open sync log"
+msgstr "افتح سجل المزامنة"
+
+#. module: nuqtapass_loyalty
+#: model:ir.model.fields,field_description:nuqtapass_loyalty.field_nuqtapass_sync__order_ref
+msgid "Order"
+msgstr "الطلب"
+
+#. module: nuqtapass_loyalty
+#: model:ir.model.fields,field_description:nuqtapass_loyalty.field_nuqtapass_sync__occurred_at
+msgid "Paid / refunded at"
+msgstr "وقت الدفع أو الإرجاع"
+
+#. module: nuqtapass_loyalty
+#: model_terms:ir.ui.view,arch_db:nuqtapass_loyalty.res_config_settings_view_form
+msgid "Paid online orders earn stamps or points."
+msgstr "طلبات المتجر الإلكتروني المدفوعة تعطي أختام أو نقاط."
+
+#. module: nuqtapass_loyalty
+#: model_terms:ir.actions.act_window,help:nuqtapass_loyalty.action_nuqtapass_sync
+msgid ""
+"Paid orders with a customer phone show up here when they are sent to "
+"NuqtaPass."
+msgstr ""
+"الطلبات المدفوعة اللي فيها جوال العميل تطلع هنا أول ما تنرسل إلى NuqtaPass."
+
+#. module: nuqtapass_loyalty
+#: model_terms:ir.ui.view,arch_db:nuqtapass_loyalty.res_config_settings_view_form
+msgid "Paid till orders with a customer phone earn stamps or points."
+msgstr "طلبات الكاشير المدفوعة اللي فيها جوال العميل تعطي أختام أو نقاط."
+
+#. module: nuqtapass_loyalty
+#. odoo-python
+#: code:addons/nuqtapass_loyalty/models/res_config_settings.py:0
+msgid "Paste your NuqtaPass key first."
+msgstr "الصق مفتاح NuqtaPass أول."
+
+#. module: nuqtapass_loyalty
+#: model:ir.model.fields,field_description:nuqtapass_loyalty.field_nuqtapass_sync__phone
+msgid "Phone"
+msgstr "الجوال"
+
+#. module: nuqtapass_loyalty
+#. odoo-python
+#: code:addons/nuqtapass_loyalty/models/nuqtapass_sync.py:0
+msgid "Points already used, not taken back: %(n)s"
+msgstr "نقاط ما رجعت لأنها انصرفت: %(n)s"
+
+#. module: nuqtapass_loyalty
+#. odoo-python
+#: code:addons/nuqtapass_loyalty/models/nuqtapass_sync.py:0
+msgid "Points given: %(n)s"
+msgstr "النقاط اللي انعطت: %(n)s"
+
+#. module: nuqtapass_loyalty
+#. odoo-python
+#: code:addons/nuqtapass_loyalty/models/nuqtapass_sync.py:0
+msgid "Points taken back: %(n)s"
+msgstr "النقاط اللي رجعت: %(n)s"
+
+#. module: nuqtapass_loyalty
+#: model:ir.model.fields,field_description:nuqtapass_loyalty.field_nuqtapass_sync__refund_ref
+#: model:ir.model.fields.selection,name:nuqtapass_loyalty.selection__nuqtapass_sync__kind__refund
+msgid "Refund"
+msgstr "مرتجع"
+
+#. module: nuqtapass_loyalty
+#: model_terms:ir.ui.view,arch_db:nuqtapass_loyalty.nuqtapass_sync_view_form
+#: model_terms:ir.ui.view,arch_db:nuqtapass_loyalty.nuqtapass_sync_view_list
+msgid "Resend"
+msgstr "أعد الإرسال"
+
+#. module: nuqtapass_loyalty
+#: model:ir.model.fields.selection,name:nuqtapass_loyalty.selection__nuqtapass_sync__kind__sale
+msgid "Sale"
+msgstr "طلب"
+
+#. module: nuqtapass_loyalty
+#: model:ir.model.fields.selection,name:nuqtapass_loyalty.selection__nuqtapass_sync__state__done
+msgid "Sent"
+msgstr "انرسل"
+
+#. module: nuqtapass_loyalty
+#. odoo-python
+#: code:addons/nuqtapass_loyalty/models/nuqtapass_sync.py:0
+msgid "Sent, nothing to give for this card"
+msgstr "انرسل، وما فيه شي ينعطى لهالبطاقة"
+
+#. module: nuqtapass_loyalty
+#. odoo-python
+#: code:addons/nuqtapass_loyalty/models/nuqtapass_sync.py:0
+msgid "Sent, nothing to take back"
+msgstr "انرسل، وما فيه شي يرجع"
+
+#. module: nuqtapass_loyalty
+#. odoo-python
+#: code:addons/nuqtapass_loyalty/models/nuqtapass_sync.py:0
+msgid "Stamps already used, not taken back: %(n)s"
+msgstr "أختام ما رجعت لأنها انستخدمت في مكافأة: %(n)s"
+
+#. module: nuqtapass_loyalty
+#: model:ir.module.module,summary:base.module_nuqtapass_loyalty
+msgid ""
+"Stamps and points on Apple Wallet and Google Wallet cards for every paid "
+"order"
+msgstr "أختام ونقاط على بطاقات Apple Wallet و Google Wallet مع كل طلب مدفوع"
+
+#. module: nuqtapass_loyalty
+#. odoo-python
+#: code:addons/nuqtapass_loyalty/models/nuqtapass_sync.py:0
+msgid "Stamps given: %(n)s"
+msgstr "الأختام اللي انعطت: %(n)s"
+
+#. module: nuqtapass_loyalty
+#. odoo-python
+#: code:addons/nuqtapass_loyalty/models/nuqtapass_sync.py:0
+msgid "Stamps taken back: %(n)s"
+msgstr "الأختام اللي رجعت: %(n)s"
+
+#. module: nuqtapass_loyalty
+#: model:ir.model.fields,field_description:nuqtapass_loyalty.field_nuqtapass_sync__state
+msgid "State"
+msgstr "الحالة"
+
+#. module: nuqtapass_loyalty
+#: model_terms:ir.ui.view,arch_db:nuqtapass_loyalty.res_config_settings_view_form
+msgid "Sync log"
+msgstr "سجل المزامنة"
+
+#. module: nuqtapass_loyalty
+#: model_terms:ir.ui.view,arch_db:nuqtapass_loyalty.res_config_settings_view_form
+msgid "Test connection"
+msgstr "جرّب الربط"
+
+#. module: nuqtapass_loyalty
+#: model:ir.model.constraint,message:nuqtapass_loyalty.constraint_nuqtapass_sync_dedupe_unique
+msgid "This order or refund is already queued for NuqtaPass."
+msgstr "هالطلب أو المرتجع موجود من قبل في قائمة الإرسال إلى NuqtaPass."
+
+#. module: nuqtapass_loyalty
+#: model:ir.model.fields.selection,name:nuqtapass_loyalty.selection__nuqtapass_sync__channel__till
+#: model_terms:ir.ui.view,arch_db:nuqtapass_loyalty.nuqtapass_sync_view_search
+msgid "Till"
+msgstr "الكاشير"
+
+#. module: nuqtapass_loyalty
+#: model_terms:ir.ui.view,arch_db:nuqtapass_loyalty.nuqtapass_sync_view_search
+msgid "Waiting"
+msgstr "بالانتظار"
+
+#. module: nuqtapass_loyalty
+#. odoo-python
+#: code:addons/nuqtapass_loyalty/models/nuqtapass_sync.py:0
+#: model:ir.model.fields.selection,name:nuqtapass_loyalty.selection__nuqtapass_sync__state__pending
+msgid "Waiting to send"
+msgstr "بانتظار الإرسال"
+
+#. module: nuqtapass_loyalty
+#. odoo-python
+#: code:addons/nuqtapass_loyalty/models/nuqtapass_sync.py:0
+msgid "Will try again: %(error)s"
+msgstr "بنحاول مرة ثانية: %(error)s"
+
+#. module: nuqtapass_loyalty
+#: model_terms:ir.ui.view,arch_db:nuqtapass_loyalty.res_config_settings_view_form
+msgid "sip_…"
+msgstr "sip_…"
+
+#. module: nuqtapass_loyalty
+#. odoo-python
+#: code:addons/nuqtapass_loyalty/models/nuqtapass_sync.py:0
+msgid "unknown error"
+msgstr "خطأ غير معروف"

@@ -255,9 +255,9 @@ class NuqtapassSync(models.Model):
             if result.get("points"):
                 parts.append(_("Points taken back: %(n)s", n=result["points"]))
             if shortfall.get("stamps"):
-                parts.append(_("Already used, not taken back: %(n)s stamps", n=shortfall["stamps"]))
+                parts.append(_("Stamps already used, not taken back: %(n)s", n=shortfall["stamps"]))
             if shortfall.get("points"):
-                parts.append(_("Already used, not taken back: %(n)s points", n=shortfall["points"]))
+                parts.append(_("Points already used, not taken back: %(n)s", n=shortfall["points"]))
             if not parts:
                 parts.append(_("Sent, nothing to take back"))
         if data.get("duplicate"):

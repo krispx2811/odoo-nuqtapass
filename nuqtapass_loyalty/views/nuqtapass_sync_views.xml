@@ -10,7 +10,7 @@
                 <field name="channel"/>
                 <field name="order_ref"/>
                 <field name="refund_ref" optional="hide"/>
-                <field name="phone"/>
+                <field name="phone" widget="phone"/>
                 <field name="amount"/>
                 <field name="currency_id" column_invisible="1"/>
                 <field name="state" widget="badge" decoration-success="state == 'done'" decoration-danger="state == 'failed'"/>
@@ -38,7 +38,7 @@
                             <field name="channel"/>
                             <field name="order_ref"/>
                             <field name="refund_ref" invisible="kind != 'refund'"/>
-                            <field name="phone"/>
+                            <field name="phone" widget="phone"/>
                             <field name="amount"/>
                             <field name="currency_id" invisible="1"/>
                             <field name="occurred_at"/>

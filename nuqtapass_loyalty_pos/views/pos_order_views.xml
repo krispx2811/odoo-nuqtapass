@@ -11,7 +11,7 @@
                         <list>
                             <field name="kind"/>
                             <field name="refund_ref" optional="hide"/>
-                            <field name="phone"/>
+                            <field name="phone" widget="phone"/>
                             <field name="amount"/>
                             <field name="currency_id" column_invisible="1"/>
                             <field name="state" widget="badge" decoration-success="state == 'done'" decoration-danger="state == 'failed'"/>
@@ -23,7 +23,7 @@
             </xpath>
             <!-- 20.0: partner_id is not inside the "Extra Info" page; pos_reference is (Other Information). -->
             <xpath expr="//page[@name='extra']//field[@name='pos_reference']" position="after">
-                <field name="nuqtapass_phone" invisible="not nuqtapass_phone"/>
+                <field name="nuqtapass_phone" widget="phone" invisible="not nuqtapass_phone"/>
             </xpath>
         </field>
     </record>

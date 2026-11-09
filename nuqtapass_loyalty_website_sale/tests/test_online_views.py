@@ -10,6 +10,7 @@ class TestOnlineViews(TransactionCase):
         arch = self._arch("sale.order")
         self.assertIn('name="nuqtapass_sync_ids"', arch)
         self.assertIn("action_resend", arch)
+        self.assertIn('<field name="phone" widget="phone"', arch)
 
     def test_website_settings_have_branch_once(self):
         self.assertEqual(self._arch("res.config.settings").count('name="website_nuqtapass_branch"'), 1)

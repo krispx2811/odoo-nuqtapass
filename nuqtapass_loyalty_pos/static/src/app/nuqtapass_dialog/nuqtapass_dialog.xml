@@ -10,8 +10,9 @@
                             t-att-disabled="this.state.loading or !this.state.phone.trim()">Look up</button>
                 </form>
                 <div t-if="this.state.loading" class="text-muted mb-2">Loading…</div>
-                <div t-if="this.state.error" class="alert alert-warning" role="alert" t-out="this.state.error"/>
-                <div t-if="this.state.done" class="alert alert-success" role="status" t-out="this.state.done"/>
+                <!-- <bdi>: a NuqtaPass answer can be English inside the Arabic till; isolate it so its words and dot keep their order. -->
+                <div t-if="this.state.error" class="alert alert-warning" role="alert"><bdi t-out="this.state.error"/></div>
+                <div t-if="this.state.done" class="alert alert-success" role="status"><bdi t-out="this.state.done"/></div>
                 <div t-if="this.state.welcome" class="o_nuqtapass_qr text-center mb-3">
                     <img t-att-src="this.state.welcome.qr" width="220" height="220" alt="QR code of the card"/>
                     <p class="fs-4 fw-bold mt-2 mb-2">Scan to add your card</p>
@@ -29,8 +30,9 @@
                     </p>
                     <div t-foreach="this.state.result.cards" t-as="card" t-key="card.cardId"
                          class="o_nuqtapass_card border rounded p-3 mb-2">
-                        <div class="fw-bold" t-out="this.cardTitle(card)"/>
-                        <div class="text-muted" t-out="this.cardLine(card)"/>
+                        <!-- <bdi>: the shop's own voucher title and the numbers in the line keep their order in RTL. -->
+                        <div class="fw-bold"><bdi t-out="this.cardTitle(card)"/></div>
+                        <div class="text-muted"><bdi t-out="this.cardLine(card)"/></div>
                         <div class="d-flex flex-wrap align-items-center gap-2 mt-2">
                             <button t-if="card.type === 'STAMPS' and card.rewardReady" class="btn btn-primary"
                                     t-att-disabled="this.state.loading"

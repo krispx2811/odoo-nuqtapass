@@ -109,10 +109,10 @@ class TestSyncSend(TransactionCase):
             "cardType": "STAMPS", "stamps": 0, "plannedStamps": 1, "shortfall": {"stamps": 1}, "reason": "ALREADY_USED"}}),
             method="refund")
         self.assertEqual(refund.state, "done")
-        self.assertEqual(refund.summary, "Already used, not taken back: 1 stamps")
+        self.assertEqual(refund.summary, "Stamps already used, not taken back: 1")
         refund.write({"response_json": json.dumps(
             {"status": "OK", "duplicate": False, "result": {"cardType": "POINTS", "points": 4, "shortfall": {"points": 8}}})})
-        self.assertEqual(refund.summary, "Points taken back: 4 · Already used, not taken back: 8 points")
+        self.assertEqual(refund.summary, "Points taken back: 4 · Points already used, not taken back: 8")
 
     def test_summary_for_failed(self):
         self._send(fail(False, 400, "phone invalid"))

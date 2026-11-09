@@ -1,0 +1,145 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* nuqtapass_loyalty_website_sale
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 20.0-20261102\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-09 14:10+0000\n"
+"PO-Revision-Date: 2026-11-09 14:10+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: ar\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5;\n"
+
+#. module: nuqtapass_loyalty_website_sale
+#: model:ir.model.fields,help:nuqtapass_loyalty_website_sale.field_res_config_settings__website_nuqtapass_branch
+#: model:ir.model.fields,help:nuqtapass_loyalty_website_sale.field_website__nuqtapass_branch
+msgid ""
+"Branch id, code or name in NuqtaPass. Empty: NuqtaPass tags the visit 'Odoo "
+"online'."
+msgstr ""
+"رقم الفرع أو رمزه أو اسمه في NuqtaPass. إذا خليته فاضي، الطلب ينحسب على "
+"«Odoo online»."
+
+#. module: nuqtapass_loyalty_website_sale
+#: model:ir.model,name:nuqtapass_loyalty_website_sale.model_res_config_settings
+msgid "Config Settings"
+msgstr "تهيئة الإعدادات"
+
+#. module: nuqtapass_loyalty_website_sale
+#: model:ir.model.fields,field_description:nuqtapass_loyalty_website_sale.field_nuqtapass_sync__move_id
+msgid "Credit note"
+msgstr "إشعار دائن"
+
+#. module: nuqtapass_loyalty_website_sale
+#: model:ir.model.fields,field_description:nuqtapass_loyalty_website_sale.field_account_move__display_name
+#: model:ir.model.fields,field_description:nuqtapass_loyalty_website_sale.field_nuqtapass_sync__display_name
+#: model:ir.model.fields,field_description:nuqtapass_loyalty_website_sale.field_payment_transaction__display_name
+#: model:ir.model.fields,field_description:nuqtapass_loyalty_website_sale.field_res_config_settings__display_name
+#: model:ir.model.fields,field_description:nuqtapass_loyalty_website_sale.field_sale_order__display_name
+#: model:ir.model.fields,field_description:nuqtapass_loyalty_website_sale.field_website__display_name
+msgid "Display Name"
+msgstr "اسم العرض"
+
+#. module: nuqtapass_loyalty_website_sale
+#: model:ir.module.module,summary:base.module_nuqtapass_loyalty_website_sale
+msgid ""
+"Earn NuqtaPass stamps and points on paid Odoo online-store orders; credit "
+"notes take them back"
+msgstr ""
+"أختام ونقاط NuqtaPass على طلبات متجر Odoo الإلكتروني المدفوعة، والإشعارات "
+"الدائنة ترجّعها"
+
+#. module: nuqtapass_loyalty_website_sale
+#: model:ir.model.fields,field_description:nuqtapass_loyalty_website_sale.field_account_move__id
+#: model:ir.model.fields,field_description:nuqtapass_loyalty_website_sale.field_nuqtapass_sync__id
+#: model:ir.model.fields,field_description:nuqtapass_loyalty_website_sale.field_payment_transaction__id
+#: model:ir.model.fields,field_description:nuqtapass_loyalty_website_sale.field_res_config_settings__id
+#: model:ir.model.fields,field_description:nuqtapass_loyalty_website_sale.field_sale_order__id
+#: model:ir.model.fields,field_description:nuqtapass_loyalty_website_sale.field_website__id
+msgid "ID"
+msgstr "المُعرف"
+
+#. module: nuqtapass_loyalty_website_sale
+#: model:ir.model,name:nuqtapass_loyalty_website_sale.model_account_move
+msgid "Journal Entry"
+msgstr "قيد اليومية"
+
+#. module: nuqtapass_loyalty_website_sale
+#: model:ir.model.fields,field_description:nuqtapass_loyalty_website_sale.field_sale_order__nuqtapass_status
+#: model_terms:ir.ui.view,arch_db:nuqtapass_loyalty_website_sale.res_config_settings_view_form_nuqtapass_website
+#: model_terms:ir.ui.view,arch_db:nuqtapass_loyalty_website_sale.view_order_form_nuqtapass
+msgid "NuqtaPass"
+msgstr "NuqtaPass"
+
+#. module: nuqtapass_loyalty_website_sale
+#: model:ir.module.module,shortdesc:base.module_nuqtapass_loyalty_website_sale
+msgid "NuqtaPass Loyalty – eCommerce"
+msgstr "ولاء NuqtaPass – المتجر الإلكتروني"
+
+#. module: nuqtapass_loyalty_website_sale
+#: model:ir.model.fields,field_description:nuqtapass_loyalty_website_sale.field_website__nuqtapass_branch
+#: model_terms:ir.ui.view,arch_db:nuqtapass_loyalty_website_sale.res_config_settings_view_form_nuqtapass_website
+msgid "NuqtaPass branch"
+msgstr "فرع NuqtaPass"
+
+#. module: nuqtapass_loyalty_website_sale
+#: model:ir.model.fields,field_description:nuqtapass_loyalty_website_sale.field_res_config_settings__website_nuqtapass_branch
+msgid "NuqtaPass branch (online store)"
+msgstr "فرع NuqtaPass (المتجر الإلكتروني)"
+
+#. module: nuqtapass_loyalty_website_sale
+#: model:ir.model,name:nuqtapass_loyalty_website_sale.model_nuqtapass_sync
+#: model:ir.model.fields,field_description:nuqtapass_loyalty_website_sale.field_sale_order__nuqtapass_sync_ids
+#: model:ir.ui.menu,name:nuqtapass_loyalty_website_sale.menu_nuqtapass_sync_website
+msgid "NuqtaPass sync"
+msgstr "مزامنة NuqtaPass"
+
+#. module: nuqtapass_loyalty_website_sale
+#: model:ir.actions.server,name:nuqtapass_loyalty_website_sale.ir_cron_nuqtapass_scan_ir_actions_server
+msgid "NuqtaPass: find online orders paid by invoice"
+msgstr "NuqtaPass: دوّر على طلبات المتجر الإلكتروني المدفوعة بفاتورة"
+
+#. module: nuqtapass_loyalty_website_sale
+#: model:ir.model.fields,field_description:nuqtapass_loyalty_website_sale.field_nuqtapass_sync__sale_order_id
+msgid "Online order"
+msgstr "طلب المتجر الإلكتروني"
+
+#. module: nuqtapass_loyalty_website_sale
+#: model:ir.model,name:nuqtapass_loyalty_website_sale.model_payment_transaction
+msgid "Payment Transaction"
+msgstr "معاملة الدفع"
+
+#. module: nuqtapass_loyalty_website_sale
+#: model_terms:ir.ui.view,arch_db:nuqtapass_loyalty_website_sale.view_order_form_nuqtapass
+msgid "Resend"
+msgstr "أعد الإرسال"
+
+#. module: nuqtapass_loyalty_website_sale
+#: model:ir.model,name:nuqtapass_loyalty_website_sale.model_sale_order
+msgid "Sales Order"
+msgstr "أمر البيع"
+
+#. module: nuqtapass_loyalty_website_sale
+#: model:ir.model,name:nuqtapass_loyalty_website_sale.model_website
+msgid "Website"
+msgstr "الموقع الإلكتروني"
+
+#. module: nuqtapass_loyalty_website_sale
+#: model_terms:ir.ui.view,arch_db:nuqtapass_loyalty_website_sale.res_config_settings_view_form_nuqtapass_website
+msgid ""
+"Which NuqtaPass branch this website's orders count for. Leave empty for "
+"'Odoo online'."
+msgstr ""
+"أي فرع في NuqtaPass تنحسب له طلبات هالموقع. خلّه فاضي عشان تنحسب على «Odoo "
+"online»."
+
+#. module: nuqtapass_loyalty_website_sale
+#: model_terms:ir.ui.view,arch_db:nuqtapass_loyalty_website_sale.res_config_settings_view_form_nuqtapass_website
+msgid "e.g. Online"
+msgstr "مثلاً: أونلاين"

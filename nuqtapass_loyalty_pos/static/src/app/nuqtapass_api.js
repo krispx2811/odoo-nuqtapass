@@ -66,19 +66,24 @@ export function cardTitle(card) {
     }
 }
 
-/** A Part 1 PosCard's one line: where it stands. */
+function usesLeft(n) {
+    // English needs "1 use left"; Arabic reads "label: number", so every count is right in both.
+    return n === 1 ? _t("1 use left") : _t("%(uses)s uses left", { uses: n });
+}
+
+/** A Part 1 PosCard's one line: where it stands. The dialog shows it inside <bdi> so numbers keep their order. */
 export function cardLine(card) {
     switch (card.type) {
         case "STAMPS":
             return _t("%(stamps)s of %(required)s stamps", { stamps: card.stamps, required: card.stampsRequired });
         case "POINTS":
-            return _t("%(points)s points", { points: card.points });
+            return card.points === 1 ? _t("1 point") : _t("%(points)s points", { points: card.points });
         case "PREPAID":
             return _t("Balance: %(balance)s", { balance: card.balance });
         case "PACK":
-            return _t("%(uses)s uses left", { uses: card.packUses });
+            return usesLeft(card.packUses);
         default:
-            return _t("%(uses)s uses left", { uses: card.voucher?.usesLeft ?? 0 });
+            return usesLeft(card.voucher?.usesLeft ?? 0);
     }
 }
 
