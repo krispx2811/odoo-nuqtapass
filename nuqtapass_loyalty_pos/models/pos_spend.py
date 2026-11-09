@@ -1,6 +1,10 @@
+import logging
 import re
 
 from odoo import api, fields, models
+
+_logger = logging.getLogger(__name__)
+REWARD_XMLID = "nuqtapass_loyalty_pos.product_nuqtapass_reward"
 
 # One use per kind for an order (NuqtaPass: points, credit, pack and reward once each; a voucher once per voucher card).
 KINDS = ("points", "credit", "pack", "reward", "voucher")
@@ -28,18 +32,55 @@ class PosConfig(models.Model):
         "product.product", "NuqtaPass reward product", compute="_compute_nuqtapass_reward_product_id")
 
     def _compute_nuqtapass_reward_product_id(self):
-        product = self._nuqtapass_reward_product()
+        product = self.env.ref(REWARD_XMLID, raise_if_not_found=False) or self.env["product.product"]
         for config in self:
             config.nuqtapass_reward_product_id = product
 
     # ── what the module adds to the till ──────────────────────────────
     @api.model
     def _nuqtapass_reward_product(self):
-        return self.env.ref("nuqtapass_loyalty_pos.product_nuqtapass_reward", raise_if_not_found=False) \
-            or self.env["product.product"]
+        """The till's NuqtaPass lines' product (points off, a pack use, a free item): a service with no tax of its own,
+        loaded by the till as a special product (so it is not in the product list).
+
+        Made here at run time, once, rather than as XML data: an upgrade loads this module before modules it doesn't
+        depend on (e.g. `sale`), and their required product fields would stay empty.
+        """
+        product = self.env.ref(REWARD_XMLID, raise_if_not_found=False)
+        if product:
+            return product
+        env = self.sudo().env
+        product = env["product.product"].with_context(lang="en_US").create({
+            "name": "NuqtaPass reward",
+            "type": "service",
+            "list_price": 0.0,
+            "taxes_id": [(5, 0, 0)],
+            "supplier_taxes_id": [(5, 0, 0)],
+            "available_in_pos": True,
+            "sale_ok": True,
+            "purchase_ok": False,
+            "default_code": "NUQTAPASS",
+            "company_id": False,
+        })
+        module, name = REWARD_XMLID.split(".")
+        env["ir.model.data"].create({"module": module, "name": name, "model": "product.product",
+                                     "res_id": product.id, "noupdate": True})
+        return product.with_env(self.env)
+
+    def open_ui(self):
+        # Opening the till: make sure it has what NuqtaPass needs (an upgrade of an older version has neither yet).
+        if self.env["nuqtapass.sync"].sudo()._channel_enabled("till"):
+            try:
+                with self.env.cr.savepoint():
+                    self._nuqtapass_reward_product()
+                    for company in self.company_id:
+                        self.env["pos.payment.method"]._nuqtapass_credit_method(company)
+            except Exception:  # the till must open even if this fails; NuqtaPass lines then can't be added
+                _logger.exception("NuqtaPass: could not prepare the till's NuqtaPass product or credit method")
+        return super().open_ui()
 
     def _get_special_products(self):
-        return super()._get_special_products() | self._nuqtapass_reward_product()
+        return super()._get_special_products() | (
+            self.env.ref(REWARD_XMLID, raise_if_not_found=False) or self.env["product.product"])
 
     @api.model_create_multi
     def create(self, vals_list):
