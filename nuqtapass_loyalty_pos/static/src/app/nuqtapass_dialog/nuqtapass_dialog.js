@@ -39,6 +39,8 @@ export class NuqtaPassDialog extends Component {
         whatsapp: { type: String, optional: true },
         sms: { type: String, optional: true },
         onCustomer: { type: Function, optional: true },
+        // Called with each customer found (the reward-ready notice).
+        onFound: { type: Function, optional: true },
         close: Function,
     };
     static defaultProps = { startingQuery: "", forOrder: false, cardUrl: "", whatsapp: "", sms: "" };
@@ -144,6 +146,7 @@ export class NuqtaPassDialog extends Component {
         this.state.query = "";
         this.state.welcome = res.walletAdded ? null : welcomeWithQr(res.welcome);
         this.props.onCustomer?.(res.phone);
+        this.props.onFound?.(res);
     }
 
     async lookUp(query = this.state.query.trim()) {

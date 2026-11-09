@@ -19,6 +19,7 @@ import {
     totalWithoutPoints,
 } from "./nuqtapass_lines";
 import { NuqtaPassPointsBox } from "./points_box";
+import { alertReward } from "../open_window";
 
 /**
  * The payment screen's NuqtaPass panel: "what do you want to use?". Each of the customer's current cards with its one
@@ -32,7 +33,12 @@ export class NuqtaPassPayPanel extends Component {
 
     setup() {
         this.pos = usePos();
-        this.state = useState({ query: "", loading: false, error: "", result: null, credit: "", pick: {} });
+        // The reward-ready notice's card, when its button brought the cashier here.
+        const focus = this.props.order.uiState?.nuqtapassFocus || "";
+        if (focus) {
+            delete this.props.order.uiState.nuqtapassFocus;
+        }
+        this.state = useState({ query: "", loading: false, error: "", result: null, credit: "", pick: {}, focus });
         const phone = this.props.order.nuqtapass_phone || this.props.order.partner_id?.phone;
         if (phone) {
             this.lookUp(phone);
@@ -83,6 +89,18 @@ export class NuqtaPassPayPanel extends Component {
         if (prepaid) {
             this.state.credit = this.creditStart(prepaid).toFixed(this.decimals);
         }
+        if (this.state.focus) {
+            this.focusCard(this.state.focus);
+        }
+        alertReward(this.pos, this.order, res.cards, { onUse: (cardId) => this.focusCard(cardId) });
+    }
+
+    /** Point at a card (the reward-ready notice's): highlighted and scrolled into view. */
+    focusCard(cardId) {
+        this.state.focus = cardId;
+        requestAnimationFrame(() =>
+            document.querySelector(".o_nuqtapass_pay .o_nuqtapass_focus")?.scrollIntoView({ block: "nearest" })
+        );
     }
 
     changeCustomer() {
