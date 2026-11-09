@@ -17,8 +17,6 @@ export function openNuqtaPassWindow(pos, { query = "", result = null } = {}) {
             startingQuery: query,
             ...(result ? { startingResult: result } : {}),
             forOrder: open,
-            // Odoo 19: the till formats money with env.utils (20.0: pos.formatCurrency).
-            formatCurrency: (amount) => pos.env.utils.formatCurrency(amount),
             onCustomer: (phone) => {
                 if (open && phone) {
                     order.nuqtapass_phone = phone;

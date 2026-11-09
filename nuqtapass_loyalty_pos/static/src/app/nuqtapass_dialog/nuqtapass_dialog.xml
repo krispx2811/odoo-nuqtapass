@@ -28,20 +28,20 @@
                             <div class="o_nuqtapass_card_title small text-muted"><bdi t-out="this.cardTitle(card)"/></div>
                             <div class="o_nuqtapass_card_line fs-5 fw-semibold"><bdi t-out="this.cardLine(card)"/></div>
                         </div>
-                        <button t-if="card.type === 'STAMPS' and card.rewardReady" class="btn btn-primary btn-lg"
-                                t-att-disabled="this.state.loading"
-                                t-on-click="() => this.redeem(card, 'reward')">Give reward</button>
-                        <div t-if="card.type === 'POINTS' and card.points > 0" class="d-flex gap-2">
-                            <label class="visually-hidden" t-att-for="'o_nuqtapass_points_' + card.cardId">Points to use</label>
-                            <input t-att-id="'o_nuqtapass_points_' + card.cardId" type="number" min="1" step="1"
-                                   t-att-max="card.points" inputmode="numeric" dir="ltr"
-                                   class="form-control form-control-lg o_nuqtapass_points" t-model="state.points"/>
-                            <button class="btn btn-primary btn-lg text-nowrap" t-att-disabled="this.state.loading"
-                                    t-on-click="() => this.redeem(card, 'reward')">Use points</button>
+                        <t t-if="!this.order">
+                            <button t-if="card.type === 'STAMPS' and card.rewardReady" class="btn btn-primary btn-lg"
+                                    t-att-disabled="this.state.loading"
+                                    t-on-click="() => this.redeem(card, 'reward')">Give reward</button>
+                            <button t-if="card.type === 'VOUCHER' and card.voucher and card.voucher.usesLeft > 0"
+                                    class="btn btn-primary btn-lg" t-att-disabled="this.state.loading"
+                                    t-on-click="() => this.redeem(card, 'voucher')">Use voucher</button>
+                        </t>
+                        <div t-if="this.canUsePoints(card)" class="w-100">
+                            <NuqtaPassPointsBox card="card" currency="this.state.result.currency"
+                                                cap="this.state.result.limits and this.state.result.limits.pointsPerVisit"
+                                                maxValue="this.maxPointsValue" busy="this.state.loading"
+                                                onUse="(plan) => this.usePoints(card, plan)"/>
                         </div>
-                        <button t-if="card.type === 'VOUCHER' and card.voucher and card.voucher.usesLeft > 0"
-                                class="btn btn-primary btn-lg" t-att-disabled="this.state.loading"
-                                t-on-click="() => this.redeem(card, 'voucher')">Use voucher</button>
                     </div>
                 </t>
                 <div t-if="this.state.welcome" class="o_nuqtapass_qr text-center mt-3">
@@ -55,6 +55,9 @@
                            t-att-href="this.state.welcome.sms">Send by SMS</a>
                     </div>
                 </div>
+                <p t-if="this.atPaymentHint" class="o_nuqtapass_hint text-muted mt-2 mb-0">
+                    Use credit, packs, rewards and vouchers on the payment screen.
+                </p>
                 <p t-if="this.willEarn" class="o_nuqtapass_will_earn text-success fw-medium mt-3 mb-0" role="status">
                     <span aria-hidden="true">✓ </span><bdi t-out="this.willEarn"/>
                 </p>

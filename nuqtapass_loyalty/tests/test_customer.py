@@ -36,6 +36,7 @@ class TestCustomer(TransactionCase):
         self.assertEqual(clean["cards"][0], {
             "cardId": STAMP_CARD, "type": "STAMPS", "stamps": 6, "stampsRequired": 6, "rewardReady": True,
             "points": 0, "pointsValue": 0, "balance": 0, "packUses": 0, "voucher": None, "current": True,
+            "pointsPerUnit": None, "usesLeft": 0, "unit": None,
         })
         self.assertEqual(clean["cards"][1]["voucher"], {"id": VOUCHER, "title": "Free coffee", "usesLeft": 1})
         self.assertTrue(clean["walletAdded"])
@@ -105,5 +106,34 @@ class TestCustomer(TransactionCase):
         self.assertEqual([c["cardId"] for c in current_cards(cards)], [STAMP_CARD, VOUCHER_CARD])
 
     def test_handles_missing_and_bad_shapes(self):
-        self.assertEqual(clean_customer(None), {"cards": [], "walletAdded": True, "welcome": None})
+        self.assertEqual(clean_customer(None), {"cards": [], "walletAdded": True, "welcome": None, "currency": None,
+                                                "limits": {"pointsPerVisit": None}})
         self.assertEqual(clean_customer({"cards": "nope"})["cards"], [])
+
+    # ── what the payment panel needs (added 2026-11-09: uses at payment) ─
+    def test_keeps_currency_limits_and_card_money_fields(self):
+        points = {"cardId": "aaaaaaaa-2222-4222-8222-222222222222", "type": "POINTS", "points": 1404,
+                  "pointsValue": 42.12, "pointsPerUnit": 33.333333, "usesLeft": 0, "unit": None}
+        pack = {"cardId": "bbbbbbbb-2222-4222-8222-222222222222", "type": "PACK", "packUses": 4, "usesLeft": 4,
+                "unit": "visits", "pointsPerUnit": None}
+        clean = clean_customer(part1_answer(
+            currency={"code": "OMR", "symbol": "OMR", "decimals": 3},
+            limits={"pointsPerVisit": {"value": 10, "points": 333}}, cards=[points, pack]))
+        self.assertEqual(clean["currency"], {"code": "OMR", "symbol": "OMR", "decimals": 3})
+        self.assertEqual(clean["limits"], {"pointsPerVisit": {"value": 10, "points": 333}})
+        self.assertEqual((clean["cards"][0]["pointsPerUnit"], clean["cards"][0]["unit"]), (33.333333, None))
+        self.assertEqual((clean["cards"][1]["usesLeft"], clean["cards"][1]["unit"], clean["cards"][1]["pointsPerUnit"]),
+                         (4, "visits", None))
+
+    def test_bad_currency_and_limits_are_dropped(self):
+        for bad in ({"code": "<b>", "symbol": "OMR", "decimals": 3}, {"code": "OMR", "symbol": "OMR", "decimals": 9},
+                    {"code": "OMR", "decimals": True}, "OMR", None):
+            with self.subTest(bad=bad):
+                self.assertIsNone(clean_customer(part1_answer(currency=bad))["currency"])
+        clean = clean_customer(part1_answer(limits={"pointsPerVisit": {"value": "10", "points": -1}}))
+        self.assertEqual(clean["limits"], {"pointsPerVisit": None})
+        self.assertEqual(clean_customer(part1_answer())["limits"], {"pointsPerVisit": None})
+        card = dict(part1_answer()["cards"][0], pointsPerUnit="x", unit="v" * 500)
+        cleaned = clean_customer(part1_answer(cards=[card]))["cards"][0]
+        self.assertIsNone(cleaned["pointsPerUnit"])
+        self.assertEqual(len(cleaned["unit"]), 40)

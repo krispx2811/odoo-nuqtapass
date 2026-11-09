@@ -1,4 +1,9 @@
+from unittest.mock import patch
+
 from odoo.tests import TransactionCase, tagged
+from odoo.tools.translate import code_translations
+
+from odoo.addons.nuqtapass_loyalty.lib.client import ApiResult, NuqtaPassClient
 
 
 @tagged("post_install", "-at_install", "nuqtapass")
@@ -24,3 +29,40 @@ class TestPosArabic(TransactionCase):
     def test_card_refusal_in_arabic(self):
         config = self.config.with_context(lang="ar_001")
         self.assertEqual(config._nuqtapass_card_refused()["message"], "هالبطاقة مو من هالمحل.")
+
+    # ── uses at payment (2026-11-09) ──────────────────────────────────
+    def test_spend_refusals_in_arabic(self):
+        self.env["ir.config_parameter"].sudo().set_param("nuqtapass_loyalty.api_key", "sip_test")
+        self.env.company.country_id = self.env.ref("base.om")
+        config = self.config.with_context(lang="ar_001")
+        use = {"use": "points", "card_id": "aaaaaaaa-2222-4222-8222-222222222222", "points": 167,
+               "label": "نقاط NuqtaPass"}
+        down = ApiResult(False, None, None, "Could not reach NuqtaPass", "NETWORK", True)
+        with patch.object(NuqtaPassClient, "redeem", return_value=down):
+            res = config._nuqtapass_spend("261-1-000042", "+96891234567", [use])
+        self.assertEqual(res["message"], "ما قدرنا نوصل NuqtaPass. شيل بنود NuqtaPass عشان تكمل الدفع بدونها.")
+        no = ApiResult(False, 400, None, "ما عنده نقاط كافية", "POINTS_TOO_SMALL", False)
+        with patch.object(NuqtaPassClient, "redeem", return_value=no):
+            res = config._nuqtapass_spend("261-1-000042", "+96891234567", [use])
+        self.assertEqual(res["message"], "نقاط NuqtaPass: ما عنده نقاط كافية. شيل هالبند عشان تكمل الدفع بدونه.")
+
+    def test_till_words_in_arabic(self):
+        messages = {m["id"]: m["string"] for m in
+                    code_translations.get_web_translations("nuqtapass_loyalty_pos", "ar_001")["messages"]}
+        expected = {
+            "%(points)s points · worth %(value)s": "%(points)s نقطة · قيمتها %(value)s",
+            "= %(points)s points": "= %(points)s نقطة",
+            "NuqtaPass points": "نقاط NuqtaPass",
+            "Use points": "اصرف النقاط",
+            "Use credit": "ادفع من الرصيد",
+            "Reward: free %(item)s": "مكافأة: %(item)s مجاناً",
+            "Service pack (1 use)": "باقة الخدمات (استخدام واحد)",
+            "Remove NuqtaPass lines": "شيل بنود NuqtaPass",
+            "Nothing is used until you validate.": "ما ينصرف شي إلا لما تأكد الدفع.",
+        }
+        for english, arabic in expected.items():
+            self.assertEqual(messages.get(english), arabic, english)
+
+    def test_credit_method_name_in_arabic(self):
+        self.assertEqual(self.env["pos.payment.method"].with_context(lang="ar_001")._fields["nuqtapass_credit"]
+                         .get_description(self.env(context={"lang": "ar_001"}))["string"], "رصيد NuqtaPass")

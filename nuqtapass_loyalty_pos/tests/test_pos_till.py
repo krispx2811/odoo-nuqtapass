@@ -51,9 +51,23 @@ class TestPosTill(TestPoSCommon):
         mocked.assert_called_once_with("+96891234567")
         self.assertTrue(res["ok"])
         self.assertEqual(res["phone"], "+96891234567")
-        self.assertEqual(res["cards"], [dict(STAMPS, current=True)])
+        self.assertEqual(res["cards"], [dict(STAMPS, current=True, pointsPerUnit=None, usesLeft=0, unit=None)])
         self.assertTrue(res["walletAdded"])
         self.assertIsNone(res["welcome"])
+
+    def test_lookup_answers_nuqtapass_currency_not_the_till_currency(self):
+        # Kareem, 2026-11-09: a till set up in US dollars still shows an Omani shop's NuqtaPass amounts in OMR.
+        self.assertNotEqual(self.config.currency_id.name, "OMR")
+        points = {"cardId": POINTS_CARD, "type": "POINTS", "points": 1404, "pointsValue": 42.12,
+                  "pointsPerUnit": 33.333333, "current": True}
+        answer = ok({"phone": "+96891234567", "walletAdded": True, "cards": [points],
+                     "currency": {"code": "OMR", "symbol": "OMR", "decimals": 3},
+                     "limits": {"pointsPerVisit": {"value": 10, "points": 333}}})
+        with patch.object(NuqtaPassClient, "customer", return_value=answer):
+            res = self.config._nuqtapass_lookup("91234567")
+        self.assertEqual(res["currency"], {"code": "OMR", "symbol": "OMR", "decimals": 3})
+        self.assertEqual(res["limits"], {"pointsPerVisit": {"value": 10, "points": 333}})
+        self.assertEqual((res["cards"][0]["pointsValue"], res["cards"][0]["pointsPerUnit"]), (42.12, 33.333333))
 
     # ── look-up by the Wallet card's QR (its card id) ─────────────────
     def test_lookup_by_card_uses_the_card_and_answers_its_phone(self):

@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 20.0-20261102\n"
+"Project-Id-Version: Odoo Server 19.0-20261102\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-09 14:10+0000\n"
-"PO-Revision-Date: 2026-11-09 14:10+0000\n"
+"POT-Creation-Date: 2026-11-09 18:10+0000\n"
+"PO-Revision-Date: 2026-11-09 18:10+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: ar\n"
@@ -93,6 +93,12 @@ msgstr "أنشئ بواسطة"
 #: model:ir.model.fields,field_description:nuqtapass_loyalty.field_nuqtapass_sync__create_date
 msgid "Created on"
 msgstr "أنشئ في"
+
+#. module: nuqtapass_loyalty
+#. odoo-python
+#: code:addons/nuqtapass_loyalty/models/nuqtapass_sync.py:0
+msgid "Credit given back: %(n)s"
+msgstr "الرصيد اللي رجع للعميل: %(n)s"
 
 #. module: nuqtapass_loyalty
 #: model:ir.model.fields,field_description:nuqtapass_loyalty.field_nuqtapass_sync__currency_id
@@ -209,11 +215,6 @@ msgid "NuqtaPass"
 msgstr "NuqtaPass"
 
 #. module: nuqtapass_loyalty
-#: model:ir.module.module,shortdesc:base.module_nuqtapass_loyalty
-msgid "NuqtaPass Loyalty"
-msgstr "ولاء NuqtaPass"
-
-#. module: nuqtapass_loyalty
 #: model:ir.model.fields,field_description:nuqtapass_loyalty.field_nuqtapass_sync__response_json
 msgid "NuqtaPass answer"
 msgstr "رد NuqtaPass"
@@ -260,6 +261,17 @@ msgstr "افتح سجل المزامنة"
 #: model:ir.model.fields,field_description:nuqtapass_loyalty.field_nuqtapass_sync__order_ref
 msgid "Order"
 msgstr "الطلب"
+
+#. module: nuqtapass_loyalty
+#: model:ir.model.fields,field_description:nuqtapass_loyalty.field_nuqtapass_sync__order_amount
+msgid "Order amount"
+msgstr "مبلغ الطلب"
+
+#. module: nuqtapass_loyalty
+#. odoo-python
+#: code:addons/nuqtapass_loyalty/models/nuqtapass_sync.py:0
+msgid "Pack uses given back: %(n)s"
+msgstr "استخدامات الباقة اللي رجعت: %(n)s"
 
 #. module: nuqtapass_loyalty
 #: model:ir.model.fields,field_description:nuqtapass_loyalty.field_nuqtapass_sync__occurred_at
@@ -315,6 +327,12 @@ msgstr "نقاط ما رجعت لأنها انصرفت: %(n)s"
 #. module: nuqtapass_loyalty
 #. odoo-python
 #: code:addons/nuqtapass_loyalty/models/nuqtapass_sync.py:0
+msgid "Points given back: %(n)s"
+msgstr "النقاط اللي رجعت للعميل: %(n)s"
+
+#. module: nuqtapass_loyalty
+#. odoo-python
+#: code:addons/nuqtapass_loyalty/models/nuqtapass_sync.py:0
 msgid "Points given: %(n)s"
 msgstr "النقاط اللي انعطت: %(n)s"
 
@@ -335,6 +353,12 @@ msgstr "مرتجع"
 #: model_terms:ir.ui.view,arch_db:nuqtapass_loyalty.nuqtapass_sync_view_list
 msgid "Resend"
 msgstr "أعد الإرسال"
+
+#. module: nuqtapass_loyalty
+#. odoo-python
+#: code:addons/nuqtapass_loyalty/models/nuqtapass_sync.py:0
+msgid "Reward given back"
+msgstr "رجعت المكافأة للعميل"
 
 #. module: nuqtapass_loyalty
 #: model:ir.model.fields.selection,name:nuqtapass_loyalty.selection__nuqtapass_sync__kind__sale
@@ -365,13 +389,6 @@ msgid "Stamps already used, not taken back: %(n)s"
 msgstr "أختام ما رجعت لأنها انستخدمت في مكافأة: %(n)s"
 
 #. module: nuqtapass_loyalty
-#: model:ir.module.module,summary:base.module_nuqtapass_loyalty
-msgid ""
-"Stamps and points on Apple Wallet and Google Wallet cards for every paid "
-"order"
-msgstr "أختام ونقاط على بطاقات Apple Wallet و Google Wallet مع كل طلب مدفوع"
-
-#. module: nuqtapass_loyalty
 #. odoo-python
 #: code:addons/nuqtapass_loyalty/models/nuqtapass_sync.py:0
 msgid "Stamps given: %(n)s"
@@ -399,6 +416,12 @@ msgid "Test connection"
 msgstr "جرّب الربط"
 
 #. module: nuqtapass_loyalty
+#. odoo-python
+#: code:addons/nuqtapass_loyalty/models/nuqtapass_sync.py:0
+msgid "The stamp card is no longer active: the reward was not given back"
+msgstr "بطاقة الأختام ما عادت فعّالة، فالمكافأة ما رجعت"
+
+#. module: nuqtapass_loyalty
 #: model:ir.model.constraint,message:nuqtapass_loyalty.constraint_nuqtapass_sync_dedupe_unique
 msgid "This order or refund is already queued for NuqtaPass."
 msgstr "هالطلب أو المرتجع موجود من قبل في قائمة الإرسال إلى NuqtaPass."
@@ -408,6 +431,17 @@ msgstr "هالطلب أو المرتجع موجود من قبل في قائمة 
 #: model_terms:ir.ui.view,arch_db:nuqtapass_loyalty.nuqtapass_sync_view_search
 msgid "Till"
 msgstr "الكاشير"
+
+#. module: nuqtapass_loyalty
+#: model:ir.model.fields,field_description:nuqtapass_loyalty.field_nuqtapass_sync__return_uses
+msgid "Uses given back"
+msgstr "اللي رجع من الاستخدامات"
+
+#. module: nuqtapass_loyalty
+#. odoo-python
+#: code:addons/nuqtapass_loyalty/models/nuqtapass_sync.py:0
+msgid "Vouchers given back: %(n)s"
+msgstr "القسائم اللي رجعت: %(n)s"
 
 #. module: nuqtapass_loyalty
 #: model_terms:ir.ui.view,arch_db:nuqtapass_loyalty.nuqtapass_sync_view_search

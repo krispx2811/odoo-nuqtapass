@@ -72,3 +72,10 @@ class TestArabicShown(TransactionCase):
             "kind": "sale", "channel": "till", "order_ref": "R2", "dedupe_key": "sale|R2|", "phone": "9417872",
             "occurred_at": "2026-11-09 10:00:00", "state": "failed", "phone_invalid": True})
         self.assertEqual(rec.summary, "رقم الجوال شكله غلط: 9417872")
+
+    def test_refund_give_backs_in_arabic(self):
+        rec = self.ar["nuqtapass.sync"].sudo().create({
+            "kind": "refund", "channel": "till", "order_ref": "R3", "refund_ref": "R3-1", "dedupe_key": "refund|R3|R3-1",
+            "occurred_at": "2026-11-09 10:00:00", "state": "done",
+            "response_json": '{"result": {"pointsReturned": 167, "rewardReturned": true}}'})
+        self.assertEqual(rec.summary, "النقاط اللي رجعت للعميل: 167 · رجعت المكافأة للعميل")

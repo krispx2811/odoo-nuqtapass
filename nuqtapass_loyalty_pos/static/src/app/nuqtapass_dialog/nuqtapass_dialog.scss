@@ -66,3 +66,47 @@
         height: clamp(56px, 10vmin, 110px);
     }
 }
+
+// The payment screen's NuqtaPass panel: the same strips as the window, under the payment methods.
+.o_nuqtapass_pay {
+    text-align: start;
+    .o_nuqtapass_card {
+        padding: 0.75rem 1rem;
+        background-color: var(--bs-tertiary-bg, rgba(0, 0, 0, 0.03));
+        border-inline-start: 4px solid var(--bs-primary);
+    }
+    .o_nuqtapass_card_line,
+    .o_nuqtapass_who,
+    .o_nuqtapass_applied {
+        font-variant-numeric: tabular-nums;
+    }
+    .o_nuqtapass_query {
+        text-align: start;
+        unicode-bidi: plaintext;
+    }
+}
+
+// The points and credit boxes: an amount in NuqtaPass's currency, then the points it takes, live.
+.o_nuqtapass_money_box,
+.o_nuqtapass_pay {
+    .o_nuqtapass_amount {
+        inline-size: 11rem;
+        flex: 0 0 auto;
+        input {
+            text-align: end;
+            font-variant-numeric: tabular-nums;
+        }
+    }
+    .o_nuqtapass_live {
+        font-size: 1.125rem;
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
+    }
+}
+
+.o_nuqtapass_pay_wide {
+    inline-size: 34rem;
+    max-inline-size: 100%;
+    align-self: center;
+    flex-shrink: 0;
+}

@@ -17,6 +17,9 @@ PARAM_BASE_URL = "nuqtapass_loyalty.base_url"
 CRON_XMLID = "nuqtapass_loyalty.ir_cron_nuqtapass_send"
 # What is kept of a Part 1 PosAnswer's `result` (no card id, links or balances).
 RESULT_KEYS = ("cardType", "stamps", "points", "shortfall", "reason")
+# What a refund gave back of the order's uses at payment (top level of a Part 1 refund answer).
+RETURNED_KEYS = ("pointsReturned", "creditReturned", "usesReturned", "rewardReturned", "vouchersReturned",
+                 "rewardNotReturned")
 
 
 class NuqtapassSync(models.Model):
@@ -42,6 +45,10 @@ class NuqtapassSync(models.Model):
         "Phone looks wrong", readonly=True,
         help="Not a valid mobile number for its country, so it is not sent. Fix the phone and press Resend.")
     amount = fields.Monetary(readonly=True, currency_field="currency_id")
+    # Refunds: the whole order's paid amount (NuqtaPass's share basis) and what the refunded lines gave back of the
+    # order's uses at payment, as Part 1's `returnUses` JSON ({points, credit, pack, reward, vouchers}).
+    order_amount = fields.Monetary("Order amount", readonly=True, currency_field="currency_id")
+    return_uses = fields.Text("Uses given back", readonly=True)
     currency_id = fields.Many2one("res.currency", default=lambda s: s.env.company.currency_id, readonly=True)
     occurred_at = fields.Datetime("Paid / refunded at", required=True, readonly=True)
     branch = fields.Char(readonly=True)
@@ -153,13 +160,25 @@ class NuqtapassSync(models.Model):
             if self.customer_name:
                 body["customerName"] = self.customer_name
             return body
-        return {
+        body = {
             "source": "odoo",
             "orderRef": self.order_ref,
             "refundRef": self.refund_ref,
             "amount": amount,
             "refundedAt": self._iso(self.occurred_at),
+            # Always named, {} when no use was refunded: NuqtaPass then gives back exactly what is named.
+            "returnUses": self._return_uses(),
         }
+        if self.order_amount and self.order_amount > 0:
+            body["orderAmount"] = round(self.order_amount, digits)
+        return body
+
+    def _return_uses(self):
+        try:
+            uses = json.loads(self.return_uses or "{}")
+        except ValueError:
+            uses = {}
+        return uses if isinstance(uses, dict) else {}
 
     # ── sending ───────────────────────────────────────────────────────
     def _send_one(self, now=None):
@@ -197,7 +216,10 @@ class NuqtapassSync(models.Model):
                 "response_json": json.dumps({
                     "status": data.get("status"),
                     "duplicate": bool(data.get("duplicate")),
-                    "result": {key: answer[key] for key in RESULT_KEYS if key in answer},
+                    "result": {
+                        **{key: answer[key] for key in RESULT_KEYS if key in answer},
+                        **{key: data[key] for key in RETURNED_KEYS if key in data},
+                    },
                 }),
             })
             return
@@ -326,8 +348,27 @@ class NuqtapassSync(models.Model):
                 parts.append(_("Stamps already used, not taken back: %(n)s", n=shortfall["stamps"]))
             if shortfall.get("points"):
                 parts.append(_("Points already used, not taken back: %(n)s", n=shortfall["points"]))
+            parts += self._returned_parts(result)
             if not parts:
                 parts.append(_("Sent, nothing to take back"))
         if data.get("duplicate"):
             parts.append(_("(NuqtaPass already had it)"))
         return " · ".join(str(p) for p in parts)
+
+    def _returned_parts(self, result):
+        """A refund's give-backs of the order's uses at payment (points, credit, pack uses, a reward, vouchers)."""
+        _ = self.env._
+        parts = []
+        if result.get("pointsReturned"):
+            parts.append(_("Points given back: %(n)s", n=result["pointsReturned"]))
+        if result.get("creditReturned"):
+            parts.append(_("Credit given back: %(n)s", n=result["creditReturned"]))
+        if result.get("usesReturned"):
+            parts.append(_("Pack uses given back: %(n)s", n=result["usesReturned"]))
+        if result.get("rewardReturned"):
+            parts.append(_("Reward given back"))
+        if result.get("vouchersReturned"):
+            parts.append(_("Vouchers given back: %(n)s", n=result["vouchersReturned"]))
+        if result.get("rewardNotReturned"):
+            parts.append(_("The stamp card is no longer active: the reward was not given back"))
+        return parts

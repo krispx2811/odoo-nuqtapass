@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-name="nuqtapass_loyalty_pos.PointsBox">
+        <form class="o_nuqtapass_money_box" t-on-submit.prevent="() => this.use()">
+            <div class="d-flex align-items-center gap-2">
+                <label class="visually-hidden" t-att-for="this.inputId">Amount to take off</label>
+                <!-- The amount reads left to right in the Arabic till too; the currency sits after it in reading order. -->
+                <div class="input-group input-group-lg o_nuqtapass_amount">
+                    <input t-att-id="this.inputId" type="text" inputmode="decimal" autocomplete="off" dir="ltr"
+                           class="form-control o_nuqtapass_amount_input" t-model="state.amount"/>
+                    <span class="input-group-text" dir="auto" t-out="this.currencyLabel"/>
+                </div>
+                <button type="submit" class="btn btn-primary btn-lg text-nowrap"
+                        t-att-disabled="this.props.busy or !this.plan.points">Use points</button>
+            </div>
+            <p class="o_nuqtapass_live mb-0 mt-1" role="status" aria-live="polite"><bdi t-out="this.liveLine"/></p>
+        </form>
+    </t>
+</templates>

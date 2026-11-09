@@ -5,16 +5,46 @@ The cards keep Part 1's field names. Besides the cards: whether the customer's c
 must start with the prefix NuqtaPass uses for it, or it is dropped.
 """
 
+import re
+
 CARD_TYPES = ("STAMPS", "POINTS", "PREPAID", "PACK", "VOUCHER")
 NUMBER_KEYS = ("stamps", "stampsRequired", "points", "pointsValue", "balance", "packUses")
 CARD_URL_PREFIX = "https://nuqtapass.com/"
 WHATSAPP_PREFIX = "https://api.whatsapp.com/"
 SMS_PREFIX = "sms:"
 MAX_LINK = 2000
+MAX_UNIT = 40
+CURRENCY_CODE = re.compile(r"^[A-Z]{3}$")
 
 
 def _number(value):
     return value if isinstance(value, (int, float)) and not isinstance(value, bool) else 0
+
+
+def _number_or_none(value):
+    return value if isinstance(value, (int, float)) and not isinstance(value, bool) and value >= 0 else None
+
+
+def _currency(value):
+    """The shop's currency at NuqtaPass ({code, symbol, decimals}): what every NuqtaPass amount on the till shows."""
+    if not isinstance(value, dict) or not isinstance(value.get("code"), str) or not CURRENCY_CODE.match(value["code"]):
+        return None
+    decimals = value.get("decimals")
+    if not isinstance(decimals, int) or isinstance(decimals, bool) or not 0 <= decimals <= 3:
+        return None
+    symbol = value.get("symbol")
+    symbol = symbol.strip()[:8] if isinstance(symbol, str) and symbol.strip() else value["code"]
+    return {"code": value["code"], "symbol": symbol, "decimals": decimals}
+
+
+def _limits(value):
+    """The shop's per-visit points cap (money and whole points), or None."""
+    cap = value.get("pointsPerVisit") if isinstance(value, dict) else None
+    if isinstance(cap, dict):
+        money, points = _number_or_none(cap.get("value")), cap.get("points")
+        if money is not None and isinstance(points, int) and not isinstance(points, bool) and points >= 0:
+            return {"pointsPerVisit": {"value": money, "points": points}}
+    return {"pointsPerVisit": None}
 
 
 def _link(value, prefix):
@@ -40,6 +70,11 @@ def _card(card):
     # The card the till acts on for its type; cards from earlier programs are false. Answers from before the flag
     # have none: every card is then current.
     clean["current"] = card.get("current") is not False
+    # For the payment panel: points per 1 unit of money (None: points are worth nothing), a pack's uses and unit.
+    clean["pointsPerUnit"] = _number_or_none(card.get("pointsPerUnit")) or None
+    clean["usesLeft"] = _number(card.get("usesLeft"))
+    unit = card.get("unit")
+    clean["unit"] = unit.strip()[:MAX_UNIT] if isinstance(unit, str) and unit.strip() else None
     return clean
 
 
@@ -69,4 +104,6 @@ def clean_customer(data):
             "whatsapp": _link(welcome.get("whatsapp"), WHATSAPP_PREFIX),
             "sms": _link(welcome.get("sms"), SMS_PREFIX),
         } if show_qr else None,
+        "currency": _currency(data.get("currency")),
+        "limits": _limits(data.get("limits")),
     }

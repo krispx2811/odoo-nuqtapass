@@ -24,6 +24,11 @@ class NuqtaPassPosController(http.Controller):
     def redeem(self, config_id, phone, card_id, action, voucher_id=None, points=None):
         return self._config(config_id)._nuqtapass_redeem(phone, card_id, action, voucher_id, points)
 
+    @http.route("/nuqtapass_loyalty/pos/spend", type="jsonrpc", auth="user", methods=["POST"])
+    def spend(self, config_id, order_ref, phone, uses):
+        """Validate on the till: spend the order's NuqtaPass uses (points, credit, pack, reward, voucher) once."""
+        return self._config(config_id)._nuqtapass_spend(order_ref, phone, uses)
+
     @http.route("/nuqtapass_loyalty/pos/after_payment", type="jsonrpc", auth="user", methods=["POST"])
     def after_payment(self, config_id, order_id):
         return self._config(config_id)._nuqtapass_after_payment(order_id)

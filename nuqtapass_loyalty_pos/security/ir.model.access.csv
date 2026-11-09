@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_nuqtapass_pos_use_user,nuqtapass.pos.use user,model_nuqtapass_pos_use,point_of_sale.group_pos_user,1,0,0,0
+access_nuqtapass_pos_use_manager,nuqtapass.pos.use manager,model_nuqtapass_pos_use,point_of_sale.group_pos_manager,1,0,0,0
