@@ -58,6 +58,11 @@ export function redeemOnCard(configId, phone, cardId, action, { voucherId = null
     });
 }
 
+/** A POS manager's correction (Part 1 POST /adjust): { ok, message } or { ok: false, error, message }. */
+export function adjustCard(configId, { card_id, action, delta, reason }) {
+    return call("/nuqtapass_loyalty/pos/adjust", { config_id: configId, card_id, action, delta, reason });
+}
+
 /** Validate: spend the order's uses at NuqtaPass, once per order: { ok, used } or { ok: false, error, index, message }. */
 export function spendUses(configId, orderRef, phone, uses) {
     return call("/nuqtapass_loyalty/pos/spend", { config_id: configId, order_ref: orderRef, phone, uses });

@@ -42,6 +42,14 @@
                                     class="btn btn-primary btn-lg" t-att-disabled="this.state.loading"
                                     t-on-click="() => this.redeem(card, 'voucher')">Use voucher</button>
                         </t>
+                        <button t-if="this.canCorrect(card) and this.state.correcting !== card.cardId" type="button"
+                                class="btn btn-link btn-sm p-0 o_nuqtapass_correct_link"
+                                t-on-click="() => this.startCorrect(card)">Correct</button>
+                        <div t-if="this.state.correcting === card.cardId" class="w-100">
+                            <NuqtaPassCorrectBox card="card" busy="this.state.loading"
+                                                 onSave="(body) => this.saveCorrection(body)"
+                                                 onCancel="() => (this.state.correcting = '')"/>
+                        </div>
                         <div t-if="this.canUsePoints(card)" class="w-100">
                             <NuqtaPassPointsBox card="card" currency="this.state.result.currency"
                                                 cap="this.state.result.limits and this.state.result.limits.pointsPerVisit"

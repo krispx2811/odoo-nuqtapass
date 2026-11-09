@@ -136,3 +136,13 @@
     background-color: rgba(var(--bs-primary-rgb, 113, 75, 103), 0.08);
     box-shadow: 0 0 0 1px rgba(var(--bs-primary-rgb, 113, 75, 103), 0.35);
 }
+
+// A POS manager's correction: under a hairline inside the card's strip, so it reads as part of that card.
+.o_nuqtapass_dialog .o_nuqtapass_correct {
+    border-block-start: 1px solid var(--bs-border-color-translucent, rgba(0, 0, 0, 0.12));
+    .o_nuqtapass_fix_points {
+        max-inline-size: 11rem;
+        text-align: start;
+        font-variant-numeric: tabular-nums;
+    }
+}

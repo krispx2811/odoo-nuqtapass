@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-name="nuqtapass_loyalty_pos.CorrectBox">
+        <form class="o_nuqtapass_correct mt-2 pt-2" t-on-submit.prevent="() => this.save()">
+            <div t-if="this.isStamps" class="btn-group w-100 mb-2" role="group" aria-label="Correction">
+                <button type="button" class="btn btn-outline-secondary"
+                        t-att-class="{'active': this.state.action === 'stamp_undo'}"
+                        t-att-aria-pressed="this.state.action === 'stamp_undo' ? 'true' : 'false'"
+                        t-on-click="() => this.pick('stamp_undo')">Undo last stamp</button>
+                <button type="button" class="btn btn-outline-secondary"
+                        t-att-class="{'active': this.state.action === 'stamp_add'}"
+                        t-att-aria-pressed="this.state.action === 'stamp_add' ? 'true' : 'false'"
+                        t-on-click="() => this.pick('stamp_add')">Add a stamp</button>
+            </div>
+            <div t-else="" class="mb-2">
+                <label class="form-label small text-muted mb-1" t-att-for="'o_nuqtapass_fix_points_' + this.id">Points to add or take off</label>
+                <input t-att-id="'o_nuqtapass_fix_points_' + this.id" type="text" inputmode="numeric" dir="ltr"
+                       autocomplete="off" class="form-control o_nuqtapass_fix_points" placeholder="+50 / -50"
+                       t-model="state.points"/>
+            </div>
+            <label class="form-label small text-muted mb-1" t-att-for="'o_nuqtapass_fix_reason_' + this.id">Reason (goes in the NuqtaPass log)</label>
+            <input t-att-id="'o_nuqtapass_fix_reason_' + this.id" type="text" dir="auto" autocomplete="off"
+                   class="form-control" t-att-maxlength="this.reasonMax" placeholder="For example: pressed twice"
+                   t-model="state.reason"/>
+            <div class="d-flex align-items-center gap-2 mt-2">
+                <button type="submit" class="btn btn-primary"
+                        t-att-disabled="this.props.busy or !this.check.ok">Save correction</button>
+                <button type="button" class="btn btn-link" t-on-click="() => this.props.onCancel()">Cancel</button>
+            </div>
+        </form>
+    </t>
+</templates>
