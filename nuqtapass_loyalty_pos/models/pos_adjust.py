@@ -60,7 +60,7 @@ class PosConfig(models.Model):
         applied, total = data.get("delta") or 0, _points(data.get("points") or 0)
         if applied == 0:
             return _("The card has no points to take off.")
-        change = f"{applied:+,}"
+        change = f"\u2066{applied:+,}\u2069"  # isolated: the sign stays before the number in Arabic
         if applied < 0 and -applied < -asked:
             return _("Points corrected: %(change)s (all the card had) · %(total)s now.", change=change, total=total)
         return _("Points corrected: %(change)s · %(total)s now.", change=change, total=total)
