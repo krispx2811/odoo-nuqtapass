@@ -3,3 +3,4 @@ from . import test_pos_till
 from . import test_pos_late_customer
 from . import test_pos_views
 from . import test_pos_i18n
+from . import test_pos_assets

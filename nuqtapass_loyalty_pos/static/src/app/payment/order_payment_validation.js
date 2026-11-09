@@ -26,7 +26,6 @@ patch(OrderPaymentValidation.prototype, {
             cardUrl: res.welcome.cardUrl,
             whatsapp: res.welcome.whatsapp || "",
             sms: res.welcome.sms || "",
-            onUsePhone: () => {},
         });
     },
 });

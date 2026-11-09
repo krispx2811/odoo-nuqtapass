@@ -4,18 +4,49 @@
         <Dialog title="this.title" size="'md'">
             <div class="o_nuqtapass_dialog">
                 <form t-if="!this.qrOnly" class="d-flex gap-2 mb-3" t-on-submit.prevent="() => this.lookUp()">
-                    <input type="tel" dir="ltr" class="form-control form-control-lg o_nuqtapass_phone"
-                           t-model.proxy="this.state.phone" placeholder="Customer phone" autocomplete="off"/>
-                    <button type="submit" class="btn btn-primary btn-lg text-nowrap"
-                            t-att-disabled="this.state.loading or !this.state.phone.trim()">Look up</button>
+                    <label class="visually-hidden" for="o_nuqtapass_query">Phone or scan card</label>
+                    <!-- dir=ltr: phones and card ids read left to right in the Arabic till too. -->
+                    <input id="o_nuqtapass_query" t-ref="this.inputRef" type="text" inputmode="tel" dir="ltr"
+                           class="form-control form-control-lg o_nuqtapass_query" t-model.proxy="this.state.query"
+                           placeholder="Phone or scan card" autocomplete="off" spellcheck="false"/>
+                    <button type="submit" class="btn btn-primary btn-lg text-nowrap px-4"
+                            t-att-disabled="this.state.loading or !this.state.query.trim()">Find</button>
                 </form>
-                <div t-if="this.state.loading" class="text-muted mb-2">Loading…</div>
+                <div t-if="this.state.loading" class="text-muted mb-2" role="status">Loading…</div>
                 <!-- <bdi>: a NuqtaPass answer can be English inside the Arabic till; isolate it so its words and dot keep their order. -->
                 <div t-if="this.state.error" class="alert alert-warning" role="alert"><bdi t-out="this.state.error"/></div>
                 <div t-if="this.state.done" class="alert alert-success" role="status"><bdi t-out="this.state.done"/></div>
-                <div t-if="this.state.welcome" class="o_nuqtapass_qr text-center mb-3">
-                    <img t-att-src="this.state.welcome.qr" width="220" height="220" alt="QR code of the card"/>
-                    <p class="fs-4 fw-bold mt-2 mb-2">Scan to add your card</p>
+                <t t-if="this.state.result">
+                    <div class="o_nuqtapass_who fs-4 fw-bold mb-2"><bdi dir="ltr" t-out="this.phoneText"/></div>
+                    <p t-if="!this.state.result.cards.length" class="text-muted mb-2">
+                        No card yet. The customer gets one with their first purchase.
+                    </p>
+                    <div t-foreach="this.state.result.cards" t-as="card" t-key="card.cardId"
+                         class="o_nuqtapass_card d-flex flex-wrap align-items-center gap-2 py-2 px-3 mb-2 rounded">
+                        <div class="flex-grow-1">
+                            <!-- <bdi>: the shop's own voucher title and the numbers in the line keep their order in RTL. -->
+                            <div class="o_nuqtapass_card_title small text-muted"><bdi t-out="this.cardTitle(card)"/></div>
+                            <div class="o_nuqtapass_card_line fs-5 fw-semibold"><bdi t-out="this.cardLine(card)"/></div>
+                        </div>
+                        <button t-if="card.type === 'STAMPS' and card.rewardReady" class="btn btn-primary btn-lg"
+                                t-att-disabled="this.state.loading"
+                                t-on-click="() => this.redeem(card, 'reward')">Give reward</button>
+                        <div t-if="card.type === 'POINTS' and card.points > 0" class="d-flex gap-2">
+                            <label class="visually-hidden" t-att-for="'o_nuqtapass_points_' + card.cardId">Points to use</label>
+                            <input t-att-id="'o_nuqtapass_points_' + card.cardId" type="number" min="1" step="1"
+                                   t-att-max="card.points" inputmode="numeric" dir="ltr"
+                                   class="form-control form-control-lg o_nuqtapass_points" t-model.proxy="this.state.points"/>
+                            <button class="btn btn-primary btn-lg text-nowrap" t-att-disabled="this.state.loading"
+                                    t-on-click="() => this.redeem(card, 'reward')">Use points</button>
+                        </div>
+                        <button t-if="card.type === 'VOUCHER' and card.voucher and card.voucher.usesLeft > 0"
+                                class="btn btn-primary btn-lg" t-att-disabled="this.state.loading"
+                                t-on-click="() => this.redeem(card, 'voucher')">Use voucher</button>
+                    </div>
+                </t>
+                <div t-if="this.state.welcome" class="o_nuqtapass_qr text-center mt-3">
+                    <img t-att-src="this.state.welcome.qr" width="200" height="200" alt="QR code of the card"/>
+                    <p class="fs-5 fw-bold mt-2 mb-2">Scan to add your card</p>
                     <div t-if="this.state.welcome.whatsapp or this.state.welcome.sms"
                          class="d-flex justify-content-center flex-wrap gap-2">
                         <a t-if="this.state.welcome.whatsapp" class="btn btn-secondary"
@@ -24,39 +55,12 @@
                            t-att-href="this.state.welcome.sms">Send by SMS</a>
                     </div>
                 </div>
-                <t t-if="this.state.result">
-                    <p t-if="!this.state.result.cards.length" class="text-muted">
-                        No card yet. The customer gets one with their first purchase.
-                    </p>
-                    <div t-foreach="this.state.result.cards" t-as="card" t-key="card.cardId"
-                         class="o_nuqtapass_card border rounded p-3 mb-2">
-                        <!-- <bdi>: the shop's own voucher title and the numbers in the line keep their order in RTL. -->
-                        <div class="fw-bold"><bdi t-out="this.cardTitle(card)"/></div>
-                        <div class="text-muted"><bdi t-out="this.cardLine(card)"/></div>
-                        <div class="d-flex flex-wrap align-items-center gap-2 mt-2">
-                            <button t-if="card.type === 'STAMPS' and card.rewardReady" class="btn btn-primary"
-                                    t-att-disabled="this.state.loading"
-                                    t-on-click="() => this.redeem(card, 'reward')">Give reward</button>
-                            <t t-if="card.type === 'POINTS' and card.points > 0">
-                                <label class="visually-hidden" t-att-for="'o_nuqtapass_points_' + card.cardId">Points to use</label>
-                                <input t-att-id="'o_nuqtapass_points_' + card.cardId" type="number" min="1" step="1"
-                                       inputmode="numeric" dir="ltr" class="form-control o_nuqtapass_points"
-                                       t-model.proxy="this.state.points"/>
-                                <button class="btn btn-primary" t-att-disabled="this.state.loading"
-                                        t-on-click="() => this.redeem(card, 'reward')">Use points</button>
-                            </t>
-                            <button t-if="card.type === 'VOUCHER' and card.voucher and card.voucher.usesLeft > 0"
-                                    class="btn btn-primary" t-att-disabled="this.state.loading"
-                                    t-on-click="() => this.redeem(card, 'voucher')">Use voucher</button>
-                        </div>
-                    </div>
-                </t>
+                <p t-if="this.willEarn" class="o_nuqtapass_will_earn text-success fw-medium mt-3 mb-0" role="status">
+                    <span aria-hidden="true">✓ </span><bdi t-out="this.willEarn"/>
+                </p>
             </div>
             <t t-set-slot="footer">
-                <button t-if="this.state.result and !this.qrOnly" class="btn btn-primary" t-on-click="() => this.usePhone()">
-                    Earn on this order
-                </button>
-                <button class="btn btn-secondary" t-on-click="() => this.props.close()">Close</button>
+                <button class="btn btn-secondary btn-lg" t-on-click="() => this.props.close()">Close</button>
             </t>
         </Dialog>
     </t>
