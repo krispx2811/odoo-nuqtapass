@@ -16,8 +16,9 @@ class NuqtaPassPosController(http.Controller):
         return config
 
     @http.route("/nuqtapass_loyalty/pos/customer", type="jsonrpc", auth="user", methods=["POST"])
-    def customer(self, config_id, phone):
-        return self._config(config_id)._nuqtapass_lookup(phone)
+    def customer(self, config_id, query=None, phone=None):
+        # `query`: a phone or a Wallet card's id, typed or scanned. `phone`: a till page loaded before this version.
+        return self._config(config_id)._nuqtapass_lookup(query if query is not None else phone)
 
     @http.route("/nuqtapass_loyalty/pos/redeem", type="jsonrpc", auth="user", methods=["POST"])
     def redeem(self, config_id, phone, card_id, action, voucher_id=None, points=None):

@@ -1,6 +1,7 @@
 from odoo import fields, models
 
-from odoo.addons.nuqtapass_loyalty.lib.customer import clean_customer
+from odoo.addons.nuqtapass_loyalty.lib.customer import clean_customer, current_cards
+from odoo.addons.nuqtapass_loyalty.lib.scan import classify
 
 ACTIONS = ("reward", "voucher")
 QUIET = {"ok": True, "show_qr": False}
@@ -20,6 +21,18 @@ class PosConfig(models.Model):
     def _nuqtapass_error(self, error, message):
         return {"ok": False, "error": error, "message": message}
 
+    def _nuqtapass_ready(self):
+        """(client, None) or (None, error dict): the till switch is on and there is a key."""
+        self.ensure_one()
+        _ = self.env._
+        Sync = self.env["nuqtapass.sync"].sudo()
+        if not Sync._channel_enabled("till"):
+            return None, self._nuqtapass_error("disabled", _("NuqtaPass is turned off for the till in Settings."))
+        client = Sync._get_client()
+        if client is None:
+            return None, self._nuqtapass_error("not_configured", _("Add your NuqtaPass key in Settings first."))
+        return client, None
+
     def _nuqtapass_prepare(self, phone):
         """(client, e164) or (None, error dict)."""
         self.ensure_one()
@@ -31,10 +44,11 @@ class PosConfig(models.Model):
         if not e164:
             typed = str(phone or "").strip()[:32]
             return None, self._nuqtapass_error("invalid_phone", _("Phone number looks wrong: %(phone)s", phone=typed))
-        client = Sync._get_client()
-        if client is None:
-            return None, self._nuqtapass_error("not_configured", _("Add your NuqtaPass key in Settings first."))
-        return client, e164
+        client, error = self._nuqtapass_ready()
+        return (client, e164) if client else (None, error)
+
+    def _nuqtapass_card_refused(self):
+        return self._nuqtapass_error("card_not_found", self.env._("This card isn't from this shop."))
 
     def _nuqtapass_failure(self, result):
         _ = self.env._
@@ -53,15 +67,35 @@ class PosConfig(models.Model):
             return self._nuqtapass_error("not_found", _("No NuqtaPass card for this phone yet."))
         return self._nuqtapass_error("refused", result.error or _("NuqtaPass said no."))
 
-    def _nuqtapass_lookup(self, phone):
-        client, e164 = self._nuqtapass_prepare(phone)
-        if client is None:
-            return e164
-        result = client.customer(e164)
-        if not result.ok:
-            return self._nuqtapass_failure(result)
+    def _nuqtapass_lookup(self, query):
+        """Find the customer by what was typed or scanned: a Wallet card's id, or a phone.
+
+        Only the current card of each type is shown (plus usable vouchers); cards from earlier programs are hidden.
+        """
+        kind, value = classify(query)
+        if kind == "card":
+            client, error = self._nuqtapass_ready()
+            if client is None:
+                return error
+            result = client.customer_by_card(value)
+            if not result.ok:
+                # 404: unknown or another shop's card (NuqtaPass answers both alike); 400: not a card id after all.
+                if result.status in (400, 404):
+                    return self._nuqtapass_card_refused()
+                return self._nuqtapass_failure(result)
+            e164 = self.env["nuqtapass.sync"].sudo()._normalise_phone((result.data or {}).get("phone"), self.company_id)
+            if not e164:
+                return self._nuqtapass_card_refused()
+        else:
+            client, e164 = self._nuqtapass_prepare(query)
+            if client is None:
+                return e164
+            result = client.customer(e164)
+            if not result.ok:
+                return self._nuqtapass_failure(result)
         # clean_customer: Part 1's cards, walletAdded and, while the card isn't on a phone, the QR / WhatsApp / SMS links.
-        return {"ok": True, "phone": e164, **clean_customer(result.data)}
+        clean = clean_customer(result.data)
+        return {"ok": True, "phone": e164, **clean, "cards": current_cards(clean["cards"])}
 
     def _nuqtapass_redeem(self, phone, card_id, action, voucher_id=None, points=None):
         """POST /redeem with Part 1's body: cardId from /customer, the card's voucher id when it has one, and for a

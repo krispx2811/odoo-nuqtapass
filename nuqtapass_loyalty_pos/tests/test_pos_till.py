@@ -51,9 +51,45 @@ class TestPosTill(TestPoSCommon):
         mocked.assert_called_once_with("+96891234567")
         self.assertTrue(res["ok"])
         self.assertEqual(res["phone"], "+96891234567")
-        self.assertEqual(res["cards"], [STAMPS])
+        self.assertEqual(res["cards"], [dict(STAMPS, current=True)])
         self.assertTrue(res["walletAdded"])
         self.assertIsNone(res["welcome"])
+
+    # ── look-up by the Wallet card's QR (its card id) ─────────────────
+    def test_lookup_by_card_uses_the_card_and_answers_its_phone(self):
+        answer = ok({"phone": "+96894176872", "walletAdded": True, "cards": [dict(STAMPS, current=True)]})
+        with patch.object(NuqtaPassClient, "customer_by_card", return_value=answer) as by_card, \
+                patch.object(NuqtaPassClient, "customer") as by_phone:
+            res = self.config._nuqtapass_lookup(STAMP_CARD.upper())
+        by_card.assert_called_once_with(STAMP_CARD)
+        by_phone.assert_not_called()
+        self.assertEqual((res["ok"], res["phone"]), (True, "+96894176872"))
+        self.assertEqual([c["cardId"] for c in res["cards"]], [STAMP_CARD])
+
+    def test_lookup_by_card_unknown_other_shop_or_malformed(self):
+        for answer in (ApiResult(False, 404, None, "Card not found", "CARD_NOT_FOUND", False),
+                       ApiResult(False, 400, None, "Invalid card id", "INVALID_CARD", False)):
+            with self.subTest(code=answer.code), patch.object(NuqtaPassClient, "customer_by_card", return_value=answer):
+                self.assertEqual(self.config._nuqtapass_lookup(STAMP_CARD),
+                                 {"ok": False, "error": "card_not_found", "message": "This card isn't from this shop."})
+
+    def test_lookup_by_card_without_a_usable_phone_is_refused(self):
+        with patch.object(NuqtaPassClient, "customer_by_card", return_value=ok({"phone": "12", "cards": [STAMPS]})):
+            self.assertEqual(self.config._nuqtapass_lookup(STAMP_CARD)["error"], "card_not_found")
+
+    def test_lookup_by_card_when_till_off_or_no_key(self):
+        self.env["ir.config_parameter"].sudo().set_str("nuqtapass_loyalty.api_key", False)
+        self.assertEqual(self.config._nuqtapass_lookup(STAMP_CARD)["error"], "not_configured")
+        self.env["ir.config_parameter"].sudo().set_bool("nuqtapass_loyalty.till_enabled", False)
+        self.assertEqual(self.config._nuqtapass_lookup(STAMP_CARD)["error"], "disabled")
+
+    def test_lookup_shows_only_current_cards(self):
+        old_points = {"cardId": POINTS_CARD, "type": "POINTS", "points": 40, "current": False}
+        answer = ok({"phone": "+96891234567", "walletAdded": True,
+                     "cards": [old_points, dict(STAMPS, current=True)]})
+        with patch.object(NuqtaPassClient, "customer", return_value=answer):
+            res = self.config._nuqtapass_lookup("91234567")
+        self.assertEqual([c["cardId"] for c in res["cards"]], [STAMP_CARD])
 
     def test_lookup_card_not_on_a_phone_carries_the_qr_links(self):
         answer = ok({"phone": "+96891234567", "walletAdded": False, "cardUrl": CARD_URL,
