@@ -6,6 +6,7 @@
     "author": "NuqtaPass",
     "website": "https://nuqtapass.com",
     "license": "LGPL-3",
+    "images": ["static/description/banner.png"],
     "support": "support@nuqtapass.com",
     "depends": ["nuqtapass_loyalty", "point_of_sale"],
     "data": [
