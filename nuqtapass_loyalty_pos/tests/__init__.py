@@ -8,3 +8,4 @@ from . import test_pos_spend
 from . import test_pos_refund_uses
 from . import test_pos_adjust
 from . import test_pos_points_tax
+from . import test_pos_refusals

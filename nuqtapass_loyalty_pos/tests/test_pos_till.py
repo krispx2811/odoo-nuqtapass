@@ -199,7 +199,7 @@ class TestPosTill(TestPoSCommon):
         with patch.object(NuqtaPassClient, "redeem", return_value=wrong):
             res = self.config._nuqtapass_redeem("91234567", STAMP_CARD, "reward")
         self.assertEqual(res["error"], "refused")
-        self.assertIn("Prepaid and pack cards", res["message"])
+        self.assertEqual(res["message"], "This card is a different type, so it can't do that.")
 
     # ── after payment: the QR code for a card that isn't on a phone yet ─
     def test_after_payment_sends_now_and_shows_the_qr(self):

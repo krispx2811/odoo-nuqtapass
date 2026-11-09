@@ -18,7 +18,7 @@
                         t-att-disabled="this.state.loading or !this.state.query.trim()">Find</button>
             </form>
             <div t-if="this.state.loading" class="text-muted mt-2" role="status">Loading…</div>
-            <div t-if="this.state.error" class="text-danger mt-2" role="alert"><bdi t-out="this.state.error"/></div>
+            <div t-if="this.state.error" class="text-danger mt-2" role="alert" t-att-title="this.state.errorDetail or undefined"><bdi t-out="this.state.error"/></div>
 
             <t t-if="this.state.result">
                 <div t-if="this.tier" class="o_nuqtapass_tier d-flex flex-wrap align-items-center column-gap-2 mb-2">

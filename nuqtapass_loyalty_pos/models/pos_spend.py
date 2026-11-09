@@ -203,6 +203,10 @@ class PosConfig(models.Model):
         if result.status in (401, 403) or result.code in ("PLAN_UPGRADE_REQUIRED", "PLAN_ENDED"):
             failure = self._nuqtapass_failure(result)  # the key or the plan: the same words as the look-up
             return failure
-        return self._nuqtapass_error("refused", _(
+        reason, detail = self._nuqtapass_refusal(result)
+        answer = self._nuqtapass_error("refused", _(
             "%(line)s: %(reason)s. Remove this line to take payment without it.",
-            line=use["label"], reason=(result.error or _("NuqtaPass said no")).rstrip(". ")))
+            line=use["label"], reason=reason.rstrip(". ")))
+        if detail:
+            answer["detail"] = detail
+        return answer

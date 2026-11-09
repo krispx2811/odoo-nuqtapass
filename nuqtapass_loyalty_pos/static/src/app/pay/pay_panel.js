@@ -37,7 +37,7 @@ export class NuqtaPassPayPanel extends Component {
         if (focus) {
             delete this.props.order.uiState.nuqtapassFocus;
         }
-        this.state = proxy({ query: "", loading: false, error: "", result: null, credit: "", pick: {}, focus });
+        this.state = proxy({ query: "", loading: false, error: "", errorDetail: "", result: null, credit: "", pick: {}, focus });
         const phone = this.props.order.nuqtapass_phone || this.props.order.partner_id?.phone;
         if (phone) {
             this.lookUp(phone);
@@ -74,11 +74,13 @@ export class NuqtaPassPayPanel extends Component {
         }
         this.state.loading = true;
         this.state.error = "";
+        this.state.errorDetail = "";
         const res = await findCustomer(this.pos.config.id, query);
         this.state.loading = false;
         if (!res.ok) {
             this.state.result = null;
             this.state.error = res.message;
+            this.state.errorDetail = res.detail || "";
             return;
         }
         this.state.result = res;
@@ -105,6 +107,7 @@ export class NuqtaPassPayPanel extends Component {
     changeCustomer() {
         this.state.result = null;
         this.state.error = "";
+        this.state.errorDetail = "";
     }
 
     // ── one strip per card ────────────────────────────────────────────

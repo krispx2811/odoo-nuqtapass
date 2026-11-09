@@ -14,6 +14,7 @@ WHATSAPP_PREFIX = "https://api.whatsapp.com/"
 SMS_PREFIX = "sms:"
 MAX_LINK = 2000
 MAX_UNIT = 40
+MAX_REWARD = 255
 CURRENCY_CODE = re.compile(r"^[A-Z]{3}$")
 TIERS = ("BRONZE", "SILVER", "GOLD")
 # The tier's colour goes into a style attribute on the till: only NuqtaPass's own "rgb(r, g, b)" shape.
@@ -69,6 +70,11 @@ def _tier(value):
     return {"name": value["name"], "cashbackPct": pct, "next": nxt, "color": color}
 
 
+def _text(value, limit):
+    """A trimmed string up to `limit` characters, or None (empty, or not a string)."""
+    return value.strip()[:limit] if isinstance(value, str) and value.strip() else None
+
+
 def _link(value, prefix):
     if isinstance(value, str) and value.startswith(prefix) and len(value) <= MAX_LINK:
         return value
@@ -95,8 +101,14 @@ def _card(card):
     # For the payment panel: points per 1 unit of money (None: points are worth nothing), a pack's uses and unit.
     clean["pointsPerUnit"] = _number_or_none(card.get("pointsPerUnit")) or None
     clean["usesLeft"] = _number(card.get("usesLeft"))
-    unit = card.get("unit")
-    clean["unit"] = unit.strip()[:MAX_UNIT] if isinstance(unit, str) and unit.strip() else None
+    clean["unit"] = _text(card.get("unit"), MAX_UNIT)
+    # The card's own reward as the customer sees it ("Free coffee"); None while the shop has none of its own. Only
+    # sent when there is one, so answers keep their old shape. NuqtaPass has no Arabic reward text yet: an Arabic one
+    # (rewardTextAr) is kept if it ever comes.
+    for key in ("rewardText", "rewardTextAr"):
+        text = _text(card.get(key), MAX_REWARD)
+        if text:
+            clean[key] = text
     # Only on the current points card, when the shop's plan has tiers.
     tier = _tier(card.get("tier"))
     if tier:

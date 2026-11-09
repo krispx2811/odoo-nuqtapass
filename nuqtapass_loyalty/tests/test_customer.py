@@ -175,3 +175,24 @@ class TestCustomer(TransactionCase):
                 tier = {"name": "GOLD", "cashbackPct": 10, "next": None, "color": color}
                 card = clean_customer(part1_answer(cards=[self._points(tier=tier)]))["cards"][0]
                 self.assertIsNone(card["tier"]["color"])
+
+    # ── the card's own reward (2026-11-09) ───────────────────────────
+    def _stamps(self, **over):
+        return dict(part1_answer()["cards"][0], **over)
+
+    def test_keeps_the_reward_text_trimmed(self):
+        card = clean_customer(part1_answer(cards=[self._stamps(rewardText="  Free coffee ")]))["cards"][0]
+        self.assertEqual(card["rewardText"], "Free coffee")
+        self.assertNotIn("rewardTextAr", card)
+        card = clean_customer(part1_answer(cards=[self._stamps(rewardText="Free coffee",
+                                                               rewardTextAr="قهوة مجانية")]))["cards"][0]
+        self.assertEqual(card["rewardTextAr"], "قهوة مجانية")
+        card = clean_customer(part1_answer(cards=[self._stamps(rewardText="x" * 400)]))["cards"][0]
+        self.assertEqual(len(card["rewardText"]), 255)
+
+    def test_no_reward_text_key_without_one(self):
+        for value in (None, "", "   ", 5, ["Free"], {"en": "Free"}):
+            with self.subTest(value=value):
+                card = clean_customer(part1_answer(cards=[self._stamps(rewardText=value, rewardTextAr=value)]))["cards"][0]
+                self.assertNotIn("rewardText", card)
+                self.assertNotIn("rewardTextAr", card)
