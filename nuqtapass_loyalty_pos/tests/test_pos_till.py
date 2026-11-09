@@ -187,3 +187,9 @@ class TestPosTill(TestPoSCommon):
         self.assertEqual(self.config._nuqtapass_after_payment(999999999), QUIET)
         self.assertEqual(self.config._nuqtapass_after_payment("junk"), QUIET)
         self.assertEqual(self.config._nuqtapass_after_payment(self._paid_order(customer=False).id), QUIET)
+
+    def test_lookup_wrong_phone_never_calls_nuqtapass(self):
+        with patch.object(NuqtaPassClient, "customer") as mocked:
+            res = self.config._nuqtapass_lookup("9417872")
+        mocked.assert_not_called()
+        self.assertEqual(res, {"ok": False, "error": "invalid_phone", "message": "Phone number looks wrong: 9417872"})

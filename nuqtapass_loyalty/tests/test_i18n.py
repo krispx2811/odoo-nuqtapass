@@ -66,3 +66,9 @@ class TestArabicShown(TransactionCase):
     def test_settings_labels_in_arabic(self):
         arch = self.ar["res.config.settings"].get_view(view_type="form")["arch"]
         self.assertIn("مفتاح NuqtaPass", arch)
+
+    def test_wrong_phone_in_arabic(self):
+        rec = self.ar["nuqtapass.sync"].sudo().create({
+            "kind": "sale", "channel": "till", "order_ref": "R2", "dedupe_key": "sale|R2|", "phone": "9417872",
+            "occurred_at": "2026-11-09 10:00:00", "state": "failed", "phone_invalid": True})
+        self.assertEqual(rec.summary, "رقم الجوال شكله غلط: 9417872")

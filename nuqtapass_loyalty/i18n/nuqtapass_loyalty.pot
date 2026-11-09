@@ -187,6 +187,13 @@ msgid "No NuqtaPass key in Settings"
 msgstr ""
 
 #. module: nuqtapass_loyalty
+#: model:ir.model.fields,help:nuqtapass_loyalty.field_nuqtapass_sync__phone_invalid
+msgid ""
+"Not a valid mobile number for its country, so it is not sent. Fix the phone "
+"and press Resend."
+msgstr ""
+
+#. module: nuqtapass_loyalty
 #: model_terms:ir.actions.act_window,help:nuqtapass_loyalty.action_nuqtapass_sync
 msgid "Nothing sent yet"
 msgstr ""
@@ -281,6 +288,17 @@ msgstr ""
 #. module: nuqtapass_loyalty
 #: model:ir.model.fields,field_description:nuqtapass_loyalty.field_nuqtapass_sync__phone
 msgid "Phone"
+msgstr ""
+
+#. module: nuqtapass_loyalty
+#: model:ir.model.fields,field_description:nuqtapass_loyalty.field_nuqtapass_sync__phone_invalid
+msgid "Phone looks wrong"
+msgstr ""
+
+#. module: nuqtapass_loyalty
+#. odoo-python
+#: code:addons/nuqtapass_loyalty/models/nuqtapass_sync.py:0
+msgid "Phone number looks wrong: %(phone)s"
 msgstr ""
 
 #. module: nuqtapass_loyalty

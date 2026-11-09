@@ -36,6 +36,9 @@ class NuqtapassSync(models.Model):
     refund_ref = fields.Char("Refund", readonly=True)
     dedupe_key = fields.Char(required=True, readonly=True)
     phone = fields.Char(readonly=True)
+    phone_invalid = fields.Boolean(
+        "Phone looks wrong", readonly=True,
+        help="Not a valid mobile number for its country, so it is not sent. Fix the phone and press Resend.")
     amount = fields.Monetary(readonly=True, currency_field="currency_id")
     currency_id = fields.Many2one("res.currency", default=lambda s: s.env.company.currency_id, readonly=True)
     occurred_at = fields.Datetime("Paid / refunded at", required=True, readonly=True)
@@ -60,7 +63,22 @@ class NuqtapassSync(models.Model):
 
     @api.model
     def _normalise_phone(self, raw, company):
-        return normalise_e164(raw, company.country_id.phone_code or None)
+        country = company.country_id
+        return normalise_e164(raw, country.code or None, country.phone_code or None)
+
+    @api.model
+    def _sale_phone_vals(self, raw, company):
+        """{} without a phone (nothing to queue), {"phone": e164}, or the typed phone flagged as wrong."""
+        raw = (raw or "").strip()
+        if not raw:
+            return {}
+        e164 = self._normalise_phone(raw, company)
+        return {"phone": e164} if e164 else {"phone": raw, "phone_invalid": True}
+
+    def _wrong_phone_vals(self, phone):
+        return {"phone": phone, "phone_invalid": True, "state": "failed", "next_attempt_at": False,
+                "last_status_code": 0,
+                "last_error": self.env._("Phone number looks wrong: %(phone)s", phone=phone)}
 
     @api.model
     def _make_client(self, key):
@@ -98,6 +116,11 @@ class NuqtapassSync(models.Model):
         )
         if existing:
             return existing
+        if vals.get("phone_invalid"):
+            # Logged so staff can see it on the order, never sent: NuqtaPass would make a customer for it.
+            vals.update(self._wrong_phone_vals(vals["phone"]))
+            with self.env.cr.savepoint():
+                return self.create(vals)
         vals.setdefault("next_attempt_at", fields.Datetime.now())
         with self.env.cr.savepoint():
             record = self.create(vals)
@@ -140,6 +163,10 @@ class NuqtapassSync(models.Model):
     def _send_one(self, now=None):
         self.ensure_one()
         now = now or fields.Datetime.now()
+        if self.kind == "sale" and not self._normalise_phone(self.phone, self.company_id):
+            # Also catches rows queued before phones were checked.
+            self.write(dict(self._wrong_phone_vals(self.phone), attempts=self.attempts + 1))
+            return
         client = self._get_client()
         if client is None:
             result = ApiResult(False, None, None, self.env._("No NuqtaPass key in Settings"),
@@ -210,8 +237,21 @@ class NuqtapassSync(models.Model):
             if not cron._commit_progress(processed=1):
                 break
 
+    def _nuqtapass_current_phone(self):
+        """The order's phone as it is now (the till and online modules read it from the order)."""
+        self.ensure_one()
+        return self.phone
+
     def action_resend(self):
         rows = self.filtered(lambda r: r.state != "done").sudo()
+        for row in rows.filtered(lambda r: r.kind == "sale"):
+            # Check the phone again (staff may have fixed it on the customer); a wrong one stays failed.
+            phone_vals = row._sale_phone_vals(row._nuqtapass_current_phone(), row.company_id)
+            if not phone_vals.get("phone") or phone_vals.get("phone_invalid"):
+                row.write(row._wrong_phone_vals(phone_vals.get("phone") or row.phone))
+                rows -= row
+            else:
+                row.write({"phone": phone_vals["phone"], "phone_invalid": False})
         rows.write({"state": "pending", "attempts": 0, "last_error": False,
                     "next_attempt_at": fields.Datetime.now()})
         cron = self.sudo().env.ref(CRON_XMLID, raise_if_not_found=False)
@@ -220,13 +260,15 @@ class NuqtapassSync(models.Model):
         return True
 
     # ── status text ───────────────────────────────────────────────────
-    @api.depends("state", "response_json", "last_error", "attempts", "kind")
+    @api.depends("state", "response_json", "last_error", "attempts", "kind", "phone", "phone_invalid")
     def _compute_summary(self):
         for rec in self:
             rec.summary = rec._summary_text()
 
     def _summary_text(self):
         _ = self.env._
+        if self.state == "failed" and self.phone_invalid:
+            return _("Phone number looks wrong: %(phone)s", phone=self.phone)
         if self.state == "failed":
             return _("Failed: %(error)s", error=self.last_error or _("unknown error"))
         if self.state == "pending":

@@ -197,3 +197,24 @@ class TestOnlineByTransaction(AccountPaymentCommon):
         sync = order.nuqtapass_sync_ids
         self.assertEqual(len(sync), 1)
         self.assertEqual((sync.kind, sync.channel, sync.order_ref), ("sale", "online", f"{order.name}#{order.id}"))
+
+
+@tagged("post_install", "-at_install", "nuqtapass")
+class TestOnlineWrongPhone(AccountTestInvoicingCommon):
+    def test_wrong_phone_logged_not_sent(self):
+        website, partner, product = _setup_shop(self.env)
+        partner.phone = "9417872"
+        order = self.env["sale.order"].create({
+            "partner_id": partner.id, "website_id": website.id,
+            "order_line": [Command.create({"product_id": product.id, "product_uom_qty": 1, "price_unit": 10.0})],
+        })
+        order.action_confirm()
+        invoice = order._create_invoices()
+        invoice.action_post()
+        self.env["account.payment.register"].with_context(
+            active_model="account.move", active_ids=invoice.ids).create({})._create_payments()
+        self.env["sale.order"]._cron_nuqtapass_scan()
+        self.env["sale.order"]._cron_nuqtapass_scan()
+        sync = order.nuqtapass_sync_ids
+        self.assertEqual((len(sync), sync.state, sync.phone), (1, "failed", "9417872"))
+        self.assertEqual(order.nuqtapass_status, "Phone number looks wrong: 9417872")

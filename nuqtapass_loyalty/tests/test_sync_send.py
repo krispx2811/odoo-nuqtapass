@@ -117,3 +117,23 @@ class TestSyncSend(TransactionCase):
     def test_summary_for_failed(self):
         self._send(fail(False, 400, "phone invalid"))
         self.assertIn("phone invalid", self.rec.summary)
+
+    def test_wrong_phone_is_never_sent(self):
+        # A row queued before phones were checked (the live "+9689417872"): refused here, no HTTP call.
+        self.rec.write({"phone": "+9689417872"})
+        mocked = self._send(ok({"status": "OK"}))
+        mocked.assert_not_called()
+        self.assertEqual(self.rec.state, "failed")
+        self.assertTrue(self.rec.phone_invalid)
+        self.assertEqual(self.rec.summary, "Phone number looks wrong: +9689417872")
+
+    def test_resend_rechecks_the_phone(self):
+        self.env.company.country_id = self.env.ref("base.om")
+        self.rec.write({"phone": "+9689417872"})
+        self._send(ok({"status": "OK"}))
+        self.rec.action_resend()
+        self.assertEqual(self.rec.state, "failed")  # still wrong: not queued again
+        self.assertFalse(self.rec.next_attempt_at)
+        with patch.object(type(self.Sync), "_nuqtapass_current_phone", return_value="9417 6872"):
+            self.rec.action_resend()
+        self.assertEqual((self.rec.state, self.rec.phone, self.rec.phone_invalid), ("pending", "+96894176872", False))

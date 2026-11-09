@@ -47,14 +47,14 @@ class SaleOrder(models.Model):
                     continue
                 if not order._nuqtapass_is_fully_paid():
                     continue
-                phone = Sync._normalise_phone(order.partner_id.phone, order.company_id)
-                if not phone:
+                phone_vals = Sync._sale_phone_vals(order.partner_id.phone, order.company_id)
+                if not phone_vals:
                     continue
                 Sync._queue({
                     "kind": "sale",
                     "channel": "online",
                     "order_ref": order._nuqtapass_order_ref(),
-                    "phone": phone,
+                    **phone_vals,
                     "amount": order.amount_total,
                     "currency_id": order.currency_id.id,
                     "occurred_at": fields.Datetime.now(),

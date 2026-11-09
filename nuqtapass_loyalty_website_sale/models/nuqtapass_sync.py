@@ -8,3 +8,8 @@ class NuqtapassSync(models.Model):
                                     ondelete="set null")
     move_id = fields.Many2one("account.move", "Credit note", index="btree_not_null", readonly=True,
                               ondelete="set null")
+
+    def _nuqtapass_current_phone(self):
+        if self.kind == "sale" and self.sale_order_id:
+            return self.sale_order_id.partner_id.phone
+        return super()._nuqtapass_current_phone()

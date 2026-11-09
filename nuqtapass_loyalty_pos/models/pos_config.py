@@ -29,7 +29,8 @@ class PosConfig(models.Model):
             return None, self._nuqtapass_error("disabled", _("NuqtaPass is turned off for the till in Settings."))
         e164 = Sync._normalise_phone(phone, self.company_id)
         if not e164:
-            return None, self._nuqtapass_error("invalid_phone", _("That phone number doesn't look right."))
+            typed = str(phone or "").strip()[:32]
+            return None, self._nuqtapass_error("invalid_phone", _("Phone number looks wrong: %(phone)s", phone=typed))
         client = Sync._get_client()
         if client is None:
             return None, self._nuqtapass_error("not_configured", _("Add your NuqtaPass key in Settings first."))

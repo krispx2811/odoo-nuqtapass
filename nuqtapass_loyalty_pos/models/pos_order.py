@@ -25,6 +25,9 @@ class PosOrder(models.Model):
         self._nuqtapass_queue()
         return result
 
+    def _nuqtapass_raw_phone(self):
+        return self.nuqtapass_phone or self.partner_id.phone
+
     def _nuqtapass_queue(self):
         for order in self:
             try:
@@ -60,8 +63,8 @@ class PosOrder(models.Model):
             return
         if currency.compare_amounts(self.amount_total, 0) <= 0:
             return
-        phone = Sync._normalise_phone(self.nuqtapass_phone or self.partner_id.phone, self.company_id)
-        if not phone:
+        phone_vals = Sync._sale_phone_vals(self._nuqtapass_raw_phone(), self.company_id)
+        if not phone_vals:
             return
         Sync._queue({
             "kind": "sale",
@@ -69,7 +72,7 @@ class PosOrder(models.Model):
             # Odoo's receipt number ("266-1-000001": year + device, till, number), not `name`: on Odoo 19 and 20 every
             # till device starts its names at "<till> - 000001", so names repeat across devices.
             "order_ref": self.pos_reference,
-            "phone": phone,
+            **phone_vals,
             "amount": self.amount_total,
             "currency_id": currency.id,
             "occurred_at": self.date_order or fields.Datetime.now(),

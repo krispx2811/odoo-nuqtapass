@@ -75,3 +75,20 @@ class TestSyncQueue(TransactionCase):
 
     def test_normalise_phone_uses_company_country(self):
         self.assertEqual(self.Sync._normalise_phone("9123 4567", self.env.company), "+96891234567")
+
+    def test_normalise_phone_refuses_a_short_oman_number(self):
+        self.assertIsNone(self.Sync._normalise_phone("9417872", self.env.company))
+
+    def test_sale_phone_vals(self):
+        company = self.env.company
+        self.assertEqual(self.Sync._sale_phone_vals("  ", company), {})
+        self.assertEqual(self.Sync._sale_phone_vals(False, company), {})
+        self.assertEqual(self.Sync._sale_phone_vals("94176872", company), {"phone": "+96894176872"})
+        self.assertEqual(self.Sync._sale_phone_vals(" 9417872 ", company), {"phone": "9417872", "phone_invalid": True})
+
+    def test_wrong_phone_is_logged_failed_and_never_due(self):
+        rec = self._sale(phone="9417872", phone_invalid=True)
+        self.assertEqual(rec.state, "failed")
+        self.assertFalse(rec.next_attempt_at)
+        self.assertEqual(rec.summary, "Phone number looks wrong: 9417872")
+        self.assertFalse(self.Sync._due(datetime(2030, 1, 1)))

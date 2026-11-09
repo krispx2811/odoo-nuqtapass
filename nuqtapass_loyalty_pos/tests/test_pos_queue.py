@@ -1,6 +1,11 @@
+from datetime import timedelta
+from unittest.mock import patch
+
+from odoo import fields
 from odoo.tests import tagged
 from odoo.tools import mute_logger
 
+from odoo.addons.nuqtapass_loyalty.lib.client import NuqtaPassClient
 from odoo.addons.point_of_sale.tests.common import TestPoSCommon
 
 
@@ -130,3 +135,20 @@ class TestPosQueue(TestPoSCommon):
         self.assertEqual(settings.pos_nuqtapass_branch, "Qurum")
         settings.pos_nuqtapass_branch = "Seeb"
         self.assertEqual(self.config.nuqtapass_branch, "Seeb")
+
+    def test_wrong_customer_phone_is_logged_not_sent(self):
+        self.customer.phone = "9417872"  # an Omani mobile missing a digit
+        with patch.object(NuqtaPassClient, "sale") as mocked:
+            order = self._pay(customer=self.customer)
+            self.Sync._send_due(now=fields.Datetime.now() + timedelta(seconds=5))
+        mocked.assert_not_called()
+        sync = order.nuqtapass_sync_ids
+        self.assertEqual((sync.kind, sync.state, sync.phone), ("sale", "failed", "9417872"))
+        self.assertEqual(order.nuqtapass_status, "Phone number looks wrong: 9417872")
+
+    def test_resend_after_fixing_the_customer_phone(self):
+        self.customer.phone = "9417872"
+        order = self._pay(customer=self.customer)
+        self.customer.phone = "9417 6872"
+        order.nuqtapass_sync_ids.action_resend()
+        self.assertEqual((order.nuqtapass_sync_ids.state, order.nuqtapass_sync_ids.phone), ("pending", "+96894176872"))
