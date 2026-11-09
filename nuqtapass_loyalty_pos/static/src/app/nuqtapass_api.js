@@ -62,10 +62,13 @@ export function spendUses(configId, orderRef, phone, uses) {
     return call("/nuqtapass_loyalty/pos/spend", { config_id: configId, order_ref: orderRef, phone, uses });
 }
 
-/** "42.120 OMR" in the shop's NuqtaPass currency (from /customer), in the till's language. LRI…PDI keeps the
- * amount in its own order inside an Arabic line. */
+/** "42.120 OMR" / "42.120 ر.ع." in the shop's NuqtaPass currency (from /customer), in the till's language. The amount
+ * is isolated so it keeps its order inside the line: left-to-right in English; right-to-left in Arabic, so the
+ * Arabic abbreviation's dots stay with it and it reads "42.120 ر.ع.". */
 export function money(amount, currency) {
-    return `\u2066${formatMoney(amount, currency, user.lang)}\u2069`;
+    const arabic = String(user.lang || "").startsWith("ar");
+    const [open, close] = arabic ? ["\u2067", "\u2069"] : ["\u2066", "\u2069"];
+    return `${open}${formatMoney(amount, currency, user.lang)}${close}`;
 }
 
 /** Right after payment: the server sends the order now and answers { show_qr, welcome } (Task 11). */

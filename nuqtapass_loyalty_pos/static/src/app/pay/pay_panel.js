@@ -4,7 +4,8 @@ import { patch } from "@web/core/utils/patch";
 import { PaymentScreen } from "@point_of_sale/app/screens/payment_screen/payment_screen";
 import { usePos } from "@point_of_sale/app/hooks/pos_hook";
 import { cardLine, cardTitle, displayPhone, findCustomer, money } from "../nuqtapass_api";
-import { creditAmount, formatNumber, parseMoney } from "./nuqtapass_math";
+import { user } from "@web/core/user";
+import { creditAmount, formatMoney, formatNumber, parseMoney } from "./nuqtapass_math";
 import {
     coverableLines,
     creditMethod,
@@ -90,6 +91,10 @@ export class NuqtaPassPayPanel extends Component {
 
     money(amount) {
         return money(amount, this.currency);
+    }
+
+    get currencyLabel() {
+        return formatMoney(0, this.currency, user.lang).replace(/^[\d.,\s]+/, "");
     }
 
     get decimals() {

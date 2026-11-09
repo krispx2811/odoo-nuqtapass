@@ -74,6 +74,15 @@ test("formatMoney: NuqtaPass's currency, never the till's", () => {
     assert.equal(formatMoney(5, null), "5");
 });
 
+test("a till in US dollars still shows an Omani shop's points in OMR (Kareem, 2026-11-09)", () => {
+    // The window formats with /customer's currency only; the till's own currency never reaches formatMoney.
+    const card = { points: 1404, pointsValue: 42.12 };
+    assert.equal(`${formatNumber(card.points)} points · worth ${formatMoney(card.pointsValue, OMR)}`,
+        "1,404 points · worth 42.120 OMR");
+    assert.equal(`${formatNumber(card.points)} نقطة · قيمتها ${formatMoney(card.pointsValue, OMR, "ar-001")}`,
+        "1,404 نقطة · قيمتها 42.120 ر.ع.");
+});
+
 test("formatNumber groups thousands", () => {
     assert.equal(formatNumber(1404), "1,404");
     assert.equal(formatNumber(1234567), "1,234,567");

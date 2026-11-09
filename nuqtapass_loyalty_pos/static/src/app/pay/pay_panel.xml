@@ -38,10 +38,10 @@
                         <form t-elif="card.type === 'PREPAID'" class="d-flex align-items-center gap-2 mt-2"
                               t-on-submit.prevent="() => this.useCredit(card)">
                             <label class="visually-hidden" t-att-for="'o_nuqtapass_credit_' + card.cardId">Credit to use</label>
-                            <div class="input-group input-group-lg o_nuqtapass_amount" dir="ltr">
-                                <input t-att-id="'o_nuqtapass_credit_' + card.cardId" type="text" inputmode="decimal"
+                            <div class="input-group input-group-lg o_nuqtapass_amount">
+                                <input t-att-id="'o_nuqtapass_credit_' + card.cardId" type="text" inputmode="decimal" dir="ltr"
                                        autocomplete="off" class="form-control" t-model.proxy="this.state.credit"/>
-                                <span class="input-group-text"><t t-out="this.currency ? this.currency.code : ''"/></span>
+                                <span class="input-group-text" dir="auto" t-out="this.currencyLabel"/>
                             </div>
                             <button type="submit" class="btn btn-primary btn-lg text-nowrap"
                                     t-att-disabled="!this.creditToUse(card)">Use credit</button>
