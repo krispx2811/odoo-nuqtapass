@@ -3,7 +3,7 @@ from random import randint
 
 from odoo.tests import tagged
 
-from .common import POINTS_CARD, NuqtaPassUsesCommon
+from .common import PHONE, POINTS_CARD, NuqtaPassUsesCommon
 
 
 @tagged("post_install", "-at_install", "nuqtapass")
@@ -36,7 +36,11 @@ class TestPosPointsTax(NuqtaPassUsesCommon):
         else:  # before: one untaxed line
             off = [self._taxed(self.reward, 1, -3.35, no_tax, nuqtapass_qty=111, **points)]
         lines = [self._taxed(self.taxed_cake, 1, 4.0, self.vat5), self._taxed(self.coffee, 1, 2.5, no_tax)] + off
-        order = self._sync(lines, [(self.cash_pm1, 3.35)])
+        # The till's own totals (tax included), as it sends them: Odoo 19 checks the payment against them.
+        data = self.create_ui_order_data([], {"nuqtapass_phone": PHONE}, payments=[(self.cash_pm1, 3.35)])
+        data.update(lines=lines, amount_total=3.35, amount_tax=0.1 if split else 0.2, amount_paid=3.35)
+        res = self.env["pos.order"].sync_from_ui([data])
+        order = self.env["pos.order"].browse(res["pos.order"][0]["id"])
         order._compute_prices()  # Odoo's own tax engine over the stored lines
         return order
 
